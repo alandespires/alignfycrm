@@ -71,7 +71,7 @@ function AuthPage() {
               CRM com pipeline visual, automações e insights de IA — tudo num só lugar para fechar mais negócios.
             </p>
           </div>
-          <div className="text-xs text-muted-foreground">© KS · Premium B2B Sales Intelligence</div>
+          <div className="text-xs text-muted-foreground">© Launcher CRM · Premium B2B Sales Intelligence</div>
         </div>
       </div>
 
