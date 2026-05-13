@@ -39,7 +39,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/contatos", label: "Contatos", icon: UserCircle },
       { to: "/empresas", label: "Empresas", icon: Building },
       { to: "/interacoes", label: "Histórico", icon: History },
-      { to: "/clinicas", label: "KS Clínicas", icon: Stethoscope, clinicOnly: true },
+      { to: "/clinicas", label: "Launcher Clínicas", icon: Stethoscope, clinicOnly: true },
     ],
   },
   {
@@ -75,7 +75,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    id: "escolar", label: "KS Escolar", icon: GraduationCap, schoolOnly: true,
+    id: "escolar", label: "Launcher Escolar", icon: GraduationCap, schoolOnly: true,
     items: [
       { to: "/escolar", label: "Visão geral", icon: LayoutDashboard, schoolOnly: true },
       { to: "/escolar/cursos", label: "Cursos", icon: BookMarked, schoolOnly: true },
@@ -165,7 +165,7 @@ export function AppShell({ children, title, subtitle, action }: {
           </div>
           {!collapsed && (
             <div className="leading-tight">
-              <div className="text-sm font-semibold tracking-tight">KS CRM</div>
+              <div className="text-sm font-semibold tracking-tight">Launcher CRM</div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Sales · Marketing · IA</div>
             </div>
           )}

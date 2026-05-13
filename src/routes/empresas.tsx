@@ -3,7 +3,7 @@ import { ModuleStub } from "@/components/module-stub";
 import { Building } from "lucide-react";
 
 export const Route = createFileRoute("/empresas")({
-  head: () => ({ meta: [{ title: "Empresas — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Empresas — Launcher CRM" }] }),
   component: () => (
     <ModuleStub
       title="Empresas"

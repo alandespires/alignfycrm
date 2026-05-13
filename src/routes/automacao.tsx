@@ -11,7 +11,7 @@ import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSq
 import { AutomationListSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/automacao")({
-  head: () => ({ meta: [{ title: "Automação — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Automação — Launcher CRM" }] }),
   component: AutomacaoPage,
 });
 

@@ -3,7 +3,7 @@ import { ModuleStub } from "@/components/module-stub";
 import { LifeBuoy } from "lucide-react";
 
 export const Route = createFileRoute("/tickets")({
-  head: () => ({ meta: [{ title: "Tickets — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Tickets — Launcher CRM" }] }),
   component: () => (
     <ModuleStub
       title="Tickets"

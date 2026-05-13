@@ -9,7 +9,7 @@ import { TaskGroupsSkeleton } from "@/components/skeletons";
 type PrazoFilter = "todos" | "hoje" | "atrasadas" | "semana" | "sem_prazo";
 
 export const Route = createFileRoute("/tarefas")({
-  head: () => ({ meta: [{ title: "Tarefas — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Tarefas — Launcher CRM" }] }),
   component: TarefasPage,
 });
 

@@ -116,7 +116,7 @@ export function gerarRelatorioPDF(rel: RelatorioPayload, contexto?: { tenant?: s
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 155);
-    doc.text(`KS CRM · KassIA · pág ${i}/${total}`, pageWidth - margin, 820, { align: "right" });
+    doc.text(`Launcher CRM · KassIA · pág ${i}/${total}`, pageWidth - margin, 820, { align: "right" });
   }
 
   return doc;

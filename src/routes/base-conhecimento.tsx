@@ -3,7 +3,7 @@ import { ModuleStub } from "@/components/module-stub";
 import { BookOpen } from "lucide-react";
 
 export const Route = createFileRoute("/base-conhecimento")({
-  head: () => ({ meta: [{ title: "Base de Conhecimento — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Base de Conhecimento — Launcher CRM" }] }),
   component: () => (
     <ModuleStub
       title="Base de Conhecimento"
