@@ -3,7 +3,7 @@ import { ModuleStub } from "@/components/module-stub";
 import { UserCircle } from "lucide-react";
 
 export const Route = createFileRoute("/contatos")({
-  head: () => ({ meta: [{ title: "Contatos — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Contatos — Launcher CRM" }] }),
   component: () => (
     <ModuleStub
       title="Contatos"

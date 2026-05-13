@@ -3,7 +3,7 @@ import { ModuleStub } from "@/components/module-stub";
 import { MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/chat")({
-  head: () => ({ meta: [{ title: "Chat ao Vivo — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Chat ao Vivo — Launcher CRM" }] }),
   component: () => (
     <ModuleStub
       title="Chat ao Vivo"

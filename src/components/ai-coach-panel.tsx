@@ -66,7 +66,7 @@ function KassiaPanel({ onClose, tab, setTab }: { onClose: () => void; tab: "suge
               </div>
               <div>
                 <h2 className="text-base font-semibold">KassIA</h2>
-                <p className="text-[11px] text-muted-foreground">Sua copiloto inteligente do KS CRM</p>
+                <p className="text-[11px] text-muted-foreground">Sua copiloto inteligente do Launcher CRM</p>
               </div>
             </div>
             <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>

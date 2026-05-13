@@ -3,7 +3,7 @@ import { ModuleStub } from "@/components/module-stub";
 import { Globe } from "lucide-react";
 
 export const Route = createFileRoute("/landing-pages")({
-  head: () => ({ meta: [{ title: "Landing Pages — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Landing Pages — Launcher CRM" }] }),
   component: () => (
     <ModuleStub
       title="Landing Pages"

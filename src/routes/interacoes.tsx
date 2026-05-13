@@ -3,7 +3,7 @@ import { ModuleStub } from "@/components/module-stub";
 import { History } from "lucide-react";
 
 export const Route = createFileRoute("/interacoes")({
-  head: () => ({ meta: [{ title: "Histórico de Interações — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Histórico de Interações — Launcher CRM" }] }),
   component: () => (
     <ModuleStub
       title="Histórico de Interações"

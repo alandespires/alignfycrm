@@ -9,7 +9,7 @@ import { Plus, Building2, Mail, Phone, Loader2, Inbox, Trash2, X, Search } from 
 import { CardGridSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/clientes")({
-  head: () => ({ meta: [{ title: "Clientes — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Clientes — Launcher CRM" }] }),
   component: ClientesPage,
 });
 

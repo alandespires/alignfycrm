@@ -6,7 +6,7 @@ import { useTenant } from "@/contexts/tenant-context";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Entrar — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Entrar — Launcher CRM" }] }),
   component: AuthPage,
 });
 
@@ -58,7 +58,7 @@ function AuthPage() {
               <Sparkles className="h-4 w-4 text-primary-foreground" />
             </div>
             <div>
-              <div className="text-sm font-semibold tracking-tight">KS CRM</div>
+              <div className="text-sm font-semibold tracking-tight">Launcher CRM</div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Inteligência comercial</div>
             </div>
           </div>
@@ -82,7 +82,7 @@ function AuthPage() {
             <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-[oklch(0.55_0.16_35)] shadow-glow">
               <Sparkles className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-sm font-semibold">KS CRM</span>
+            <span className="text-sm font-semibold">Launcher CRM</span>
           </div>
 
           <h1 className="text-2xl font-semibold tracking-tight">

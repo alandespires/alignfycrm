@@ -19,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ListSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/")({
-  head: () => ({ meta: [{ title: "Dashboard — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Launcher CRM" }] }),
   component: DashboardPage,
 });
 

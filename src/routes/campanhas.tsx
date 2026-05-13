@@ -3,7 +3,7 @@ import { ModuleStub } from "@/components/module-stub";
 import { Megaphone } from "lucide-react";
 
 export const Route = createFileRoute("/campanhas")({
-  head: () => ({ meta: [{ title: "Campanhas — KS CRM" }] }),
+  head: () => ({ meta: [{ title: "Campanhas — Launcher CRM" }] }),
   component: () => (
     <ModuleStub
       title="Campanhas"

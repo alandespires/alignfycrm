@@ -116,7 +116,7 @@ function Page() {
       <section className="ks-card col-span-full flex items-center gap-3 p-5">
         <Cog className="h-5 w-5 text-muted-foreground" />
         <p className="text-xs text-muted-foreground">
-          Dica: as regras valem para todo o módulo KS Escolar deste tenant. Mudanças refletem imediatamente no painel e na console da turma.
+          Dica: as regras valem para todo o módulo Launcher Escolar deste tenant. Mudanças refletem imediatamente no painel e na console da turma.
         </p>
       </section>
     </div>
