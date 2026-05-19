@@ -10,7 +10,7 @@ export const Route = createFileRoute("/base-conhecimento")({
       subtitle="Centralize artigos de ajuda, tutoriais e procedimentos internos"
       icon={BookOpen}
       ctaLabel="Novo artigo"
-      description="Editor markdown, categorias, busca semântica via IA e métricas de utilidade. Conectada à KassIA para sugerir artigos durante atendimentos."
+      description="Editor markdown, categorias, busca semântica via IA e métricas de utilidade. Conectada à Launch para sugerir artigos durante atendimentos."
       kpis={[
         { label: "Artigos publicados", value: "127" },
         { label: "Visualizações (mês)", value: "4.218" },

@@ -63,7 +63,7 @@ const NAV_GROUPS: NavGroup[] = [
     id: "inteligencia", label: "Inteligência", icon: BrainCircuit,
     items: [
       { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
-      { to: "/insights", label: "KassIA", icon: Sparkles },
+      { to: "/insights", label: "Launch", icon: Sparkles },
       { to: "/dashboards", label: "Dashboards", icon: LineChart },
     ],
   },
@@ -336,7 +336,7 @@ function SidebarCoachCard() {
     <div className="m-3 rounded-xl border border-border bg-gradient-to-br from-surface-2 to-surface-1 p-4 shadow-card">
       <div className="mb-2 flex items-center gap-2">
         <Sparkles className="h-3.5 w-3.5 text-primary" />
-        <span className="text-xs font-semibold">KassIA</span>
+        <span className="text-xs font-semibold">Launch</span>
       </div>
       <p className="text-xs leading-relaxed text-muted-foreground">
         Você tem <span className="font-semibold text-foreground">{quentes} {quentes === 1 ? "lead quente" : "leads quentes"}</span> aguardando ação hoje.

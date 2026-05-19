@@ -48,12 +48,12 @@ export function AiCoachButton() {
       <button onClick={() => setOpen(true)} className="mt-3 w-full rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-90">
         Conversar com a IA
       </button>
-      {open && <KassiaPanel onClose={() => setOpen(false)} tab={tab} setTab={setTab} />}
+      {open && <LaunchPanel onClose={() => setOpen(false)} tab={tab} setTab={setTab} />}
     </>
   );
 }
 
-function KassiaPanel({ onClose, tab, setTab }: { onClose: () => void; tab: "sugestoes" | "chat"; setTab: (t: "sugestoes" | "chat") => void }) {
+function LaunchPanel({ onClose, tab, setTab }: { onClose: () => void; tab: "sugestoes" | "chat"; setTab: (t: "sugestoes" | "chat") => void }) {
   return (
     <div className="fixed inset-0 z-50 flex justify-end" role="dialog">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
@@ -65,7 +65,7 @@ function KassiaPanel({ onClose, tab, setTab }: { onClose: () => void; tab: "suge
                 <Sparkles className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-semibold">KassIA</h2>
+                <h2 className="text-base font-semibold">Launch</h2>
                 <p className="text-[11px] text-muted-foreground">Sua copiloto inteligente do Launcher CRM</p>
               </div>
             </div>
@@ -169,7 +169,7 @@ function ChatView() {
         };
       }));
     } else if (!convId) {
-      setDraft([{ role: "assistant", content: "Olá! Eu sou a **KassIA** 👋\n\nPosso responder dúvidas, gerar relatórios em PDF e até executar ações como criar tarefas e mover leads no pipeline. O que você quer ver hoje?" }]);
+      setDraft([{ role: "assistant", content: "Olá! Eu sou o **Launch** 👋\n\nPosso responder dúvidas, gerar relatórios em PDF e até executar ações como criar tarefas e mover leads no pipeline. O que você quer ver hoje?" }]);
     }
   }, [messagesQ.data, convId]);
 
@@ -222,7 +222,7 @@ function ChatView() {
 
       if (resp.status === 429) throw new Error("Muitas requisições. Aguarde alguns segundos.");
       if (resp.status === 402) throw new Error("Créditos de IA esgotados.");
-      if (!resp.ok || !resp.body) throw new Error("Falha ao conectar com a KassIA");
+      if (!resp.ok || !resp.body) throw new Error("Falha ao conectar com o Launch");
 
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
@@ -305,7 +305,7 @@ function ChatView() {
         metadata: { tool_calls: finalMsg.tool_calls, relatorio: finalMsg.relatorio },
       }).catch(() => null);
     } catch (e: any) {
-      toast.error(e.message ?? "Erro na KassIA");
+      toast.error(e.message ?? "Erro no Launch");
       setDraft((cur) => {
         const copy = [...cur];
         copy[copy.length - 1] = { role: "assistant", content: `⚠️ ${e.message ?? "Erro ao responder."}` };
@@ -462,7 +462,7 @@ function ChatView() {
 
       <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="border-t border-border bg-surface-1 p-3">
         <div className="flex items-end gap-2 rounded-xl border border-border bg-surface-2 p-1.5 focus-within:border-primary/50">
-          <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }} placeholder="Pergunte qualquer coisa para a KassIA..." rows={1} className="max-h-32 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm placeholder:text-muted-foreground focus:outline-none" />
+          <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }} placeholder="Pergunte qualquer coisa para o Launch..." rows={1} className="max-h-32 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm placeholder:text-muted-foreground focus:outline-none" />
           <button type="submit" disabled={!input.trim() || sending} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground transition hover:opacity-90 disabled:opacity-40">
             {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
           </button>

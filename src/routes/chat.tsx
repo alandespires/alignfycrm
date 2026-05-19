@@ -10,7 +10,7 @@ export const Route = createFileRoute("/chat")({
       subtitle="Atendimento em tempo real no site, com transferência para vendas/suporte"
       icon={MessageCircle}
       ctaLabel="Configurar widget"
-      description="Widget customizável, distribuição inteligente entre operadores, respostas rápidas, integração com KassIA e conversão automática em lead."
+      description="Widget customizável, distribuição inteligente entre operadores, respostas rápidas, integração com Launch e conversão automática em lead."
       kpis={[
         { label: "Conversas hoje", value: "84" },
         { label: "Tempo médio resp.", value: "27s", delta: "−8s" },

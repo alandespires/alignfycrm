@@ -32,7 +32,7 @@ export function gerarRelatorioPDF(rel: RelatorioPayload, contexto?: { tenant?: s
   doc.setFontSize(9);
   doc.setTextColor(120, 120, 130);
   const meta = [
-    `Gerado pela KassIA · ${new Date().toLocaleString("pt-BR")}`,
+    `Gerado pela Launch · ${new Date().toLocaleString("pt-BR")}`,
     contexto?.tenant ? `Empresa: ${contexto.tenant}` : null,
     contexto?.periodo ? `Período: ${contexto.periodo}` : null,
   ].filter(Boolean).join("  ·  ");
@@ -97,7 +97,7 @@ export function gerarRelatorioPDF(rel: RelatorioPayload, contexto?: { tenant?: s
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.setTextColor(40, 40, 45);
-    doc.text("Insights da KassIA", margin, y);
+    doc.text("Insights do Launch", margin, y);
     y += 14;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
@@ -116,7 +116,7 @@ export function gerarRelatorioPDF(rel: RelatorioPayload, contexto?: { tenant?: s
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 155);
-    doc.text(`Launcher CRM · KassIA · pág ${i}/${total}`, pageWidth - margin, 820, { align: "right" });
+    doc.text(`Launcher CRM · Launch · pág ${i}/${total}`, pageWidth - margin, 820, { align: "right" });
   }
 
   return doc;

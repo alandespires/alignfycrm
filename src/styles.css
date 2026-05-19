@@ -70,10 +70,10 @@
   /* LIGHT MODE — Launcher Mint White + Neon Green + Deep Forest */
   --radius: 1rem;
 
-  --background: oklch(0.98 0.022 160);          /* #E5FEF2 mint white */
+  --background: oklch(0.992 0.008 160);         /* #F9FEFB ultra-light mint */
   --surface-1: oklch(1 0 0);
-  --surface-2: oklch(0.965 0.025 160);
-  --surface-3: oklch(0.94 0.03 160);
+  --surface-2: oklch(0.975 0.012 160);
+  --surface-3: oklch(0.95 0.018 160);
 
   --foreground: oklch(0.14 0.03 158);           /* #00140A deep forest */
   --card: oklch(1 0 0);
