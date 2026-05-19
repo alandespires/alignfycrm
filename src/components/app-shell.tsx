@@ -298,12 +298,12 @@ export function AppShell({ children, title, subtitle, action }: {
             </button>
             <NotificationsPopover />
             <div className="flex items-center gap-2.5 rounded-lg border border-border bg-surface-1 py-1 pl-1 pr-3">
-              <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-primary to-[oklch(0.55_0.16_35)] text-xs font-bold text-primary-foreground">
+              <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-primary to-[oklch(0.65_0.18_145)] text-xs font-bold text-primary-foreground">
                 {initials}
               </div>
               <div className="hidden leading-tight sm:block">
                 <div className="text-xs font-semibold">{displayName}</div>
-                <div className="text-[10px] text-muted-foreground">{user.email}</div>
+                <div className="text-[10px] text-muted-foreground capitalize">{commercialRole}</div>
               </div>
             </div>
             <button
