@@ -210,7 +210,6 @@ function DealDialog({ draft, onClose, onSave }: { draft: Partial<DealRow>; onClo
 function L({ label, children }: { label: string; children: React.ReactNode }) {
   return <label className="block"><span className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>{children}</label>;
 }
-function Inp(props: React.InputHTMLAttributes<HTMLInputElement> & { onChange: (v: string) => any }) {
-  const { onChange, ...rest } = props;
+function Inp({ onChange, ...rest }: Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> & { onChange: (v: string) => void }) {
   return <input {...rest} onChange={(e) => onChange(e.target.value)} className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/25" />;
 }
