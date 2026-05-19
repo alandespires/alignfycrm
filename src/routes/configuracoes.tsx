@@ -138,34 +138,71 @@ function PerfilTab() {
 
 function EquipeTab() {
   const { current } = useTenant();
-  const members = [
-    { name: "Você", email: "—", role: "Administrador", status: "Ativo" },
-    { name: "Camila Reis", email: "camila@empresa.com", role: "Vendedora", status: "Ativo" },
-    { name: "Bruno Almeida", email: "bruno@empresa.com", role: "Pré-vendas", status: "Convidado" },
-  ];
+  const { canEdit } = useMyCommercialRole();
+  const isAdmin = current?.role === "tenant_admin";
+  const { data: team = [], isLoading } = useTeam();
+  const setRole = useSetCommercialRole();
+
+  const ROLE_LABEL: Record<CommercialRole, string> = {
+    admin: "Admin Comercial",
+    comercial: "Comercial",
+    visualizador: "Visualizador",
+  };
+
   return (
-    <>
-      <Card title="Membros do time" description={`Tenant: ${current?.tenant?.nome ?? "—"}`}>
-        <ul className="divide-y divide-border rounded-lg border border-border bg-surface-1">
-          {members.map((m, i) => (
-            <li key={i} className="flex items-center gap-4 p-4">
-              <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-xs font-bold text-primary">
-                {m.name.split(" ").map((s) => s[0]).join("").slice(0, 2)}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold">{m.name}</div>
-                <div className="text-xs text-muted-foreground">{m.email}</div>
-              </div>
-              <span className="rounded-md bg-surface-3 px-2 py-1 text-[11px] font-medium">{m.role}</span>
-              <StatusPill tone={m.status === "Ativo" ? "success" : "warn"}>{m.status}</StatusPill>
-            </li>
-          ))}
-        </ul>
-        <div className="flex justify-end">
-          <PrimaryButton icon={Users}>Convidar membro</PrimaryButton>
+    <Card title="Membros do time" description={`Workspace: ${current?.tenant?.nome ?? "—"}`}>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-10 text-muted-foreground">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Carregando equipe…
         </div>
-      </Card>
-    </>
+      ) : team.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+          Nenhum membro encontrado.
+        </div>
+      ) : (
+        <ul className="divide-y divide-border rounded-lg border border-border bg-surface-1">
+          {team.map((m) => {
+            const name = m.profile?.full_name || m.profile?.email || m.user_id.slice(0, 8);
+            const email = m.profile?.email || "—";
+            const initials = name.split(" ").map((s) => s[0]).join("").slice(0, 2).toUpperCase();
+            const currentRole: CommercialRole = m.commercial_role ?? (m.role === "tenant_admin" ? "admin" : "visualizador");
+            return (
+              <li key={m.user_id} className="flex flex-wrap items-center gap-4 p-4">
+                <div className="grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-xs font-bold text-primary">
+                  {initials}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold">{name}</div>
+                  <div className="text-xs text-muted-foreground">{email}</div>
+                </div>
+                {m.role === "tenant_admin" && (
+                  <StatusPill tone="info">Workspace Admin</StatusPill>
+                )}
+                {isAdmin && canEdit ? (
+                  <select
+                    value={currentRole}
+                    onChange={(e) => setRole.mutate({ userId: m.user_id, role: e.target.value as CommercialRole })}
+                    disabled={setRole.isPending}
+                    className="h-9 rounded-md border border-border bg-surface-2 px-2 text-xs font-medium"
+                  >
+                    <option value="admin">Admin Comercial</option>
+                    <option value="comercial">Comercial</option>
+                    <option value="visualizador">Visualizador</option>
+                  </select>
+                ) : (
+                  <span className="rounded-md bg-surface-3 px-2 py-1 text-[11px] font-medium">
+                    {ROLE_LABEL[currentRole]}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      <p className="text-[11px] text-muted-foreground">
+        Apenas o admin do workspace pode alterar permissões comerciais. <strong>Admin</strong> edita e exclui · <strong>Comercial</strong> cria e edita · <strong>Visualizador</strong> apenas lê.
+      </p>
+    </Card>
   );
 }
 
