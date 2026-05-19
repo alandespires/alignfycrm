@@ -16,6 +16,24 @@ export type ActivityRow = {
   created_at: string;
 };
 
+export function useAllActivities(limit = 200) {
+  const tenantId = getActiveTenantId();
+  return useQuery({
+    queryKey: ["activities", tenantId, "all", limit],
+    enabled: !!tenantId,
+    queryFn: async (): Promise<ActivityRow[]> => {
+      const { data, error } = await supabase
+        .from("activities")
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return (data ?? []) as ActivityRow[];
+    },
+  });
+}
+
 export function useLeadActivities(leadId: string | null) {
   const tenantId = getActiveTenantId();
   return useQuery({
