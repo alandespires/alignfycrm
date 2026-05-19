@@ -132,7 +132,7 @@ function TicketsPage() {
               id: t.id, assunto: t.assunto!, descricao: t.descricao ?? null,
               status: (t.status as TicketStatus) ?? "aberto",
               prioridade: (t.prioridade as TicketPriority) ?? "media",
-              company_id: t.company_id || undefined,
+              company_id: t.company_id ?? undefined,
             }, { onSuccess: () => setEditing(null) });
           }} />
       )}
