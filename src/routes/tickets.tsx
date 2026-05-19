@@ -129,10 +129,10 @@ function TicketsPage() {
           onSave={(t) => {
             if (!t.assunto?.trim()) { toast.error("Informe o assunto"); return; }
             upsert.mutate({
-              id: t.id, assunto: t.assunto!, descricao: t.descricao ?? null,
+              id: t.id, assunto: t.assunto!, descricao: t.descricao ?? undefined,
               status: (t.status as TicketStatus) ?? "aberto",
               prioridade: (t.prioridade as TicketPriority) ?? "media",
-              company_id: t.company_id ?? undefined,
+              company_id: t.company_id ?? null,
             }, { onSuccess: () => setEditing(null) });
           }} />
       )}
