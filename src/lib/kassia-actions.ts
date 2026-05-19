@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { requireTenantId } from "@/contexts/tenant-context";
 
-/** Cria tarefa a partir de tool-call da KassIA. */
+/** Cria tarefa a partir de tool-call do Launch. */
 export async function executarCriarTarefa(args: {
   titulo: string;
   descricao?: string;
