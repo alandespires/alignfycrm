@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
 import { useTheme } from "@/contexts/theme-context";
 import { useLeads } from "@/hooks/use-leads";
+import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { AiCoachButton } from "@/components/ai-coach-panel";
 import { NotificationsPopover } from "@/components/notifications-popover";
 
