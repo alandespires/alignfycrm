@@ -450,6 +450,119 @@ export type Database = {
         }
         Relationships: []
       }
+      companies: {
+        Row: {
+          cidade: string | null
+          cnpj: string | null
+          created_at: string
+          created_by: string
+          estado: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          owner_id: string | null
+          razao_social: string | null
+          segmento: string | null
+          site: string | null
+          tamanho: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          created_by: string
+          estado?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          owner_id?: string | null
+          razao_social?: string | null
+          segmento?: string | null
+          site?: string | null
+          tamanho?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          created_by?: string
+          estado?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          owner_id?: string | null
+          razao_social?: string | null
+          segmento?: string | null
+          site?: string | null
+          tamanho?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      contacts: {
+        Row: {
+          cargo: string | null
+          company_id: string | null
+          created_at: string
+          created_by: string
+          email: string | null
+          id: string
+          lead_id: string | null
+          nome: string
+          observacoes: string | null
+          owner_id: string | null
+          telefone: string | null
+          tenant_id: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          cargo?: string | null
+          company_id?: string | null
+          created_at?: string
+          created_by: string
+          email?: string | null
+          id?: string
+          lead_id?: string | null
+          nome: string
+          observacoes?: string | null
+          owner_id?: string | null
+          telefone?: string | null
+          tenant_id: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          cargo?: string | null
+          company_id?: string | null
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          id?: string
+          lead_id?: string | null
+          nome?: string
+          observacoes?: string | null
+          owner_id?: string | null
+          telefone?: string | null
+          tenant_id?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deals: {
         Row: {
           created_at: string
@@ -2326,6 +2439,152 @@ export type Database = {
           },
         ]
       }
+      ticket_messages: {
+        Row: {
+          autor_id: string
+          autor_tipo: string
+          conteudo: string
+          created_at: string
+          id: string
+          interno: boolean
+          tenant_id: string
+          ticket_id: string
+        }
+        Insert: {
+          autor_id: string
+          autor_tipo?: string
+          conteudo: string
+          created_at?: string
+          id?: string
+          interno?: boolean
+          tenant_id: string
+          ticket_id: string
+        }
+        Update: {
+          autor_id?: string
+          autor_tipo?: string
+          conteudo?: string
+          created_at?: string
+          id?: string
+          interno?: boolean
+          tenant_id?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          assignee_id: string | null
+          assunto: string
+          client_id: string | null
+          company_id: string | null
+          contact_id: string | null
+          created_at: string
+          created_by: string
+          descricao: string | null
+          fechado_em: string | null
+          id: string
+          numero: number
+          prioridade: Database["public"]["Enums"]["ticket_priority"]
+          resolvido_em: string | null
+          sla_vencimento: string | null
+          status: Database["public"]["Enums"]["ticket_status"]
+          tags: string[] | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          assignee_id?: string | null
+          assunto: string
+          client_id?: string | null
+          company_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by: string
+          descricao?: string | null
+          fechado_em?: string | null
+          id?: string
+          numero?: number
+          prioridade?: Database["public"]["Enums"]["ticket_priority"]
+          resolvido_em?: string | null
+          sla_vencimento?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          tags?: string[] | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          assignee_id?: string | null
+          assunto?: string
+          client_id?: string | null
+          company_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string
+          descricao?: string | null
+          fechado_em?: string | null
+          id?: string
+          numero?: number
+          prioridade?: Database["public"]["Enums"]["ticket_priority"]
+          resolvido_em?: string | null
+          sla_vencimento?: string | null
+          status?: Database["public"]["Enums"]["ticket_status"]
+          tags?: string[] | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_commercial_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["commercial_role"]
+          tenant_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["commercial_role"]
+          tenant_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["commercial_role"]
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -2352,6 +2611,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_delete_commercial: {
+        Args: { _tenant_id: string; _user_id: string }
+        Returns: boolean
+      }
+      can_edit_commercial: {
+        Args: { _tenant_id: string; _user_id: string }
+        Returns: boolean
+      }
       create_tenant_with_owner: {
         Args: {
           _email_principal?: string
@@ -2390,6 +2657,14 @@ export type Database = {
           _trigger: Database["public"]["Enums"]["automation_trigger"]
         }
         Returns: undefined
+      }
+      has_commercial_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["commercial_role"]
+          _tenant_id: string
+          _user_id: string
+        }
+        Returns: boolean
       }
       has_role: {
         Args: {
@@ -2455,6 +2730,7 @@ export type Database = {
         | "observacao"
         | "retorno"
         | "procedimento"
+      commercial_role: "admin" | "comercial" | "visualizador"
       commission_status: "pendente" | "aprovada" | "paga" | "cancelada"
       financial_entry_category:
         | "venda"
@@ -2527,6 +2803,13 @@ export type Database = {
       tenant_role: "tenant_admin" | "tenant_user"
       tenant_segmento: "geral" | "clinica" | "escolar"
       tenant_status: "trial" | "ativo" | "suspenso" | "cancelado"
+      ticket_priority: "baixa" | "media" | "alta" | "urgente"
+      ticket_status:
+        | "aberto"
+        | "em_andamento"
+        | "aguardando"
+        | "resolvido"
+        | "fechado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2686,6 +2969,7 @@ export const Constants = {
         "retorno",
         "procedimento",
       ],
+      commercial_role: ["admin", "comercial", "visualizador"],
       commission_status: ["pendente", "aprovada", "paga", "cancelada"],
       financial_entry_category: [
         "venda",
@@ -2766,6 +3050,14 @@ export const Constants = {
       tenant_role: ["tenant_admin", "tenant_user"],
       tenant_segmento: ["geral", "clinica", "escolar"],
       tenant_status: ["trial", "ativo", "suspenso", "cancelado"],
+      ticket_priority: ["baixa", "media", "alta", "urgente"],
+      ticket_status: [
+        "aberto",
+        "em_andamento",
+        "aguardando",
+        "resolvido",
+        "fechado",
+      ],
     },
   },
 } as const
