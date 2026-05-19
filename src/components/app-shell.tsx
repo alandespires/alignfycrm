@@ -106,6 +106,7 @@ export function AppShell({ children, title, subtitle, action }: {
   const { user, loading, signOut } = useAuth();
   const { loading: tenantLoading, memberships, isSuperAdmin, current } = useTenant();
   const { theme, toggleTheme } = useTheme();
+  const { role: commercialRole } = useMyCommercialRole();
   const navigate = useNavigate();
 
   const [collapsed, setCollapsed] = useState<boolean>(() => {
