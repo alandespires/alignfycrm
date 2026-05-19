@@ -3,9 +3,10 @@ import { useState } from "react";
 import { AppShell, StatusPill, PrimaryButton } from "@/components/app-shell";
 import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
+import { useTeam, useSetCommercialRole, useMyCommercialRole, type CommercialRole } from "@/hooks/use-commercial-role";
 import {
   UserCircle, Users, Shield, Plug, Palette, ShoppingBag, Megaphone, Save,
-  Mail, MessageSquare, Calendar, Webhook, Globe, Bell, Languages,
+  Mail, MessageSquare, Calendar, Webhook, Globe, Bell, Languages, Loader2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/configuracoes")({
