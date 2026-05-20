@@ -212,6 +212,14 @@
     font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
     letter-spacing: -0.01em;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html { overflow-x: hidden; }
+
+  @media (max-width: 767px) {
+    input, textarea, select { font-size: 16px; } /* prevent iOS zoom on focus */
   }
 
   h1, h2, h3, h4, h5, h6 {
