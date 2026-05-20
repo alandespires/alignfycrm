@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 export function useRealtimeSync(tables: { table: string; queryKeys: string[][] }[]) {
   const qc = useQueryClient();
   useEffect(() => {
-    const channel = supabase.channel(`realtime-${tables.map((t) => t.table).join("-")}`);
+    const channel = supabase.channel(`realtime-${tables.map((t) => t.table).join("-")}-${Math.random().toString(36).slice(2, 8)}`);
     tables.forEach(({ table, queryKeys }) => {
       (channel as any).on(
         "postgres_changes",
