@@ -290,30 +290,47 @@ export function AppShell({ children, title, subtitle, action }: {
 
       <div className={collapsed ? "md:pl-16" : "md:pl-64"}>
         {/* ===== Mobile header ===== */}
-        <header className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-border bg-background/85 px-3 backdrop-blur-xl md:hidden"
-          style={{ paddingTop: "max(0px, env(safe-area-inset-top))", height: "calc(3.5rem + env(safe-area-inset-top))" }}>
-          <button
-            onClick={() => setMobileNavOpen(true)}
-            aria-label="Abrir menu"
-            className="grid h-10 w-10 place-items-center rounded-lg border border-border bg-surface-1 text-foreground"
-          >
-            <Menu className="h-4.5 w-4.5" />
-          </button>
-          <Link to="/" className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-[oklch(0.65_0.18_145)] shadow-glow">
-              <Sparkles className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="text-sm font-semibold tracking-tight">Launcher</span>
-          </Link>
-          <div className="ml-auto flex items-center gap-1.5">
+        <header className="sticky top-0 z-20 flex flex-col gap-2 border-b border-border bg-background/85 px-3 pt-2 pb-2 backdrop-blur-xl md:hidden"
+          style={{ paddingTop: "max(0.5rem, calc(env(safe-area-inset-top) + 0.25rem))" }}>
+          <div className="flex h-11 items-center gap-2">
             <button
-              onClick={toggleTheme}
-              aria-label="Tema"
-              className="grid h-9 w-9 place-items-center rounded-lg border border-border bg-surface-1 text-muted-foreground"
+              onClick={() => setMobileNavOpen(true)}
+              aria-label="Abrir menu"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-border bg-surface-1 text-foreground"
             >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              <Menu className="h-4 w-4" />
             </button>
-            <NotificationsPopover />
+            <Link to="/" className="flex items-center gap-2">
+              <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-[oklch(0.65_0.18_145)] shadow-glow">
+                <Sparkles className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <span className="text-sm font-semibold tracking-tight">Launcher</span>
+            </Link>
+            <div className="ml-auto flex items-center gap-1.5">
+              <Link
+                to="/leads"
+                aria-label="Novo lead"
+                className="grid h-10 w-10 place-items-center rounded-lg bg-primary text-primary-foreground shadow-glow"
+              >
+                <Plus className="h-4 w-4" />
+              </Link>
+              <button
+                onClick={toggleTheme}
+                aria-label="Tema"
+                className="grid h-10 w-10 place-items-center rounded-lg border border-border bg-surface-1 text-muted-foreground"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+              <NotificationsPopover />
+            </div>
+          </div>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="search"
+              placeholder="Buscar leads, negócios, clientes..."
+              className="h-10 w-full rounded-lg border border-border bg-surface-1 pl-10 pr-3 text-sm placeholder:text-muted-foreground focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
           </div>
         </header>
 
