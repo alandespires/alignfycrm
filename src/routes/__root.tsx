@@ -28,11 +28,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" },
-      { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "theme-color", content: "#050505" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Launcher CRM - CRM Inteligente com IA" },
       { name: "description", content: "Launcher CRM é uma plataforma SaaS multi-tenant de CRM inteligente com IA." },
       { name: "author", content: "Lovable" },
@@ -41,8 +37,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: "Launcher CRM - CRM Inteligente com IA" },
       { name: "twitter:description", content: "Launcher CRM é uma plataforma SaaS multi-tenant de CRM inteligente com IA." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5142da5c-336b-4c5b-9067-b7f409525118/id-preview-bbdc4b73--216410ad-fa57-4c32-bc88-f10f9b2e82a0.lovable.app-1777565521594.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5142da5c-336b-4c5b-9067-b7f409525118/id-preview-bbdc4b73--216410ad-fa57-4c32-bc88-f10f9b2e82a0.lovable.app-1777565521594.png" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/5dae77c0-80ce-46e3-8c76-e18e16320901" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/5dae77c0-80ce-46e3-8c76-e18e16320901" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
