@@ -71,8 +71,8 @@ function OnboardingPage() {
     <div className="grid min-h-screen place-items-center bg-background px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-primary to-[oklch(0.55_0.16_35)] shadow-glow">
-            <Sparkles className="h-4 w-4 text-primary-foreground" />
+          <div className="grid h-10 w-10 place-items-center overflow-hidden rounded-xl bg-black shadow-glow ring-1 ring-primary/40">
+            <img src={alignIcon} alt="Align" className="h-10 w-10 object-contain" />
           </div>
           <div>
             <div className="text-sm font-semibold tracking-tight">Align CRM</div>
