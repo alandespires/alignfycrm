@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Sparkles, Loader2, Building2, ArrowRight, LogOut } from "lucide-react";
+import { Loader2, Building2, ArrowRight, LogOut } from "lucide-react";
+import alignIcon from "@/assets/align-icon.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
