@@ -3,7 +3,7 @@ import { ModuleStub } from "@/components/module-stub";
 import { LineChart } from "lucide-react";
 
 export const Route = createFileRoute("/dashboards")({
-  head: () => ({ meta: [{ title: "Dashboards Customizáveis — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Dashboards Customizáveis — Align CRM" }] }),
   component: () => (
     <ModuleStub
       title="Dashboards Customizáveis"

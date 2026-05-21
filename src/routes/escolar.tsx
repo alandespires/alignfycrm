@@ -9,7 +9,7 @@ export const Route = createFileRoute("/escolar")({
 function EscolarLayout() {
   return (
     <AppShell
-      title="Launcher Escolar"
+      title="Align Escolar"
       subtitle="Sistema pedagógico — turmas, notas, frequência e portal do aluno."
       action={
         <div className="flex items-center gap-2 rounded-full border border-primary/40 bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary shadow-glow">

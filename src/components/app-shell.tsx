@@ -41,7 +41,7 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/contatos", label: "Contatos", icon: UserCircle },
       { to: "/empresas", label: "Empresas", icon: Building },
       { to: "/interacoes", label: "Histórico", icon: History },
-      { to: "/clinicas", label: "Launcher Clínicas", icon: Stethoscope, clinicOnly: true },
+      { to: "/clinicas", label: "Align Clínicas", icon: Stethoscope, clinicOnly: true },
     ],
   },
   {
@@ -77,7 +77,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    id: "escolar", label: "Launcher Escolar", icon: GraduationCap, schoolOnly: true,
+    id: "escolar", label: "Align Escolar", icon: GraduationCap, schoolOnly: true,
     items: [
       { to: "/escolar", label: "Visão geral", icon: LayoutDashboard, schoolOnly: true },
       { to: "/escolar/cursos", label: "Cursos", icon: BookMarked, schoolOnly: true },
@@ -190,7 +190,7 @@ export function AppShell({ children, title, subtitle, action }: {
           </div>
           {!collapsed && (
             <div className="leading-tight">
-              <div className="text-sm font-semibold tracking-tight">Launcher CRM</div>
+              <div className="text-sm font-semibold tracking-tight">Align CRM</div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Sales · Marketing · IA</div>
             </div>
           )}
@@ -304,7 +304,7 @@ export function AppShell({ children, title, subtitle, action }: {
               <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-[oklch(0.65_0.18_145)] shadow-glow">
                 <Sparkles className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="text-sm font-semibold tracking-tight">Launcher</span>
+              <span className="text-sm font-semibold tracking-tight">Align</span>
             </Link>
             <div className="ml-auto flex items-center gap-1.5">
               <Link
@@ -443,7 +443,7 @@ export function AppShell({ children, title, subtitle, action }: {
                 <Sparkles className="h-4 w-4 text-primary-foreground" />
               </div>
               <div className="leading-tight">
-                <div className="text-sm font-semibold">Launcher CRM</div>
+                <div className="text-sm font-semibold">Align CRM</div>
                 <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Sales · IA</div>
               </div>
               <button onClick={() => setMobileNavOpen(false)} aria-label="Fechar" className="ml-auto grid h-9 w-9 place-items-center rounded-lg text-muted-foreground hover:bg-surface-3">

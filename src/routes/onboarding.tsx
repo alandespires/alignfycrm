@@ -7,7 +7,7 @@ import { useTenant } from "@/contexts/tenant-context";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/onboarding")({
-  head: () => ({ meta: [{ title: "Onboarding — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Onboarding — Align CRM" }] }),
   component: OnboardingPage,
 });
 
@@ -75,7 +75,7 @@ function OnboardingPage() {
             <Sparkles className="h-4 w-4 text-primary-foreground" />
           </div>
           <div>
-            <div className="text-sm font-semibold tracking-tight">Launcher CRM</div>
+            <div className="text-sm font-semibold tracking-tight">Align CRM</div>
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground">CRM Inteligente com ia</div>
           </div>
         </div>

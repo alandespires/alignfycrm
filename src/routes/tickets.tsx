@@ -8,7 +8,7 @@ import { LifeBuoy, Plus, Pencil, Trash2, Search, X, AlertTriangle, Clock, CheckC
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/tickets")({
-  head: () => ({ meta: [{ title: "Suporte / Tickets — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Suporte / Tickets — Align CRM" }] }),
   component: TicketsPage,
 });
 

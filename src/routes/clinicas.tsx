@@ -19,7 +19,7 @@ function ClinicasLayout() {
 
   return (
     <AppShell
-      title="Launcher Clínicas"
+      title="Align Clínicas"
       subtitle="Gestão clínica completa — pacientes, agenda, prontuário e operação."
       action={
         <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">

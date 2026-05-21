@@ -11,7 +11,7 @@ import { Building2, Plus, Pencil, Trash2, Search, X, Users, Briefcase } from "lu
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/empresas")({
-  head: () => ({ meta: [{ title: "Empresas — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Empresas — Align CRM" }] }),
   component: EmpresasPage,
 });
 

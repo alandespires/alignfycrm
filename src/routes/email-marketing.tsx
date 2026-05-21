@@ -3,7 +3,7 @@ import { ModuleStub } from "@/components/module-stub";
 import { Mail } from "lucide-react";
 
 export const Route = createFileRoute("/email-marketing")({
-  head: () => ({ meta: [{ title: "E-mail Marketing — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "E-mail Marketing — Align CRM" }] }),
   component: () => (
     <ModuleStub
       title="E-mail Marketing"

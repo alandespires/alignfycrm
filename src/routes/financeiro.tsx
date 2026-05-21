@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/financeiro")({
-  head: () => ({ meta: [{ title: "Financeiro — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Financeiro — Align CRM" }] }),
   component: FinanceiroPage,
 });
 
