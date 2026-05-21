@@ -152,12 +152,15 @@ export function DashboardPage() {
   const maxStage = Math.max(1, ...stageCounts.map((s) => s.count));
 
   const topInsights = (insights.data ?? []).filter((i) => !i.lido).slice(0, 3);
-  const topActivities = activities.data ?? [];
+  const topActivities = (activities.data ?? []).slice(0, 5);
   const isLoading = leads.isLoading || deals.isLoading;
+
+  const hour = new Date().getHours();
+  const greeting = hour < 5 ? "Boa madrugada" : hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
 
   return (
     <AppShell
-      title="Bom dia 👋"
+      title={`${greeting} 👋`}
       subtitle="Aqui está o panorama da sua operação comercial hoje."
       action={
         <div className="flex gap-2">
