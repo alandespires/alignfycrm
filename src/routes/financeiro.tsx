@@ -84,14 +84,17 @@ function DashboardTab() {
   const ini = startOfMonth();
   const fim = endOfMonth();
 
-  const inMonth = (d: string | null) => d && new Date(d) >= ini && new Date(d) <= fim;
+  const inMonth = (d: string | null) => !!d && new Date(d) >= ini && new Date(d) <= fim;
+  // Fallback: usa created_at se o campo de data específico estiver vazio
+  const inMonthOr = (primary: string | null, fallback: string | null) =>
+    inMonth(primary) || (!primary && inMonth(fallback));
 
-  const receitaPrevista = entries.filter((e) => e.status !== "cancelado" && inMonth(e.vencimento)).reduce((s, e) => s + Number(e.valor), 0);
-  const receitaRecebida = entries.filter((e) => e.status === "pago" && inMonth(e.recebido_em)).reduce((s, e) => s + Number(e.valor), 0);
-  const receitaPendente = entries.filter((e) => (e.status === "pendente" || e.status === "atrasado") && inMonth(e.vencimento)).reduce((s, e) => s + Number(e.valor), 0);
-  const totalDespesas = expenses.filter((e) => e.status === "pago" && inMonth(e.pago_em)).reduce((s, e) => s + Number(e.valor), 0);
+  const receitaPrevista = entries.filter((e) => e.status !== "cancelado" && inMonthOr(e.vencimento, e.created_at)).reduce((s, e) => s + Number(e.valor), 0);
+  const receitaRecebida = entries.filter((e) => e.status === "pago" && inMonthOr(e.recebido_em, e.created_at)).reduce((s, e) => s + Number(e.valor_pago || e.valor), 0);
+  const receitaPendente = entries.filter((e) => (e.status === "pendente" || e.status === "atrasado") && inMonthOr(e.vencimento, e.created_at)).reduce((s, e) => s + (Number(e.valor) - Number(e.valor_pago || 0)), 0);
+  const totalDespesas = expenses.filter((e) => e.status === "pago" && inMonthOr(e.pago_em, e.created_at)).reduce((s, e) => s + Number(e.valor), 0);
   const lucroLiquido = receitaRecebida - totalDespesas;
-  const inadimplencia = entries.filter((e) => e.status === "atrasado").reduce((s, e) => s + Number(e.valor), 0);
+  const inadimplencia = entries.filter((e) => e.status === "atrasado").reduce((s, e) => s + (Number(e.valor) - Number(e.valor_pago || 0)), 0);
   const comissoesPendentes = comms.filter((c) => c.status === "pendente" || c.status === "aprovada").reduce((s, c) => s + Number(c.valor), 0);
   const mrr = subs.filter((s) => s.status === "ativo" || s.status === "trial").reduce((s, x) => s + Number(x.valor_mensal), 0);
 

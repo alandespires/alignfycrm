@@ -225,16 +225,31 @@
   /* Icon defaults — lucide SVG, bold stroke for premium feel */
   svg.lucide { stroke-width: 2.25; }
 
-
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Satoshi', 'Inter Tight', 'Inter', system-ui, sans-serif;
     letter-spacing: -0.025em;
     font-weight: 600;
   }
 
-  svg.lucide {
-    stroke-width: 2;
+  /* ============ MODERN SCROLLBARS ============ */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(from var(--foreground) l c h / 0.18) transparent;
   }
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb {
+    background: oklch(from var(--foreground) l c h / 0.14);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background .2s ease;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: oklch(from var(--primary) l c h / 0.55);
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-corner { background: transparent; }
 }
 
 @layer utilities {
