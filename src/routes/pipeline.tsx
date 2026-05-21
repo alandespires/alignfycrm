@@ -185,6 +185,27 @@ function PipelinePage() {
         <KanbanSkeleton columns={6} />
       ) : (
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+          {/* Navbar horizontal de stages — sumário acima dos cards */}
+          <div className="mb-4 overflow-x-auto rounded-2xl border border-border bg-surface-2 p-2 shadow-card">
+            <div className="flex min-w-max items-center gap-1">
+              {STAGES.map((s) => {
+                const stageLeads = leads.filter((l) => l.status === s.id);
+                const total = stageLeads.reduce((a, l) => a + Number(l.valor_estimado || 0), 0);
+                return (
+                  <div
+                    key={s.id}
+                    className="flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 transition hover:border-border hover:bg-surface-1"
+                  >
+                    <span className="h-2 w-2 rounded-full" style={{ background: s.color, boxShadow: `0 0 8px ${s.color}` }} />
+                    <span className="text-xs font-semibold uppercase tracking-wide text-foreground">{s.label}</span>
+                    <span className="rounded-md bg-surface-3 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-muted-foreground">{stageLeads.length}</span>
+                    <span className="text-[11px] tabular-nums text-muted-foreground">{formatBRL(total)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="-mx-5 overflow-x-auto px-5 pb-4 md:-mx-8 md:px-8">
             <div className="flex gap-4">
               {STAGES.map((s) => (
