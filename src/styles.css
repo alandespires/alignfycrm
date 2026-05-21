@@ -222,6 +222,33 @@
     input, textarea, select { font-size: 16px; } /* prevent iOS zoom on focus */
   }
 
+  /* Material Symbols Rounded — filled, bold (icon system) */
+  .material-symbols-rounded {
+    font-family: 'Material Symbols Rounded';
+    font-weight: 700;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings:
+      'FILL' 1,
+      'wght' 700,
+      'GRAD' 200,
+      'opsz' 24;
+    vertical-align: middle;
+    user-select: none;
+  }
+  .ks-mi { flex-shrink: 0; }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Satoshi', 'Inter Tight', 'Inter', system-ui, sans-serif;
     letter-spacing: -0.025em;
