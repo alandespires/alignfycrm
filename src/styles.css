@@ -9,8 +9,8 @@
  *
  * Inspired by Linear, Perplexity, Arc, Vercel, Notion AI.
  * Palette:
- *   Lime Accent  #A3FF12  → oklch(0.93 0.27 128)
- *   Lime Hover   #C1FF5A  → oklch(0.96 0.22 128)
+ *   Lime Accent  #A3FF12  → oklch(0.88 0.26 152)
+ *   Lime Hover   #C1FF5A  → oklch(0.94 0.22 152)
  *   BG Primary   #050505  → oklch(0.06 0 0)
  *   BG Secondary #0B0B0B  → oklch(0.10 0 0)
  *   Card Surface #111111  → oklch(0.14 0 0)
@@ -83,7 +83,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.16 0 0);
 
-  --primary: oklch(0.78 0.25 128);               /* lime tuned for legibility on light */
+  --primary: oklch(0.78 0.24 152);               /* lime tuned for legibility on light */
   --primary-foreground: oklch(0.14 0 0);
 
   --secondary: oklch(0.95 0.005 130);
@@ -92,10 +92,10 @@
   --muted: oklch(0.95 0.003 130);
   --muted-foreground: oklch(0.50 0 0);
 
-  --accent: oklch(0.78 0.25 128);
+  --accent: oklch(0.78 0.24 152);
   --accent-foreground: oklch(0.14 0 0);
 
-  --success: oklch(0.78 0.25 128);
+  --success: oklch(0.78 0.24 152);
   --success-foreground: oklch(0.14 0 0);
   --warning: oklch(0.78 0.16 80);
 
@@ -104,9 +104,9 @@
 
   --border: oklch(0.16 0 0 / 0.08);
   --input: oklch(0.16 0 0 / 0.10);
-  --ring: oklch(0.78 0.25 128);
+  --ring: oklch(0.78 0.24 152);
 
-  --chart-1: oklch(0.78 0.25 128);
+  --chart-1: oklch(0.78 0.24 152);
   --chart-2: oklch(0.55 0.16 175);
   --chart-3: oklch(0.65 0.2 145);
   --chart-4: oklch(0.78 0.16 80);
@@ -114,15 +114,15 @@
 
   --sidebar: oklch(1 0 0 / 0.78);
   --sidebar-foreground: oklch(0.16 0 0);
-  --sidebar-primary: oklch(0.78 0.25 128);
+  --sidebar-primary: oklch(0.78 0.24 152);
   --sidebar-primary-foreground: oklch(0.14 0 0);
   --sidebar-accent: oklch(0.95 0.003 130);
   --sidebar-accent-foreground: oklch(0.16 0 0);
   --sidebar-border: oklch(0.16 0 0 / 0.08);
-  --sidebar-ring: oklch(0.78 0.25 128);
+  --sidebar-ring: oklch(0.78 0.24 152);
 
-  --gradient-primary: linear-gradient(135deg, oklch(0.85 0.26 128) 0%, oklch(0.72 0.22 135) 100%);
-  --gradient-accent: linear-gradient(135deg, oklch(0.85 0.26 128) 0%, oklch(0.65 0.18 145) 100%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.85 0.25 152) 0%, oklch(0.70 0.22 148) 100%);
+  --gradient-accent: linear-gradient(135deg, oklch(0.85 0.25 152) 0%, oklch(0.65 0.18 145) 100%);
   --gradient-surface: linear-gradient(180deg, oklch(1 0 0) 0%, oklch(0.97 0.003 130) 100%);
   --gradient-glow: radial-gradient(circle at 50% 0%, oklch(0.85 0.26 128 / 0.18), transparent 60%);
   --glass-bg: oklch(1 0 0 / 0.65);
@@ -146,7 +146,7 @@
   --popover: oklch(0.12 0 0);
   --popover-foreground: oklch(1 0 0);
 
-  --primary: oklch(0.93 0.27 128);               /* #A3FF12 lime */
+  --primary: oklch(0.88 0.26 152);               /* #A3FF12 lime */
   --primary-foreground: oklch(0.06 0 0);
 
   --secondary: oklch(0.16 0 0);
@@ -155,10 +155,10 @@
   --muted: oklch(0.16 0 0);
   --muted-foreground: oklch(0.74 0 0);           /* #B4B4B4 */
 
-  --accent: oklch(0.93 0.27 128);
+  --accent: oklch(0.88 0.26 152);
   --accent-foreground: oklch(0.06 0 0);
 
-  --success: oklch(0.93 0.27 128);
+  --success: oklch(0.88 0.26 152);
   --success-foreground: oklch(0.06 0 0);
   --warning: oklch(0.82 0.18 85);
 
@@ -167,9 +167,9 @@
 
   --border: oklch(1 0 0 / 0.08);
   --input: oklch(1 0 0 / 0.06);
-  --ring: oklch(0.93 0.27 128);
+  --ring: oklch(0.88 0.26 152);
 
-  --chart-1: oklch(0.93 0.27 128);
+  --chart-1: oklch(0.88 0.26 152);
   --chart-2: oklch(0.7 0.18 175);
   --chart-3: oklch(0.85 0.22 145);
   --chart-4: oklch(0.82 0.18 85);
@@ -177,15 +177,15 @@
 
   --sidebar: oklch(0.08 0 0 / 0.72);
   --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.93 0.27 128);
+  --sidebar-primary: oklch(0.88 0.26 152);
   --sidebar-primary-foreground: oklch(0.06 0 0);
   --sidebar-accent: oklch(0.14 0 0);
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 0.08);
-  --sidebar-ring: oklch(0.93 0.27 128);
+  --sidebar-ring: oklch(0.88 0.26 152);
 
-  --gradient-primary: linear-gradient(135deg, oklch(0.93 0.27 128) 0%, oklch(0.75 0.22 135) 100%);
-  --gradient-accent: linear-gradient(135deg, oklch(0.93 0.27 128) 0%, oklch(0.65 0.18 145) 100%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.88 0.26 152) 0%, oklch(0.72 0.22 148) 100%);
+  --gradient-accent: linear-gradient(135deg, oklch(0.88 0.26 152) 0%, oklch(0.65 0.18 145) 100%);
   --gradient-surface: linear-gradient(180deg, oklch(0.14 0 0) 0%, oklch(0.08 0 0) 100%);
   --gradient-glow: radial-gradient(circle at 50% 0%, oklch(0.93 0.27 128 / 0.18), transparent 60%);
   --glass-bg: oklch(0.10 0 0 / 0.6);
