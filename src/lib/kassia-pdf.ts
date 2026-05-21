@@ -116,7 +116,7 @@ export function gerarRelatorioPDF(rel: RelatorioPayload, contexto?: { tenant?: s
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 155);
-    doc.text(`Launcher CRM · Launch · pág ${i}/${total}`, pageWidth - margin, 820, { align: "right" });
+    doc.text(`Align CRM · Launch · pág ${i}/${total}`, pageWidth - margin, 820, { align: "right" });
   }
 
   return doc;

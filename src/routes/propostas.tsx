@@ -9,7 +9,7 @@ import { FileText, Plus, Pencil, Trash2, Search, X, Send, CheckCircle2 } from "l
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/propostas")({
-  head: () => ({ meta: [{ title: "Propostas — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Propostas — Align CRM" }] }),
   component: PropostasPage,
 });
 

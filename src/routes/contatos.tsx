@@ -9,7 +9,7 @@ import { Users, Plus, Pencil, Trash2, Search, X, Mail, Phone, Building2 } from "
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/contatos")({
-  head: () => ({ meta: [{ title: "Contatos — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Contatos — Align CRM" }] }),
   component: ContatosPage,
 });
 

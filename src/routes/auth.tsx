@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
 import { toast } from "sonner";
+import alignIcon from "@/assets/align-icon.png";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Entrar — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Entrar — Align CRM" }] }),
   component: AuthPage,
 });
 
@@ -54,11 +55,11 @@ function AuthPage() {
         <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(60% 50% at 30% 20%, oklch(0.685 0.175 45 / 0.25), transparent 70%)" }} />
         <div className="relative z-10 flex h-full flex-col justify-between p-12">
           <div className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-primary to-[oklch(0.55_0.16_35)] shadow-glow">
-              <Sparkles className="h-4 w-4 text-primary-foreground" />
+            <div className="grid h-10 w-10 place-items-center overflow-hidden rounded-xl bg-black shadow-glow ring-1 ring-primary/40">
+              <img src={alignIcon} alt="Align" className="h-10 w-10 object-contain" />
             </div>
             <div>
-              <div className="text-sm font-semibold tracking-tight">Launcher CRM</div>
+              <div className="text-sm font-semibold tracking-tight">Align CRM</div>
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Inteligência comercial</div>
             </div>
           </div>
@@ -71,7 +72,7 @@ function AuthPage() {
               CRM com pipeline visual, automações e insights de IA — tudo num só lugar para fechar mais negócios.
             </p>
           </div>
-          <div className="text-xs text-muted-foreground">© Launcher CRM · Premium B2B Sales Intelligence</div>
+          <div className="text-xs text-muted-foreground">© Align CRM · Premium B2B Sales Intelligence</div>
         </div>
       </div>
 
@@ -79,10 +80,10 @@ function AuthPage() {
       <div className="flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-8 flex items-center gap-2 lg:hidden">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-primary to-[oklch(0.55_0.16_35)] shadow-glow">
-              <Sparkles className="h-4 w-4 text-primary-foreground" />
+            <div className="grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-black shadow-glow ring-1 ring-primary/40">
+              <img src={alignIcon} alt="Align" className="h-9 w-9 object-contain" />
             </div>
-            <span className="text-sm font-semibold">Launcher CRM</span>
+            <span className="text-sm font-semibold">Align CRM</span>
           </div>
 
           <h1 className="text-2xl font-semibold tracking-tight">

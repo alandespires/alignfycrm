@@ -15,7 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatBRL } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/relatorios")({
-  head: () => ({ meta: [{ title: "Relatórios — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Relatórios — Align CRM" }] }),
   component: RelatoriosPage,
 });
 

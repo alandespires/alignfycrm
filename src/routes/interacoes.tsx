@@ -7,7 +7,7 @@ import { useRealtimeSync } from "@/hooks/use-realtime";
 import { MessageSquare, Phone, Mail, Calendar, FileText, ArrowRightLeft, CheckSquare, Search } from "lucide-react";
 
 export const Route = createFileRoute("/interacoes")({
-  head: () => ({ meta: [{ title: "Interações — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Interações — Align CRM" }] }),
   component: InteracoesPage,
 });
 

@@ -25,7 +25,7 @@ const STAGES: { id: LeadStatus; label: string; color: string }[] = [
 ];
 
 export const Route = createFileRoute("/pipeline")({
-  head: () => ({ meta: [{ title: "Pipeline — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Pipeline — Align CRM" }] }),
   component: PipelinePage,
 });
 

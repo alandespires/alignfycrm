@@ -9,7 +9,7 @@ import { Target, Plus, Pencil, Trash2, Search, X, TrendingUp } from "lucide-reac
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/oportunidades")({
-  head: () => ({ meta: [{ title: "Oportunidades — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Oportunidades — Align CRM" }] }),
   component: OportunidadesPage,
 });
 

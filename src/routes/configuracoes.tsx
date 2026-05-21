@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/configuracoes")({
-  head: () => ({ meta: [{ title: "Configurações — Launcher CRM" }] }),
+  head: () => ({ meta: [{ title: "Configurações — Align CRM" }] }),
   component: ConfigPage,
 });
 
@@ -30,7 +30,7 @@ function ConfigPage() {
   const [tab, setTab] = useState<TabId>("perfil");
 
   return (
-    <AppShell title="Configurações" subtitle="Personalize o Launcher CRM para o seu time">
+    <AppShell title="Configurações" subtitle="Personalize o Align CRM para o seu time">
       <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
         <aside className="rounded-2xl border border-border bg-surface-2 p-2 shadow-card lg:sticky lg:top-24 lg:self-start">
           {TABS.map((t) => (
@@ -258,7 +258,7 @@ function IntegracoesTab() {
     { name: "Site / Landing pages", icon: Globe, status: "Disponível", desc: "Capture leads de qualquer formulário", connected: false },
   ];
   return (
-    <Card title="Integrações" description="Conecte ferramentas externas ao Launcher CRM">
+    <Card title="Integrações" description="Conecte ferramentas externas ao Align CRM">
       <div className="grid gap-3 md:grid-cols-2">
         {integrations.map((i) => (
           <div key={i.name} className="rounded-xl border border-border bg-surface-1 p-4">
