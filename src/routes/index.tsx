@@ -114,7 +114,7 @@ export function DashboardPage() {
 
   const leads = useLeads();
   const deals = useDeals();
-  const activities = useActivities(8);
+  const activities = useActivities(5);
   const revenue = useRevenueSeries();
   const insights = useInsights("todas");
 
