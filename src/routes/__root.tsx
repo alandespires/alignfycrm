@@ -41,6 +41,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "Align CRM — CRM Inteligente com IA" },
       { name: "twitter:description", content: "Align CRM é uma plataforma SaaS multi-tenant de CRM inteligente com IA." },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cb9a6524-a134-4121-a7e1-0bc00d9b1588/id-preview-09131305--2c47a923-dc87-4ff4-87ee-50546a020d80.lovable.app-1779329070726.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cb9a6524-a134-4121-a7e1-0bc00d9b1588/id-preview-09131305--2c47a923-dc87-4ff4-87ee-50546a020d80.lovable.app-1779329070726.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
