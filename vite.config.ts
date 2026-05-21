@@ -3,7 +3,17 @@
 //   - tanstackStart, viteReact, tailwindcss, tsConfigPaths, cloudflare (build-only),
 //     componentTagger (dev-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
 //     error logger plugins, and sandbox detection (port/host/strictPort).
-// You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { fileURLToPath } from "node:url";
 
-export default defineConfig();
+const shim = fileURLToPath(new URL("./src/lib/lucide-react-shim.cjs", import.meta.url));
+
+export default defineConfig({
+  vite: {
+    resolve: {
+      alias: [
+        { find: /^lucide-react$/, replacement: shim },
+      ],
+    },
+  },
+});
