@@ -75,34 +75,58 @@ function FinanceiroPage() {
 }
 
 // =================================================================
-// DASHBOARD
+// DASHBOARD — métricas reais (parcelas + exclui canceladas)
 // =================================================================
 function DashboardTab() {
   const { data: entries = [], isLoading: l1 } = useEntries();
   const { data: expenses = [], isLoading: l2 } = useExpenses();
   const { data: subs = [], isLoading: l3 } = useFinSubscriptions();
   const { data: comms = [], isLoading: l4 } = useCommissions();
-  const loading = l1 || l2 || l3 || l4;
+  const { data: payments = [], isLoading: l5 } = useAllPayments();
+  const loading = l1 || l2 || l3 || l4 || l5;
 
   const ini = startOfMonth();
   const fim = endOfMonth();
-
   const inMonth = (d: string | null) => !!d && new Date(d) >= ini && new Date(d) <= fim;
-  // Fallback: usa created_at se o campo de data específico estiver vazio
   const inMonthOr = (primary: string | null, fallback: string | null) =>
     inMonth(primary) || (!primary && inMonth(fallback));
 
-  const receitaPrevista = entries.filter((e) => e.status !== "cancelado" && inMonthOr(e.vencimento, e.created_at)).reduce((s, e) => s + Number(e.valor), 0);
-  const receitaRecebida = entries.filter((e) => e.status === "pago" && inMonthOr(e.recebido_em, e.created_at)).reduce((s, e) => s + Number(e.valor_pago || e.valor), 0);
-  const receitaPendente = entries.filter((e) => (e.status === "pendente" || e.status === "atrasado") && inMonthOr(e.vencimento, e.created_at)).reduce((s, e) => s + (Number(e.valor) - Number(e.valor_pago || 0)), 0);
-  const totalDespesas = expenses.filter((e) => e.status === "pago" && inMonthOr(e.pago_em, e.created_at)).reduce((s, e) => s + Number(e.valor), 0);
+  const validEntries = entries.filter((e) => e.status !== "cancelado");
+
+  const receitaPrevista = validEntries
+    .filter((e) => inMonthOr(e.vencimento, e.created_at))
+    .reduce((s, e) => s + Number(e.valor), 0);
+
+  const paidIds = new Set(payments.map((p) => p.entry_id));
+  const receitaRecebidaParcelas = payments
+    .filter((p) => inMonth(p.pago_em + "T12:00:00"))
+    .reduce((s, p) => s + Number(p.valor), 0);
+  const receitaRecebidaDireta = validEntries
+    .filter((e) => e.status === "pago" && !paidIds.has(e.id) && inMonthOr(e.recebido_em, e.created_at))
+    .reduce((s, e) => s + computeEntryReceived(e, payments), 0);
+  const receitaRecebida = receitaRecebidaParcelas + receitaRecebidaDireta;
+
+  const receitaPendente = validEntries
+    .filter((e) => e.status !== "pago" && inMonthOr(e.vencimento, e.created_at))
+    .reduce((s, e) => s + computeEntryBalance(e, payments), 0);
+
+  const totalDespesas = expenses
+    .filter((e) => e.status !== "cancelado" && e.status === "pago" && inMonthOr(e.pago_em, e.created_at))
+    .reduce((s, e) => s + Number(e.valor), 0);
   const lucroLiquido = receitaRecebida - totalDespesas;
-  const inadimplencia = entries.filter((e) => e.status === "atrasado").reduce((s, e) => s + (Number(e.valor) - Number(e.valor_pago || 0)), 0);
+
+  const inadimplencia = validEntries
+    .filter((e) => effectiveEntryStatus(e, payments) === "atrasado")
+    .reduce((s, e) => s + computeEntryBalance(e, payments), 0);
+
   const comissoesPendentes = comms.filter((c) => c.status === "pendente" || c.status === "aprovada").reduce((s, c) => s + Number(c.valor), 0);
   const mrr = subs.filter((s) => s.status === "ativo" || s.status === "trial").reduce((s, x) => s + Number(x.valor_mensal), 0);
 
-  const proximosVencimentos = entries
-    .filter((e) => e.status === "pendente" && e.vencimento)
+  const proximosVencimentos = validEntries
+    .filter((e) => {
+      const st = effectiveEntryStatus(e, payments);
+      return (st === "pendente" || st === "parcial") && e.vencimento;
+    })
     .sort((a, b) => (a.vencimento! < b.vencimento! ? -1 : 1))
     .slice(0, 6);
 
@@ -110,24 +134,22 @@ function DashboardTab() {
 
   return (
     <div className="space-y-6">
-      {/* KPI Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Kpi icon={DollarSign} label="Receita recebida" value={brl(receitaRecebida)} sub="No mês" tone="success" />
+        <Kpi icon={DollarSign} label="Receita recebida" value={brl(receitaRecebida)} sub="No mês (inclui parcelas)" tone="success" />
         <Kpi icon={Activity} label="MRR (Recorrente)" value={brl(mrr)} sub={`${subs.filter((s) => s.status === "ativo").length} ativas`} tone="info" />
-        <Kpi icon={Clock} label="Receita pendente" value={brl(receitaPendente)} sub={`${entries.filter((e) => e.status === "pendente").length} cobranças`} tone="warn" />
+        <Kpi icon={Clock} label="Receita pendente" value={brl(receitaPendente)} sub={`${validEntries.filter((e) => effectiveEntryStatus(e, payments) !== "pago" && inMonthOr(e.vencimento, e.created_at)).length} cobranças`} tone="warn" />
         <Kpi icon={TrendingDown} label="Despesas do mês" value={brl(totalDespesas)} sub={`${expenses.filter((e) => inMonth(e.pago_em)).length} pagamentos`} tone="danger" />
         <Kpi icon={TrendingUp} label="Lucro líquido" value={brl(lucroLiquido)} sub="Receita − despesas" tone={lucroLiquido >= 0 ? "success" : "danger"} />
-        <Kpi icon={AlertTriangle} label="Inadimplência" value={brl(inadimplencia)} sub={`${entries.filter((e) => e.status === "atrasado").length} em atraso`} tone="danger" />
+        <Kpi icon={AlertTriangle} label="Inadimplência" value={brl(inadimplencia)} sub={`${validEntries.filter((e) => effectiveEntryStatus(e, payments) === "atrasado").length} em atraso`} tone="danger" />
         <Kpi icon={Award} label="Comissões a pagar" value={brl(comissoesPendentes)} sub={`${comms.filter((c) => c.status !== "paga" && c.status !== "cancelada").length} pendentes`} tone="warn" />
         <Kpi icon={Repeat} label="Receita prevista" value={brl(receitaPrevista)} sub="Total previsto no mês" tone="info" />
       </div>
 
-      {/* Fluxo + Próximos vencimentos */}
       <div className="grid gap-5 lg:grid-cols-3">
         <div className="lg:col-span-2 rounded-2xl border border-border bg-surface-2 p-6 shadow-card">
           <div className="mb-4 flex items-center gap-2">
             <Activity className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-semibold">Fluxo de caixa do mês</h3>
+            <h3 className="text-sm font-semibold">Fluxo de caixa (30 dias)</h3>
           </div>
           <FluxoCaixa entries={entries} expenses={expenses} />
         </div>
@@ -144,14 +166,13 @@ function DashboardTab() {
                   <div className="truncate text-sm font-medium">{e.descricao}</div>
                   <div className="text-[11px] text-muted-foreground">Vence em {new Date(e.vencimento!).toLocaleDateString("pt-BR")}</div>
                 </div>
-                <span className="ml-2 text-sm font-semibold tabular-nums text-primary">{brl(Number(e.valor))}</span>
+                <span className="ml-2 text-sm font-semibold tabular-nums text-primary">{brl(computeEntryBalance(e, payments))}</span>
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      {/* IA Financeira */}
       <FinanceAI entries={entries} expenses={expenses} subs={subs} comms={comms} />
     </div>
   );
