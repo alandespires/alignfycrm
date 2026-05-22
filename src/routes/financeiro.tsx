@@ -7,10 +7,13 @@ import {
   useFinSubscriptions, useCreateFinSub, useUpdateFinSub, useDeleteFinSub,
   useCommissions, useCreateCommission, useUpdateCommission, useDeleteCommission,
   brl, startOfMonth, endOfMonth,
+  computeEntryReceived, computeEntryBalance, effectiveEntryStatus,
   type EntryRow, type ExpenseRow, type SubRow, type CommissionRow,
   type FinStatus, type EntryCategory, type ExpenseCategory, type PaymentMethod,
   type SubStatus, type CommissionStatus,
 } from "@/hooks/use-finance";
+import { useAllPayments } from "@/hooks/use-payments";
+import { useRealtimeSync } from "@/hooks/use-realtime";
 import { useClients } from "@/hooks/use-clients";
 import { ReconciliationModal } from "@/components/reconciliation-modal";
 import {
