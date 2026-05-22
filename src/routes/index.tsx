@@ -13,6 +13,8 @@ import {
 import { formatBRL } from "@/lib/mock-data";
 import { useLeads, type LeadStatus } from "@/hooks/use-leads";
 import { useActivities, useDeals, useRevenueSeries } from "@/hooks/use-dashboard";
+import { useEntries, computeEntryReceived, startOfMonth, endOfMonth } from "@/hooks/use-finance";
+import { useAllPayments } from "@/hooks/use-payments";
 import { useInsights } from "@/hooks/use-insights";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import { Skeleton } from "@/components/ui/skeleton";
