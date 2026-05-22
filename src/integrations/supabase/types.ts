@@ -737,6 +737,7 @@ export type Database = {
           lead_id: string | null
           observacoes: string | null
           origem: string | null
+          project_id: string | null
           recebido_em: string | null
           status: Database["public"]["Enums"]["financial_status"]
           tenant_id: string
@@ -759,6 +760,7 @@ export type Database = {
           lead_id?: string | null
           observacoes?: string | null
           origem?: string | null
+          project_id?: string | null
           recebido_em?: string | null
           status?: Database["public"]["Enums"]["financial_status"]
           tenant_id: string
@@ -781,6 +783,7 @@ export type Database = {
           lead_id?: string | null
           observacoes?: string | null
           origem?: string | null
+          project_id?: string | null
           recebido_em?: string | null
           status?: Database["public"]["Enums"]["financial_status"]
           tenant_id?: string
@@ -789,7 +792,15 @@ export type Database = {
           valor_pago?: number
           vencimento?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "financial_entries_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       financial_expenses: {
         Row: {
@@ -1549,6 +1560,78 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          client_id: string | null
+          concluido_em: string | null
+          created_at: string
+          created_by: string
+          descricao: string | null
+          entregas: Json
+          etapas: Json
+          id: string
+          inicio: string | null
+          lead_id: string | null
+          observacoes: string | null
+          owner_id: string | null
+          prazo: string | null
+          prioridade: Database["public"]["Enums"]["task_priority"]
+          progresso: number
+          status: Database["public"]["Enums"]["project_status"]
+          tags: string[] | null
+          tenant_id: string
+          titulo: string
+          updated_at: string
+          valor_total: number
+        }
+        Insert: {
+          client_id?: string | null
+          concluido_em?: string | null
+          created_at?: string
+          created_by: string
+          descricao?: string | null
+          entregas?: Json
+          etapas?: Json
+          id?: string
+          inicio?: string | null
+          lead_id?: string | null
+          observacoes?: string | null
+          owner_id?: string | null
+          prazo?: string | null
+          prioridade?: Database["public"]["Enums"]["task_priority"]
+          progresso?: number
+          status?: Database["public"]["Enums"]["project_status"]
+          tags?: string[] | null
+          tenant_id: string
+          titulo: string
+          updated_at?: string
+          valor_total?: number
+        }
+        Update: {
+          client_id?: string | null
+          concluido_em?: string | null
+          created_at?: string
+          created_by?: string
+          descricao?: string | null
+          entregas?: Json
+          etapas?: Json
+          id?: string
+          inicio?: string | null
+          lead_id?: string | null
+          observacoes?: string | null
+          owner_id?: string | null
+          prazo?: string | null
+          prioridade?: Database["public"]["Enums"]["task_priority"]
+          progresso?: number
+          status?: Database["public"]["Enums"]["project_status"]
+          tags?: string[] | null
+          tenant_id?: string
+          titulo?: string
+          updated_at?: string
+          valor_total?: number
+        }
+        Relationships: []
+      }
       proposals: {
         Row: {
           aceita_em: string | null
@@ -2281,6 +2364,7 @@ export type Database = {
           lead_id: string | null
           prazo: string | null
           prioridade: Database["public"]["Enums"]["task_priority"]
+          project_id: string | null
           status: Database["public"]["Enums"]["task_status"]
           tenant_id: string
           titulo: string
@@ -2297,6 +2381,7 @@ export type Database = {
           lead_id?: string | null
           prazo?: string | null
           prioridade?: Database["public"]["Enums"]["task_priority"]
+          project_id?: string | null
           status?: Database["public"]["Enums"]["task_status"]
           tenant_id: string
           titulo: string
@@ -2313,6 +2398,7 @@ export type Database = {
           lead_id?: string | null
           prazo?: string | null
           prioridade?: Database["public"]["Enums"]["task_priority"]
+          project_id?: string | null
           status?: Database["public"]["Enums"]["task_status"]
           tenant_id?: string
           titulo?: string
@@ -2331,6 +2417,13 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
           {
@@ -2780,6 +2873,12 @@ export type Database = {
         | "insight_ia"
         | "sistema"
       patient_status: "ativo" | "inativo" | "bloqueado"
+      project_status:
+        | "planejado"
+        | "em_andamento"
+        | "pausado"
+        | "concluido"
+        | "cancelado"
       school_assessment_type:
         | "prova"
         | "trabalho"
@@ -3024,6 +3123,13 @@ export const Constants = {
         "sistema",
       ],
       patient_status: ["ativo", "inativo", "bloqueado"],
+      project_status: [
+        "planejado",
+        "em_andamento",
+        "pausado",
+        "concluido",
+        "cancelado",
+      ],
       school_assessment_type: [
         "prova",
         "trabalho",

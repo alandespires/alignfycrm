@@ -14,6 +14,7 @@ import { Route as TarefasRouteImport } from './routes/tarefas'
 import { Route as SuperAdminRouteImport } from './routes/super-admin'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as PropostasRouteImport } from './routes/propostas'
+import { Route as ProjetosRouteImport } from './routes/projetos'
 import { Route as PortalAlunoRouteImport } from './routes/portal-aluno'
 import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as OportunidadesRouteImport } from './routes/oportunidades'
@@ -80,6 +81,11 @@ const RelatoriosRoute = RelatoriosRouteImport.update({
 const PropostasRoute = PropostasRouteImport.update({
   id: '/propostas',
   path: '/propostas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjetosRoute = ProjetosRouteImport.update({
+  id: '/projetos',
+  path: '/projetos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalAlunoRoute = PortalAlunoRouteImport.update({
@@ -317,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/oportunidades': typeof OportunidadesRoute
   '/pipeline': typeof PipelineRoute
   '/portal-aluno': typeof PortalAlunoRoute
+  '/projetos': typeof ProjetosRoute
   '/propostas': typeof PropostasRoute
   '/relatorios': typeof RelatoriosRoute
   '/super-admin': typeof SuperAdminRoute
@@ -364,6 +371,7 @@ export interface FileRoutesByTo {
   '/oportunidades': typeof OportunidadesRoute
   '/pipeline': typeof PipelineRoute
   '/portal-aluno': typeof PortalAlunoRoute
+  '/projetos': typeof ProjetosRoute
   '/propostas': typeof PropostasRoute
   '/relatorios': typeof RelatoriosRoute
   '/super-admin': typeof SuperAdminRoute
@@ -413,6 +421,7 @@ export interface FileRoutesById {
   '/oportunidades': typeof OportunidadesRoute
   '/pipeline': typeof PipelineRoute
   '/portal-aluno': typeof PortalAlunoRoute
+  '/projetos': typeof ProjetosRoute
   '/propostas': typeof PropostasRoute
   '/relatorios': typeof RelatoriosRoute
   '/super-admin': typeof SuperAdminRoute
@@ -464,6 +473,7 @@ export interface FileRouteTypes {
     | '/oportunidades'
     | '/pipeline'
     | '/portal-aluno'
+    | '/projetos'
     | '/propostas'
     | '/relatorios'
     | '/super-admin'
@@ -511,6 +521,7 @@ export interface FileRouteTypes {
     | '/oportunidades'
     | '/pipeline'
     | '/portal-aluno'
+    | '/projetos'
     | '/propostas'
     | '/relatorios'
     | '/super-admin'
@@ -559,6 +570,7 @@ export interface FileRouteTypes {
     | '/oportunidades'
     | '/pipeline'
     | '/portal-aluno'
+    | '/projetos'
     | '/propostas'
     | '/relatorios'
     | '/super-admin'
@@ -609,6 +621,7 @@ export interface RootRouteChildren {
   OportunidadesRoute: typeof OportunidadesRoute
   PipelineRoute: typeof PipelineRoute
   PortalAlunoRoute: typeof PortalAlunoRoute
+  ProjetosRoute: typeof ProjetosRoute
   PropostasRoute: typeof PropostasRoute
   RelatoriosRoute: typeof RelatoriosRoute
   SuperAdminRoute: typeof SuperAdminRoute
@@ -652,6 +665,13 @@ declare module '@tanstack/react-router' {
       path: '/propostas'
       fullPath: '/propostas'
       preLoaderRoute: typeof PropostasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projetos': {
+      id: '/projetos'
+      path: '/projetos'
+      fullPath: '/projetos'
+      preLoaderRoute: typeof ProjetosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal-aluno': {
@@ -1040,6 +1060,7 @@ const rootRouteChildren: RootRouteChildren = {
   OportunidadesRoute: OportunidadesRoute,
   PipelineRoute: PipelineRoute,
   PortalAlunoRoute: PortalAlunoRoute,
+  ProjetosRoute: ProjetosRoute,
   PropostasRoute: PropostasRoute,
   RelatoriosRoute: RelatoriosRoute,
   SuperAdminRoute: SuperAdminRoute,
@@ -1050,12 +1071,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
