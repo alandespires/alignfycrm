@@ -1,75 +1,67 @@
-Vou entregar em duas ondas. Onda 1 é fundação (migração + RBAC + módulos críticos), Onda 2 é refinamento (KB completo, métricas globais, tabelas que ainda faltam). Cada onda é um único deploy aprovado.
+# Reestruturação Financeira + Controle de Projetos
 
----
+## 1. Correção dos bugs de métricas (Dashboard + Financeiro)
 
-## Onda 1 — Persistência + RBAC + módulos centrais
+**Problema raiz:** as métricas atuais somam `valor` do `deals`/`financial_entries` sem considerar exclusões em tempo real, status "cancelado" ou parcelas em `financial_payments`.
 
-### Banco de dados (1 migração)
+**Correções:**
+- `useDeals` / `useRevenueSeries` em `src/hooks/use-dashboard.ts`: filtrar `stage != 'perdido'` e excluir cancelados; invalidação por realtime já existe.
+- `src/routes/financeiro.tsx`: recalcular **Receita Recebida** como `SUM(financial_payments.valor)` (não `valor_pago` da entrada) + entradas com status `pago` sem pagamentos parciais. Excluir status `cancelado` de todos os totais.
+- Adicionar indicadores: **Previsão**, **Realizada**, **Pendente**, **Inadimplência** (vencimento < hoje E status != pago/cancelado).
+- React Query: garantir `invalidateQueries(['fin-entries'])` + `['fin-payments-all']` + `['deals']` em todos os deletes (já existe parcialmente em `use-payments.ts`; estender para deals).
 
-Tabelas novas:
-- `commercial_roles` (enum: `admin`, `comercial`, `visualizador`) + tabela `user_commercial_roles (user_id, tenant_id, role)` — segue o padrão seguro do projeto (não guardar role em `profiles`).
-- `companies` — separado de `clients`: razão social, CNPJ, segmento, site, tamanho, owner, notas. (Hoje "Empresas" usa stub local.)
-- `contacts` — pessoa física vinculada opcionalmente a `company_id` e/ou `lead_id`: nome, cargo, email, whatsapp, owner.
-- `tickets` — suporte de verdade: assunto, descrição, status (`aberto/em_andamento/aguardando/resolvido/fechado`), prioridade, sla_vencimento, client_id, assignee_id.
-- `ticket_messages` — thread de respostas (interno/cliente).
+## 2. Módulo Financeiro reestruturado (`src/routes/financeiro.tsx`)
 
-Funções/triggers:
-- `has_commercial_role(_user, _tenant, _role)` — security definer, igual `has_role`.
-- `can_edit_commercial(_user, _tenant)` — TRUE se `admin` OU `comercial`.
-- Trigger em `leads`: ao virar `status='fechado'`, criar automaticamente `company` (se não existir pelo nome) + `contact` + `deal` `stage='fechado'` ligado (fluxo lead→oportunidade→empresa).
+Substituir o layout atual por **abas**:
+1. **Visão Geral** — 6 KPIs (Previsão, Realizada, Pendente, Inadimplência, A Pagar, Saldo), gráfico fluxo de caixa 6 meses, resumo mensal.
+2. **Contas a Receber** — lista de `financial_entries` + status (pago/parcial/pendente/atrasado), botão Reconciliar.
+3. **Contas a Pagar** — lista de `financial_expenses` com vencimentos e status.
+4. **Fluxo de Caixa** — tabela diária/mensal entradas vs saídas vs saldo acumulado.
+5. **Parcelas & Pagamentos** — todas as `financial_payments`.
+6. **Histórico** — log de operações financeiras.
 
-RLS (todas as tabelas novas + reforço nas existentes `deals`, `proposals`, `clients`):
-- SELECT: `is_tenant_member` (qualquer função vê).
-- INSERT/UPDATE/DELETE: exige `can_edit_commercial` (visualizador é read-only).
+Filtros globais por período (mês atual, últimos 30/90 dias, ano, custom).
 
-### Frontend — hooks reais
+## 3. Controle de Projetos (nova seção)
 
-Substituir `module-stub` (localStorage) por hooks Supabase tipados:
-- `use-companies.ts`, `use-contacts.ts`, `use-deals.ts` (já existe deals como tipo), `use-proposals.ts`, `use-tickets.ts`.
-- `use-commercial-role.ts` — retorna `{ role, canEdit, canDelete }` para o tenant ativo; usado para esconder/desabilitar botões "Novo/Editar/Excluir".
+**Migration:** criar tabela `projects` com:
+- titulo, descricao, status (planejado/em_andamento/pausado/concluido/cancelado)
+- progresso (0-100), prioridade, prazo, etapas (jsonb), entregas (jsonb)
+- client_id, owner_id, valor_total, tenant_id
+- timeline via `activities` existente
 
-### Telas reescritas (sai do stub, vira CRUD real)
+**Rota:** `src/routes/projetos.tsx` com:
+- Lista/kanban de projetos
+- Drawer com tabs: Detalhes, Tarefas vinculadas (`tasks.project_id`), Financeiro vinculado (`financial_entries.project_id`), Timeline
+- Adicionar `project_id` em `tasks` e `financial_entries` (migration)
 
-- `/oportunidades` — lista de `deals` com kanban opcional, valor, stage, lead origem, owner. KPIs reais (pipeline aberto, ganhos no mês, ticket médio).
-- `/propostas` — lista de `proposals` com status (rascunho/enviada/visualizada/aceita/recusada), valor, validade, link de visualização. KPIs (taxa de aceite, ticket médio).
-- `/empresas` — CRUD de `companies` com contatos vinculados, deals abertos, MRR. KPIs (total, novas no mês, em negociação).
-- `/contatos` — CRUD de `contacts` com filtro por empresa.
-- `/tickets` — fila de suporte com colunas por status, SLA visível, drawer de detalhe com thread de mensagens. KPIs (abertos, atrasados, tempo médio resolução).
-- `/interacoes` — vira leitura agregada da tabela `activities` já existente (timeline cross-módulo), não mais stub.
+## 4. Sidebar (`src/components/app-shell.tsx`)
 
-Cada lista ganha: busca, filtros básicos, e (mantido do escopo anterior) o botão "Nova" só aparece se `canEdit`.
+Nova ordem dos itens primários:
+1. Dashboard
+2. Financeiro
+3. Tarefas
+4. Controle de Projetos
+5. ... (demais seções comerciais)
+6. Configurações
 
-### App-shell
-
-Indicador discreto do papel atual ao lado do nome do usuário (`Admin`, `Comercial`, `Visualizador`). Tela `/configuracoes` ganha aba "Equipe" para o `admin` atribuir papéis aos membros do tenant.
-
----
-
-## Onda 2 — Refinamento (depois da aprovação da Onda 1)
-
-- `/base-conhecimento` virar editor real de `knowledge_articles` (já tem tabela): editor de markdown, busca full-text, categorias, contador de visualizações, modo público vs interno.
-- KPIs do dashboard principal (`/`) e `/dashboards` puxarem números reais (deals fechados no mês, MRR via `financial_subscriptions`, tickets atrasados, leads quentes).
-- `/campanhas` e `/email-marketing` conectarem em `marketing_campaigns` e `marketing_emails` (já existem).
-- `/landing-pages` conectar em `landing_pages` (já existe).
-- `/relatorios` consolidado com filtros por período usando dados reais.
-
----
-
-## O que NÃO entra agora (para deixar claro)
-
-- Exportação CSV/PDF e sugestões IA Launch por módulo (opções 2 e 3 que você não marcou) — fica para uma terceira onda quando esta base estiver firme.
-- RBAC nos módulos Escolar/Clínicas/Financeiro — você pediu só comerciais.
-- Editor visual de proposta com aceite por link (token já existe no schema, mas a UI fica para depois).
-
----
+Remover o grupo "Gestão" — mover seus itens para grupos apropriados (Comercial / Operações).
 
 ## Detalhes técnicos
 
-- Migração única com todas as tabelas, enums, policies e a trigger de conversão automática `lead.fechado → company+contact+deal`.
-- Realtime: assinar `deals`, `proposals`, `companies`, `tickets` via `useRealtimeSync` (padrão já usado em leads).
-- TanStack Query para todas as listas com `invalidate` nos mutates; loading skeletons.
-- `ModuleStub` (localStorage) será removido — qualquer rota que ainda dependia dele será reescrita.
-- Sem mudanças em `src/integrations/supabase/*` (auto-gerados).
-- Sem novas Edge Functions — tudo client com RLS, padrão do projeto.
+- Novos hooks: `src/hooks/use-projects.ts` (CRUD + vinculação tarefas/financeiro).
+- Helpers em `use-finance.ts`: `computeEntryStatus(entry, payments)`, `sumReceivedFromPayments(entryId, payments)`.
+- `useAllPayments` já existe — usar para agregar pagamentos no dashboard financeiro.
+- Manter design system existente (Dialog, Input, Tabs).
 
-Confirma a Onda 1 para eu rodar a migração e implementar?
+## Escopo
+
+Mudanças em:
+- `supabase/migrations/*` (projects + project_id em tasks/financial_entries)
+- `src/hooks/use-dashboard.ts`, `src/hooks/use-finance.ts`, `src/hooks/use-tasks.ts`
+- `src/hooks/use-projects.ts` (novo)
+- `src/routes/financeiro.tsx` (reescrita)
+- `src/routes/projetos.tsx` (novo)
+- `src/routes/index.tsx` (métricas corretas)
+- `src/components/app-shell.tsx` (sidebar)
+- `src/components/reconciliation-modal.tsx` (garantir invalidações)
