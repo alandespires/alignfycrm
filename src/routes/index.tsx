@@ -108,6 +108,9 @@ export function DashboardPage() {
     { table: "deals", queryKeys: [["deals"], ["revenue_series"]] },
     { table: "activities", queryKeys: [["activities"]] },
     { table: "ai_insights", queryKeys: [["ai_insights"]] },
+    { table: "financial_entries", queryKeys: [["fin-entries"], ["revenue_series"]] },
+    { table: "financial_payments", queryKeys: [["fin-payments-all"], ["fin-entries"]] },
+    { table: "projects", queryKeys: [["projects"]] },
   ]);
   const [periodo, setPeriodo] = useState<Periodo>("semana");
   const [periodoOpen, setPeriodoOpen] = useState(false);
@@ -119,9 +122,13 @@ export function DashboardPage() {
   const activities = useActivities(5);
   const revenue = useRevenueSeries();
   const insights = useInsights("todas");
+  const entries = useEntries();
+  const payments = useAllPayments();
 
   const leadList = leads.data ?? [];
   const dealList = deals.data ?? [];
+  const entryList = entries.data ?? [];
+  const paymentList = payments.data ?? [];
 
   const periodDays = PERIODO_DAYS[periodo];
   const cutoffMs = periodDays != null ? Date.now() - periodDays * 864e5 : 0;
@@ -139,15 +146,23 @@ export function DashboardPage() {
     .filter((l) => l.status !== "fechado" && l.status !== "perdido")
     .reduce((a, l) => a + Number(l.valor_estimado ?? 0), 0);
 
+  // "Fechado no mês" agora usa receita REAL recebida (pagamentos + entradas pagas),
+  // excluindo canceladas — em vez de somar deals.valor que ignorava exclusões/cancelamentos.
+  const ini = startOfMonth();
+  const fim = endOfMonth();
+  const inMonthDate = (iso: string | null | undefined) => !!iso && new Date(iso) >= ini && new Date(iso) <= fim;
+
   const wonMonth = (() => {
-    const now = new Date();
-    return dealList
-      .filter((d) => d.stage === "fechado" && d.fechado_em)
-      .filter((d) => {
-        const dt = new Date(d.fechado_em as string);
-        return dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear();
-      })
-      .reduce((a, d) => a + Number(d.valor ?? 0), 0);
+    // Pagamentos parciais registrados no mês
+    const fromPayments = paymentList
+      .filter((p) => inMonthDate(p.pago_em + "T12:00:00"))
+      .reduce((s, p) => s + Number(p.valor || 0), 0);
+    // Entradas marcadas como pagas no mês SEM pagamentos parciais (evita duplicidade)
+    const paidEntriesIds = new Set(paymentList.map((p) => p.entry_id));
+    const fromEntries = entryList
+      .filter((e) => e.status === "pago" && !paidEntriesIds.has(e.id) && inMonthDate((e.recebido_em || e.created_at) + (e.recebido_em ? "T12:00:00" : "")))
+      .reduce((s, e) => s + computeEntryReceived(e, paymentList), 0);
+    return fromPayments + fromEntries;
   })();
 
   const oportunidadesAbertas = leadList.filter((l) => l.status !== "fechado" && l.status !== "perdido").length;
