@@ -258,3 +258,41 @@ export function brl(n: number) {
 }
 export function startOfMonth(d = new Date()) { const x = new Date(d.getFullYear(), d.getMonth(), 1); return x; }
 export function endOfMonth(d = new Date()) { const x = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59); return x; }
+
+// =============== CÁLCULO REAL DE STATUS / RECEBIDO ===============
+// Integra pagamentos parciais (financial_payments) com a entrada para
+// derivar o status real e o valor efetivamente recebido — corrige bug
+// de métricas que ignoravam parcelas e itens excluídos/cancelados.
+
+export type PaymentLite = { entry_id: string; valor: number; pago_em: string };
+
+export function sumPaymentsForEntry(entryId: string, payments: PaymentLite[]) {
+  return payments.filter((p) => p.entry_id === entryId).reduce((s, p) => s + Number(p.valor || 0), 0);
+}
+
+export function computeEntryReceived(entry: Pick<EntryRow, "id" | "valor" | "valor_pago" | "status">, payments: PaymentLite[]) {
+  if (entry.status === "cancelado") return 0;
+  const fromPayments = sumPaymentsForEntry(entry.id, payments);
+  // Prefer real payments; fallback to valor_pago; if status pago e nada, considere valor total.
+  if (fromPayments > 0) return Math.min(fromPayments, Number(entry.valor || 0));
+  const direct = Number(entry.valor_pago || 0);
+  if (direct > 0) return Math.min(direct, Number(entry.valor || 0));
+  if (entry.status === "pago") return Number(entry.valor || 0);
+  return 0;
+}
+
+export function computeEntryBalance(entry: Pick<EntryRow, "id" | "valor" | "valor_pago" | "status">, payments: PaymentLite[]) {
+  if (entry.status === "cancelado") return 0;
+  return Math.max(Number(entry.valor || 0) - computeEntryReceived(entry, payments), 0);
+}
+
+export function effectiveEntryStatus(entry: EntryRow, payments: PaymentLite[]): "pago" | "parcial" | "atrasado" | "pendente" | "cancelado" {
+  if (entry.status === "cancelado") return "cancelado";
+  const received = computeEntryReceived(entry, payments);
+  const total = Number(entry.valor || 0);
+  if (received >= total && total > 0) return "pago";
+  const today = new Date(); today.setHours(0,0,0,0);
+  const overdue = entry.vencimento && new Date(entry.vencimento + "T12:00:00") < today;
+  if (received > 0 && received < total) return overdue ? "atrasado" : "parcial";
+  return overdue ? "atrasado" : "pendente";
+}
