@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import {
   useEntries, useCreateEntry, useUpdateEntry, useDeleteEntry,
