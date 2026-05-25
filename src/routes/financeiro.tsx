@@ -24,6 +24,9 @@ import {
 
 export const Route = createFileRoute("/financeiro")({
   head: () => ({ meta: [{ title: "Financeiro — Align CRM" }] }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: (search.tab as Tab | undefined) ?? undefined,
+  }),
   component: FinanceiroPage,
 });
 
@@ -42,7 +45,12 @@ const TABS: { id: Tab; label: string; icon: any }[] = [
 ];
 
 function FinanceiroPage() {
-  const [tab, setTab] = useState<Tab>("dashboard");
+  const search = Route.useSearch();
+  const [tab, setTab] = useState<Tab>(search.tab ?? "dashboard");
+  // Sincroniza estado quando o usuário navega via sidebar
+  if (search.tab && search.tab !== tab) {
+    setTimeout(() => setTab(search.tab as Tab), 0);
+  }
 
   return (
     <AppShell title="Financeiro" subtitle="Centro de controle financeiro do seu CRM">
