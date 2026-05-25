@@ -162,6 +162,7 @@ function KpiCard({ icon: Icon, label, value, accent }: { icon: any; label: strin
 function ProjectFormModal({ onClose }: { onClose: () => void }) {
   const create = useCreateProject();
   const { data: clients = [] } = useClients();
+  const { data: leads = [] } = useLeads();
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [status, setStatus] = useState<ProjectStatus>("planejado");
@@ -169,6 +170,7 @@ function ProjectFormModal({ onClose }: { onClose: () => void }) {
   const [prazo, setPrazo] = useState<string>("");
   const [valor, setValor] = useState<string>("");
   const [clientId, setClientId] = useState<string>("");
+  const [leadId, setLeadId] = useState<string>("");
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -181,6 +183,7 @@ function ProjectFormModal({ onClose }: { onClose: () => void }) {
       prazo: prazo || null,
       valor_total: Number(valor) || 0,
       client_id: clientId || null,
+      lead_id: leadId || null,
     });
     onClose();
   }
