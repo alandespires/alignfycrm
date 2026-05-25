@@ -66,8 +66,10 @@ function FinanceiroPage() {
       </div>
 
       {tab === "dashboard" && <DashboardTab />}
-      {tab === "entradas" && <EntradasTab />}
-      {tab === "saidas" && <SaidasTab />}
+      {tab === "receber" && <EntradasTab />}
+      {tab === "pagar" && <SaidasTab />}
+      {tab === "fluxo" && <FluxoTab />}
+      {tab === "parcelas" && <ParcelasTab />}
       {tab === "assinaturas" && <AssinaturasTab />}
       {tab === "inadimplencia" && <InadimplenciaTab />}
       {tab === "comissoes" && <ComissoesTab />}
