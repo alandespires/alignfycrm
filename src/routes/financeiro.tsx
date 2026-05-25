@@ -413,13 +413,14 @@ function SaidasTab() {
   const del = useDeleteExpense();
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<FinStatus | "todos">("todos");
-  const filtered = filter === "todos" ? expenses : expenses.filter((e) => e.status === filter);
+  const validAll = expenses.filter((e) => e.status !== "cancelado");
+  const filtered = filter === "todos" ? validAll : validAll.filter((e) => e.status === filter);
 
   const totais = useMemo(() => ({
-    pago: expenses.filter((e) => e.status === "pago").reduce((s, e) => s + Number(e.valor), 0),
-    pendente: expenses.filter((e) => e.status === "pendente").reduce((s, e) => s + Number(e.valor), 0),
-    atrasado: expenses.filter((e) => e.status === "atrasado").reduce((s, e) => s + Number(e.valor), 0),
-  }), [expenses]);
+    pago: validAll.filter((e) => e.status === "pago").reduce((s, e) => s + Number(e.valor), 0),
+    pendente: validAll.filter((e) => e.status === "pendente").reduce((s, e) => s + Number(e.valor), 0),
+    atrasado: validAll.filter((e) => e.status === "atrasado").reduce((s, e) => s + Number(e.valor), 0),
+  }), [validAll]);
 
   return (
     <div className="space-y-5">
