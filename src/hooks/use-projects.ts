@@ -78,8 +78,27 @@ export function useUpdateProject() {
     mutationFn: async ({ id, ...patch }: Partial<ProjectRow> & { id: string }) => {
       const { error } = await (supabase as any).from("projects").update(patch).eq("id", id);
       if (error) throw error;
+      // Sincroniza cancelamento: entradas financeiras vinculadas viram "cancelado"
+      // para sumirem dos relatórios e métricas.
+      if (patch.status === "cancelado") {
+        await (supabase as any)
+          .from("financial_entries")
+          .update({ status: "cancelado" })
+          .eq("project_id", id)
+          .neq("status", "cancelado");
+      }
+      // Conclusão fecha pendências de progresso
+      if (patch.status === "concluido" && (patch.progresso === undefined)) {
+        await (supabase as any).from("projects").update({ progresso: 100, concluido_em: new Date().toISOString() }).eq("id", id);
+      }
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["projects"] }); toast.success("Projeto atualizado"); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["projects"] });
+      qc.invalidateQueries({ queryKey: ["fin-entries"] });
+      qc.invalidateQueries({ queryKey: ["fin-payments-all"] });
+      qc.invalidateQueries({ queryKey: ["tasks"] });
+      toast.success("Projeto atualizado");
+    },
     onError: (e: any) => toast.error(e.message ?? "Erro"),
   });
 }
