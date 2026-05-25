@@ -250,21 +250,24 @@ export function AppShell({ children, title, subtitle, action }: {
                   <div className="space-y-0.5">
                     {items.map(({ to, label, icon: Icon, badge }) => {
                       const active = isActive(to);
+                      const showFinanceQuick = to === "/financeiro" && active && !collapsed;
                       return (
-                        <Link
-                          key={to}
-                          to={to as any}
-                          title={collapsed ? label : undefined}
-                          className={[
-                            "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all",
-                            active ? "bg-surface-3 text-foreground shadow-card" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
-                          ].join(" ")}
-                        >
-                          <Icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : ""}`} />
-                          {!collapsed && <span className="font-medium">{label}</span>}
-                          {!collapsed && badge && <span className="ml-auto rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-primary">{badge}</span>}
-                          {active && !collapsed && !badge && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_oklch(0.685_0.175_45)]" />}
-                        </Link>
+                        <div key={to}>
+                          <Link
+                            to={to as any}
+                            title={collapsed ? label : undefined}
+                            className={[
+                              "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all",
+                              active ? "bg-surface-3 text-foreground shadow-card" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
+                            ].join(" ")}
+                          >
+                            <Icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : ""}`} />
+                            {!collapsed && <span className="font-medium">{label}</span>}
+                            {!collapsed && badge && <span className="ml-auto rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-primary">{badge}</span>}
+                            {active && !collapsed && !badge && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_oklch(0.685_0.175_45)]" />}
+                          </Link>
+                          {showFinanceQuick && <FinanceQuickActions pathname={pathname} />}
+                        </div>
                       );
                     })}
                   </div>
