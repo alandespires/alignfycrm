@@ -23,8 +23,13 @@ type NavGroup = { id: string; label: string; icon: any; items: NavItem[]; school
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    id: "inicio", label: "Início", icon: Home,
-    items: [{ to: "/", label: "Dashboard", icon: LayoutDashboard }],
+    id: "principal", label: "Principal", icon: Home,
+    items: [
+      { to: "/", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/financeiro", label: "Financeiro", icon: Wallet },
+      { to: "/tarefas", label: "Tarefas", icon: ListChecks },
+      { to: "/projetos", label: "Projetos", icon: Briefcase },
+    ],
   },
   {
     id: "vendas", label: "Vendas", icon: ShoppingBag,
@@ -68,13 +73,6 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
       { to: "/insights", label: "Launch", icon: Sparkles },
       { to: "/dashboards", label: "Dashboards", icon: LineChart },
-    ],
-  },
-  {
-    id: "gestao", label: "Gestão", icon: Briefcase,
-    items: [
-      { to: "/tarefas", label: "Tarefas", icon: ListChecks },
-      { to: "/financeiro", label: "Financeiro", icon: Wallet },
     ],
   },
   {
