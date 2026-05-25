@@ -3,6 +3,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import { useProjects, useCreateProject, useUpdateProject, useDeleteProject, PROJECT_STATUS_LABEL, PROJECT_STATUS_TONE, type ProjectStatus, type ProjectRow } from "@/hooks/use-projects";
 import { useClients } from "@/hooks/use-clients";
+import { useLeads } from "@/hooks/use-leads";
 import { useTasks } from "@/hooks/use-tasks";
 import { useEntries, brl, computeEntryReceived, computeEntryBalance } from "@/hooks/use-finance";
 import { useAllPayments } from "@/hooks/use-payments";
