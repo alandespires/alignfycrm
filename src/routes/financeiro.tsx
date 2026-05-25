@@ -808,8 +808,121 @@ function RelatoriosTab() {
 }
 
 // =================================================================
-// COMPONENTES DE APOIO
+// FLUXO DE CAIXA — visão expandida
 // =================================================================
+function FluxoTab() {
+  const { data: entries = [] } = useEntries();
+  const { data: expenses = [] } = useExpenses();
+  const { data: payments = [] } = useAllPayments();
+
+  const validEntries = entries.filter((e) => e.status !== "cancelado");
+  const validExpenses = expenses.filter((e) => e.status !== "cancelado");
+
+  // 6 meses
+  const months: { label: string; receita: number; despesa: number; saldo: number }[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(); d.setMonth(d.getMonth() - i); d.setDate(1);
+    const ini = startOfMonth(d); const fim = endOfMonth(d);
+    const recPay = payments.filter((p) => { const dt = new Date(p.pago_em + "T12:00:00"); return dt >= ini && dt <= fim; }).reduce((s, p) => s + Number(p.valor), 0);
+    const paidIds = new Set(payments.map((p) => p.entry_id));
+    const recDirect = validEntries.filter((e) => e.status === "pago" && !paidIds.has(e.id) && e.recebido_em && new Date(e.recebido_em) >= ini && new Date(e.recebido_em) <= fim).reduce((s, e) => s + Number(e.valor), 0);
+    const receita = recPay + recDirect;
+    const despesa = validExpenses.filter((e) => e.status === "pago" && e.pago_em && new Date(e.pago_em) >= ini && new Date(e.pago_em) <= fim).reduce((s, e) => s + Number(e.valor), 0);
+    months.push({ label: d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" }), receita, despesa, saldo: receita - despesa });
+  }
+  const max = Math.max(1, ...months.flatMap((m) => [m.receita, m.despesa]));
+  const totalRec = months.reduce((s, m) => s + m.receita, 0);
+  const totalDesp = months.reduce((s, m) => s + m.despesa, 0);
+
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <MiniStat label="Receita 6 meses" value={brl(totalRec)} tone="success" />
+        <MiniStat label="Despesa 6 meses" value={brl(totalDesp)} tone="danger" />
+        <MiniStat label="Saldo acumulado" value={brl(totalRec - totalDesp)} tone={totalRec - totalDesp >= 0 ? "success" : "danger"} />
+      </div>
+
+      <Card title="Fluxo mensal — 6 meses" icon={Activity}>
+        <div className="flex h-56 items-end gap-3">
+          {months.map((m, i) => (
+            <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
+              <div className="flex h-full w-full items-end justify-center gap-1">
+                <div className="w-1/2 rounded-t-md bg-success/70" style={{ height: `${(m.receita / max) * 100}%` }} title={`Receita: ${brl(m.receita)}`} />
+                <div className="w-1/2 rounded-t-md bg-destructive/70" style={{ height: `${(m.despesa / max) * 100}%` }} title={`Despesa: ${brl(m.despesa)}`} />
+              </div>
+              <span className="text-[10px] font-medium uppercase text-muted-foreground">{m.label}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card title="Detalhamento mensal" icon={FileBarChart}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-border">
+              <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground">
+                <th className="py-2">Mês</th><th>Receita</th><th>Despesa</th><th>Saldo</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {months.map((m, i) => (
+                <tr key={i}>
+                  <td className="py-2 font-medium capitalize">{m.label}</td>
+                  <td className="tabular-nums text-success">{brl(m.receita)}</td>
+                  <td className="tabular-nums text-destructive">{brl(m.despesa)}</td>
+                  <td className={`tabular-nums font-semibold ${m.saldo >= 0 ? "text-success" : "text-destructive"}`}>{brl(m.saldo)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// =================================================================
+// PARCELAS — histórico de pagamentos
+// =================================================================
+function ParcelasTab() {
+  const { data: payments = [], isLoading } = useAllPayments();
+  const { data: entries = [] } = useEntries();
+  const { data: clients = [] } = useClients();
+
+  const enriched = useMemo(() => payments.map((p) => {
+    const entry = entries.find((e) => e.id === p.entry_id);
+    const client = entry ? clients.find((c) => c.id === entry.client_id) : null;
+    return { p, entry, client };
+  }), [payments, entries, clients]);
+
+  const total = payments.reduce((s, p) => s + Number(p.valor), 0);
+  const noMes = payments.filter((p) => { const d = new Date(p.pago_em + "T12:00:00"); return d >= startOfMonth() && d <= endOfMonth(); }).reduce((s, p) => s + Number(p.valor), 0);
+
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <MiniStat label="Total recebido" value={brl(total)} tone="success" />
+        <MiniStat label="Recebido no mês" value={brl(noMes)} tone="info" />
+        <MiniStat label="Nº de parcelas" value={String(payments.length)} tone="info" />
+      </div>
+
+      <DataTable
+        loading={isLoading}
+        empty="Nenhuma parcela registrada. Use o botão de reconciliação em Contas a Receber para registrar pagamentos parciais."
+        cols={["Data", "Entrada", "Cliente", "Valor", "Forma"]}
+        rows={enriched.map(({ p, entry, client }) => [
+          new Date(p.pago_em + "T12:00:00").toLocaleDateString("pt-BR"),
+          entry ? <div><div className="font-medium">{entry.descricao}</div><div className="text-[10px] uppercase text-muted-foreground">{entry.categoria}</div></div> : "—",
+          client ? (client.empresa || client.nome) : "—",
+          <span className="font-semibold tabular-nums text-success">{brl(Number(p.valor))}</span>,
+          <span className="text-xs capitalize">{p.forma_pagamento || "—"}</span>,
+        ])}
+      />
+    </div>
+  );
+}
+
+
 function Card({ title, icon: Icon, children }: { title: string; icon: any; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-border bg-surface-2 p-6 shadow-card">
