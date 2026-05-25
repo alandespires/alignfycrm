@@ -47,10 +47,7 @@ const TABS: { id: Tab; label: string; icon: any }[] = [
 function FinanceiroPage() {
   const search = Route.useSearch();
   const [tab, setTab] = useState<Tab>(search.tab ?? "dashboard");
-  // Sincroniza estado quando o usuário navega via sidebar
-  if (search.tab && search.tab !== tab) {
-    setTimeout(() => setTab(search.tab as Tab), 0);
-  }
+  useEffect(() => { if (search.tab && search.tab !== tab) setTab(search.tab); }, [search.tab]);
 
   return (
     <AppShell title="Financeiro" subtitle="Centro de controle financeiro do seu CRM">
