@@ -307,12 +307,13 @@ function EntradasTab() {
   const [filter, setFilter] = useState<FinStatus | "todos">("todos");
   const [reconciling, setReconciling] = useState<EntryRow | null>(null);
 
-  const filtered = filter === "todos" ? entries : entries.filter((e) => e.status === filter);
+  const validAll = entries.filter((e) => e.status !== "cancelado");
+  const filtered = filter === "todos" ? validAll : validAll.filter((e) => e.status === filter);
   const totais = useMemo(() => ({
-    pago: entries.reduce((s, e) => s + Number(e.valor_pago || 0), 0),
-    pendente: entries.filter((e) => e.status === "pendente").reduce((s, e) => s + Math.max(Number(e.valor) - Number(e.valor_pago || 0), 0), 0),
-    atrasado: entries.filter((e) => e.status === "atrasado").reduce((s, e) => s + Math.max(Number(e.valor) - Number(e.valor_pago || 0), 0), 0),
-  }), [entries]);
+    pago: validAll.reduce((s, e) => s + Number(e.valor_pago || 0), 0),
+    pendente: validAll.filter((e) => e.status === "pendente").reduce((s, e) => s + Math.max(Number(e.valor) - Number(e.valor_pago || 0), 0), 0),
+    atrasado: validAll.filter((e) => e.status === "atrasado").reduce((s, e) => s + Math.max(Number(e.valor) - Number(e.valor_pago || 0), 0), 0),
+  }), [validAll]);
 
   return (
     <div className="space-y-5">
