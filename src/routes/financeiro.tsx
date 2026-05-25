@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import {
   useEntries, useCreateEntry, useUpdateEntry, useDeleteEntry,
@@ -24,6 +24,9 @@ import {
 
 export const Route = createFileRoute("/financeiro")({
   head: () => ({ meta: [{ title: "Financeiro — Align CRM" }] }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: (search.tab as Tab | undefined) ?? undefined,
+  }),
   component: FinanceiroPage,
 });
 
@@ -42,7 +45,9 @@ const TABS: { id: Tab; label: string; icon: any }[] = [
 ];
 
 function FinanceiroPage() {
-  const [tab, setTab] = useState<Tab>("dashboard");
+  const search = Route.useSearch();
+  const [tab, setTab] = useState<Tab>(search.tab ?? "dashboard");
+  useEffect(() => { if (search.tab && search.tab !== tab) setTab(search.tab); }, [search.tab]);
 
   return (
     <AppShell title="Financeiro" subtitle="Centro de controle financeiro do seu CRM">

@@ -3,6 +3,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import { useProjects, useCreateProject, useUpdateProject, useDeleteProject, PROJECT_STATUS_LABEL, PROJECT_STATUS_TONE, type ProjectStatus, type ProjectRow } from "@/hooks/use-projects";
 import { useClients } from "@/hooks/use-clients";
+import { useLeads } from "@/hooks/use-leads";
 import { useTasks } from "@/hooks/use-tasks";
 import { useEntries, brl, computeEntryReceived, computeEntryBalance } from "@/hooks/use-finance";
 import { useAllPayments } from "@/hooks/use-payments";
@@ -161,6 +162,7 @@ function KpiCard({ icon: Icon, label, value, accent }: { icon: any; label: strin
 function ProjectFormModal({ onClose }: { onClose: () => void }) {
   const create = useCreateProject();
   const { data: clients = [] } = useClients();
+  const { data: leads = [] } = useLeads();
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [status, setStatus] = useState<ProjectStatus>("planejado");
@@ -168,6 +170,7 @@ function ProjectFormModal({ onClose }: { onClose: () => void }) {
   const [prazo, setPrazo] = useState<string>("");
   const [valor, setValor] = useState<string>("");
   const [clientId, setClientId] = useState<string>("");
+  const [leadId, setLeadId] = useState<string>("");
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -180,6 +183,7 @@ function ProjectFormModal({ onClose }: { onClose: () => void }) {
       prazo: prazo || null,
       valor_total: Number(valor) || 0,
       client_id: clientId || null,
+      lead_id: leadId || null,
     });
     onClose();
   }
@@ -208,9 +212,15 @@ function ProjectFormModal({ onClose }: { onClose: () => void }) {
             <Field label="Prazo"><input type="date" value={prazo} onChange={(e) => setPrazo(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm" /></Field>
             <Field label="Valor total (R$)"><input type="number" step="0.01" min="0" value={valor} onChange={(e) => setValor(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm tabular-nums" /></Field>
             <Field label="Cliente">
-              <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="col-span-2 h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
+              <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
                 <option value="">—</option>
                 {clients.map((c) => <option key={c.id} value={c.id}>{c.empresa || c.nome}</option>)}
+              </select>
+            </Field>
+            <Field label="Lead (Pipeline)">
+              <select value={leadId} onChange={(e) => setLeadId(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
+                <option value="">—</option>
+                {leads.map((l) => <option key={l.id} value={l.id}>{l.empresa ? `${l.nome} · ${l.empresa}` : l.nome}</option>)}
               </select>
             </Field>
           </div>

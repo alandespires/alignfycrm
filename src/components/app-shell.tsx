@@ -250,21 +250,24 @@ export function AppShell({ children, title, subtitle, action }: {
                   <div className="space-y-0.5">
                     {items.map(({ to, label, icon: Icon, badge }) => {
                       const active = isActive(to);
+                      const showFinanceQuick = to === "/financeiro" && active && !collapsed;
                       return (
-                        <Link
-                          key={to}
-                          to={to as any}
-                          title={collapsed ? label : undefined}
-                          className={[
-                            "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all",
-                            active ? "bg-surface-3 text-foreground shadow-card" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
-                          ].join(" ")}
-                        >
-                          <Icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : ""}`} />
-                          {!collapsed && <span className="font-medium">{label}</span>}
-                          {!collapsed && badge && <span className="ml-auto rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-primary">{badge}</span>}
-                          {active && !collapsed && !badge && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_oklch(0.685_0.175_45)]" />}
-                        </Link>
+                        <div key={to}>
+                          <Link
+                            to={to as any}
+                            title={collapsed ? label : undefined}
+                            className={[
+                              "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all",
+                              active ? "bg-surface-3 text-foreground shadow-card" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
+                            ].join(" ")}
+                          >
+                            <Icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : ""}`} />
+                            {!collapsed && <span className="font-medium">{label}</span>}
+                            {!collapsed && badge && <span className="ml-auto rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-primary">{badge}</span>}
+                            {active && !collapsed && !badge && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_oklch(0.685_0.175_45)]" />}
+                          </Link>
+                          {showFinanceQuick && <FinanceQuickActions pathname={pathname} />}
+                        </div>
                       );
                     })}
                   </div>
@@ -590,5 +593,39 @@ export function StatusPill({ tone, children }: { tone: "success" | "warn" | "inf
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {children}
     </span>
+  );
+}
+
+const FINANCE_QUICK = [
+  { tab: "receber", label: "Contas a Receber" },
+  { tab: "pagar", label: "Contas a Pagar" },
+  { tab: "fluxo", label: "Fluxo de Caixa" },
+  { tab: "parcelas", label: "Parcelas" },
+] as const;
+
+function FinanceQuickActions({ pathname }: { pathname: string }) {
+  // Lê tab atual via URL para destacar
+  const current = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : null;
+  if (!pathname.startsWith("/financeiro")) return null;
+  return (
+    <div className="mb-1 ml-7 mt-1 space-y-0.5 border-l border-border/60 pl-2">
+      {FINANCE_QUICK.map((q) => {
+        const active = current === q.tab;
+        return (
+          <Link
+            key={q.tab}
+            to="/financeiro"
+            search={{ tab: q.tab } as any}
+            className={[
+              "flex items-center gap-2 rounded-md px-2 py-1 text-[11px] transition",
+              active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
+            ].join(" ")}
+          >
+            <span className={`h-1 w-1 rounded-full ${active ? "bg-primary" : "bg-muted-foreground/50"}`} />
+            {q.label}
+          </Link>
+        );
+      })}
+    </div>
   );
 }
