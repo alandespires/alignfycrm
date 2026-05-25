@@ -19,7 +19,7 @@ import { ReconciliationModal } from "@/components/reconciliation-modal";
 import {
   Wallet, TrendingUp, TrendingDown, Repeat, AlertTriangle, Award, FileBarChart,
   Plus, Trash2, X, Loader2, Sparkles, ArrowUpRight, ArrowDownRight, Clock,
-  CheckCircle2, XCircle, CalendarClock, DollarSign, Activity, Receipt,
+  CheckCircle2, XCircle, CalendarClock, DollarSign, Activity, Receipt, Layers,
 } from "lucide-react";
 
 export const Route = createFileRoute("/financeiro")({
@@ -27,12 +27,14 @@ export const Route = createFileRoute("/financeiro")({
   component: FinanceiroPage,
 });
 
-type Tab = "dashboard" | "entradas" | "saidas" | "assinaturas" | "inadimplencia" | "comissoes" | "relatorios";
+type Tab = "dashboard" | "receber" | "pagar" | "fluxo" | "parcelas" | "assinaturas" | "inadimplencia" | "comissoes" | "relatorios";
 
 const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: "dashboard", label: "Dashboard", icon: Wallet },
-  { id: "entradas", label: "Entradas", icon: TrendingUp },
-  { id: "saidas", label: "Saídas", icon: TrendingDown },
+  { id: "receber", label: "Contas a Receber", icon: TrendingUp },
+  { id: "pagar", label: "Contas a Pagar", icon: TrendingDown },
+  { id: "fluxo", label: "Fluxo de Caixa", icon: Activity },
+  { id: "parcelas", label: "Parcelas", icon: Layers },
   { id: "assinaturas", label: "Assinaturas", icon: Repeat },
   { id: "inadimplencia", label: "Inadimplência", icon: AlertTriangle },
   { id: "comissoes", label: "Comissões", icon: Award },
