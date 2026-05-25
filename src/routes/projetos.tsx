@@ -212,9 +212,15 @@ function ProjectFormModal({ onClose }: { onClose: () => void }) {
             <Field label="Prazo"><input type="date" value={prazo} onChange={(e) => setPrazo(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm" /></Field>
             <Field label="Valor total (R$)"><input type="number" step="0.01" min="0" value={valor} onChange={(e) => setValor(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm tabular-nums" /></Field>
             <Field label="Cliente">
-              <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="col-span-2 h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
+              <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
                 <option value="">—</option>
                 {clients.map((c) => <option key={c.id} value={c.id}>{c.empresa || c.nome}</option>)}
+              </select>
+            </Field>
+            <Field label="Lead (Pipeline)">
+              <select value={leadId} onChange={(e) => setLeadId(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
+                <option value="">—</option>
+                {leads.map((l) => <option key={l.id} value={l.id}>{l.empresa ? `${l.nome} · ${l.empresa}` : l.nome}</option>)}
               </select>
             </Field>
           </div>
