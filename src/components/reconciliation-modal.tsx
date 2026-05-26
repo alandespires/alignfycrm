@@ -1,7 +1,8 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { X, Loader2, Plus, Trash2, CheckCircle2, Wallet } from "lucide-react";
+import { X, Loader2, Plus, Trash2, CheckCircle2, Wallet, AlertTriangle, Ban } from "lucide-react";
 import { useEntryPayments, useCreatePayment, useDeletePayment } from "@/hooks/use-payments";
 import { brl, type EntryRow, type PaymentMethod } from "@/hooks/use-finance";
+import { toast } from "sonner";
 
 const PM_OPTIONS: PaymentMethod[] = ["pix", "boleto", "cartao_credito", "cartao_debito", "transferencia", "dinheiro", "outros"];
 
@@ -15,34 +16,49 @@ export function ReconciliationModal({ entry, onClose }: { entry: EntryRow | null
   const [pagoEm, setPagoEm] = useState<string>(new Date().toISOString().slice(0, 10));
   const [forma, setForma] = useState<PaymentMethod | "">("");
   const [obs, setObs] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
   const totalPago = useMemo(() => payments.reduce((s, p) => s + Number(p.valor), 0), [payments]);
   const saldo = entry ? Math.max(Number(entry.valor) - totalPago, 0) : 0;
   const quitado = entry ? totalPago >= Number(entry.valor) && Number(entry.valor) > 0 : false;
+  const isCancelled = entry?.status === "cancelado";
+  const today = new Date().toISOString().slice(0, 10);
 
   if (!open || !entry) return null;
+
+  function validate(v: number, when: string): string | null {
+    if (isCancelled) return "Entrada cancelada — não é possível registrar pagamentos. Reabra a cobrança primeiro.";
+    if (!when) return "Informe a data do pagamento.";
+    if (when > today) return "A data do pagamento não pode ser futura.";
+    if (!Number.isFinite(v) || v <= 0) return "Informe um valor maior que zero.";
+    if (v > 9_999_999) return "Valor acima do limite permitido.";
+    if (saldo <= 0) return "Esta cobrança já está quitada.";
+    return null;
+  }
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!entry) return;
     const v = Number(valor);
-    if (!Number.isFinite(v) || v <= 0) return;
+    const err = validate(v, pagoEm);
+    if (err) { setError(err); toast.error(err); return; }
+    setError(null);
     if (v > saldo + 0.001) {
       if (!confirm(`O valor (${brl(v)}) é maior que o saldo pendente (${brl(saldo)}). Continuar?`)) return;
     }
-    await create.mutateAsync({
-      entry_id: entry.id,
-      valor: v,
-      pago_em: pagoEm,
-      forma_pagamento: forma || null,
-      observacoes: obs.trim() || null,
-    });
-    setValor("");
-    setObs("");
-    setForma("");
+    try {
+      await create.mutateAsync({
+        entry_id: entry.id, valor: v, pago_em: pagoEm,
+        forma_pagamento: forma || null, observacoes: obs.trim() || null,
+      });
+      setValor(""); setObs(""); setForma("");
+    } catch (ex: any) {
+      setError(ex?.message ?? "Falha ao registrar pagamento");
+    }
   }
 
   function quitarTotal() {
+    if (isCancelled) { toast.error("Entrada cancelada"); return; }
     setValor(String(saldo.toFixed(2)));
   }
 
