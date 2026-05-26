@@ -3,34 +3,30 @@ import {
   LayoutDashboard, Users, Kanban, Building2, ListChecks, Zap, Sparkles,
   BarChart3, Settings, Search, Plus, LogOut, Loader2, Sun, Moon, Shield, Wallet,
   Stethoscope, Target, FileText, UserCircle, Building, History, Megaphone, Mail,
-  Globe, LifeBuoy, BookOpen, MessageCircle, LineChart, ChevronDown, ChevronRight,
-  PanelLeftClose, PanelLeftOpen, Home, ShoppingBag, HeartHandshake, BrainCircuit,
-  Briefcase, Cog, GraduationCap, BookMarked, ClipboardList, CalendarCheck, Bell, IdCard,
-  Menu, MoreHorizontal, X,
+  Globe, LifeBuoy, BookOpen, MessageCircle, LineChart, Briefcase, GraduationCap,
+  BookMarked, ClipboardList, CalendarCheck, Bell, IdCard, MoreHorizontal, X,
+  ShoppingBag, ChevronRight,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import alignIcon from "@/assets/align-icon.png";
 import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
 import { useTheme } from "@/contexts/theme-context";
-import { useLeads } from "@/hooks/use-leads";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
-import { AiCoachButton } from "@/components/ai-coach-panel";
 import { NotificationsPopover } from "@/components/notifications-popover";
 
-type NavItem = { to: string; label: string; icon: any; badge?: string; clinicOnly?: boolean; schoolOnly?: boolean };
-type NavGroup = { id: string; label: string; icon: any; items: NavItem[]; schoolOnly?: boolean };
+/* ============================================================
+ * Align CRM — Liquid Glass shell (iOS 26-inspired)
+ *  - No sidebar
+ *  - Floating bottom dock (glass) on every viewport
+ *  - 5 slots: Dashboard · Comercial · Tarefas · Financeiro · Mais
+ * ============================================================ */
 
-const NAV_GROUPS: NavGroup[] = [
-  {
-    id: "principal", label: "Principal", icon: Home,
-    items: [
-      { to: "/", label: "Dashboard", icon: LayoutDashboard },
-      { to: "/financeiro", label: "Financeiro", icon: Wallet },
-      { to: "/tarefas", label: "Tarefas", icon: ListChecks },
-      { to: "/projetos", label: "Projetos", icon: Briefcase },
-    ],
-  },
+type SubItem = { to: string; label: string; icon: any; clinicOnly?: boolean; schoolOnly?: boolean };
+type SubGroup = { id: string; label: string; icon: any; items: SubItem[]; schoolOnly?: boolean };
+
+// Items under "Comercial" dock slot
+const COMERCIAL_GROUPS: SubGroup[] = [
   {
     id: "vendas", label: "Vendas", icon: ShoppingBag,
     items: [
@@ -41,7 +37,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    id: "clientes", label: "Clientes", icon: HeartHandshake,
+    id: "clientes", label: "Clientes", icon: Building2,
     items: [
       { to: "/clientes", label: "Clientes", icon: Building2 },
       { to: "/contatos", label: "Contatos", icon: UserCircle },
@@ -50,11 +46,15 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/clinicas", label: "Align Clínicas", icon: Stethoscope, clinicOnly: true },
     ],
   },
+];
+
+// Items under "Mais" dock slot
+const MAIS_GROUPS: SubGroup[] = [
   {
     id: "marketing", label: "Marketing", icon: Megaphone,
     items: [
       { to: "/campanhas", label: "Campanhas", icon: Megaphone },
-      { to: "/email-marketing", label: "E-mail Marketing", icon: Mail },
+      { to: "/email-marketing", label: "E-mail", icon: Mail },
       { to: "/landing-pages", label: "Landing Pages", icon: Globe },
       { to: "/automacao", label: "Automação", icon: Zap },
     ],
@@ -63,16 +63,22 @@ const NAV_GROUPS: NavGroup[] = [
     id: "suporte", label: "Suporte", icon: LifeBuoy,
     items: [
       { to: "/tickets", label: "Tickets", icon: LifeBuoy },
-      { to: "/base-conhecimento", label: "Base de Conhecimento", icon: BookOpen },
-      { to: "/chat", label: "Chat ao Vivo", icon: MessageCircle },
+      { to: "/base-conhecimento", label: "Base", icon: BookOpen },
+      { to: "/chat", label: "Chat", icon: MessageCircle },
     ],
   },
   {
-    id: "inteligencia", label: "Inteligência", icon: BrainCircuit,
+    id: "inteligencia", label: "Inteligência", icon: Sparkles,
     items: [
       { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
       { to: "/insights", label: "Launch", icon: Sparkles },
       { to: "/dashboards", label: "Dashboards", icon: LineChart },
+    ],
+  },
+  {
+    id: "operacional", label: "Operacional", icon: Briefcase,
+    items: [
+      { to: "/projetos", label: "Projetos", icon: Briefcase },
     ],
   },
   {
@@ -83,29 +89,22 @@ const NAV_GROUPS: NavGroup[] = [
       { to: "/escolar/turmas", label: "Turmas", icon: Users, schoolOnly: true },
       { to: "/escolar/alunos", label: "Alunos", icon: GraduationCap, schoolOnly: true },
       { to: "/escolar/professores", label: "Professores", icon: IdCard, schoolOnly: true },
-      { to: "/escolar/diario", label: "Diário de Classe", icon: ClipboardList, schoolOnly: true },
+      { to: "/escolar/diario", label: "Diário", icon: ClipboardList, schoolOnly: true },
       { to: "/escolar/avaliacoes", label: "Avaliações", icon: FileText, schoolOnly: true },
       { to: "/escolar/frequencia", label: "Frequência", icon: CalendarCheck, schoolOnly: true },
       { to: "/escolar/comunicacao", label: "Comunicação", icon: Bell, schoolOnly: true },
-      { to: "/escolar/configuracoes", label: "Configurações", icon: Cog, schoolOnly: true },
+      { to: "/escolar/configuracoes", label: "Config. Escola", icon: Settings, schoolOnly: true },
     ],
   },
   {
-    id: "config", label: "Configurações", icon: Cog,
-    items: [{ to: "/configuracoes", label: "Configurações", icon: Settings }],
+    id: "config", label: "Sistema", icon: Settings,
+    items: [
+      { to: "/configuracoes", label: "Configurações", icon: Settings },
+    ],
   },
 ];
 
-// Bottom-tab items for mobile (native app feel)
-const MOBILE_TABS: { to: string; label: string; icon: any }[] = [
-  { to: "/", label: "Início", icon: Home },
-  { to: "/leads", label: "Leads", icon: Users },
-  { to: "/pipeline", label: "Pipeline", icon: Kanban },
-  { to: "/insights", label: "Launch", icon: Sparkles },
-];
-
-const COLLAPSED_KEY = "ks-sidebar-collapsed";
-const GROUPS_OPEN_KEY = "ks-sidebar-groups";
+const COMERCIAL_PATHS = ["/leads", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas"];
 
 export function AppShell({ children, title, subtitle, action }: {
   children: ReactNode; title: string; subtitle?: string; action?: ReactNode;
@@ -117,16 +116,8 @@ export function AppShell({ children, title, subtitle, action }: {
   const { role: commercialRole } = useMyCommercialRole();
   const navigate = useNavigate();
 
-  const [collapsed, setCollapsed] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(COLLAPSED_KEY) === "1";
-  });
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
-    if (typeof window === "undefined") return {};
-    try { return JSON.parse(localStorage.getItem(GROUPS_OPEN_KEY) || "{}"); } catch { return {}; }
-  });
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [comercialOpen, setComercialOpen] = useState(false);
+  const [maisOpen, setMaisOpen] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -135,15 +126,8 @@ export function AppShell({ children, title, subtitle, action }: {
     if (memberships.length === 0 && !isSuperAdmin) navigate({ to: "/onboarding" });
   }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
 
-  useEffect(() => {
-    localStorage.setItem(COLLAPSED_KEY, collapsed ? "1" : "0");
-  }, [collapsed]);
-  useEffect(() => {
-    localStorage.setItem(GROUPS_OPEN_KEY, JSON.stringify(openGroups));
-  }, [openGroups]);
-
-  // Close mobile sheets on route change
-  useEffect(() => { setMobileNavOpen(false); setMoreOpen(false); }, [pathname]);
+  // Close sheets on route change
+  useEffect(() => { setComercialOpen(false); setMaisOpen(false); }, [pathname]);
 
   if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
     return (
@@ -156,424 +140,322 @@ export function AppShell({ children, title, subtitle, action }: {
   const initials = (user.user_metadata?.full_name || user.email || "U")
     .split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
   const displayName = user.user_metadata?.full_name || user.email?.split("@")[0];
-
-  function toggleGroup(id: string) {
-    setOpenGroups((p) => ({ ...p, [id]: !(p[id] ?? true) }));
-  }
-
-  function isGroupOpen(g: NavGroup) {
-    const hasActive = g.items.some((i) => i.to === "/" ? pathname === "/" : pathname.startsWith(i.to));
-    if (hasActive) return true;
-    return openGroups[g.id] ?? true;
-  }
-
   const segmento = (current?.tenant as any)?.segmento;
-  const sidebarWidth = collapsed ? "w-16" : "w-64";
-
-  const visibleGroups = NAV_GROUPS.map((group) => {
-    if (group.schoolOnly && segmento !== "escolar") return null;
-    const items = group.items.filter((i) => (!i.clinicOnly || segmento === "clinica") && (!i.schoolOnly || segmento === "escolar"));
-    if (items.length === 0) return null;
-    return { group, items };
-  }).filter(Boolean) as { group: NavGroup; items: NavItem[] }[];
 
   const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
+  const isComercialActive = COMERCIAL_PATHS.some((p) => pathname.startsWith(p));
+
+  const filteredComercial = useMemo(
+    () => COMERCIAL_GROUPS.map((g) => ({
+      ...g,
+      items: g.items.filter((i) => (!i.clinicOnly || segmento === "clinica") && (!i.schoolOnly || segmento === "escolar")),
+    })).filter((g) => g.items.length),
+    [segmento],
+  );
+  const filteredMais = useMemo(
+    () => MAIS_GROUPS.map((g) => {
+      if (g.schoolOnly && segmento !== "escolar") return null;
+      const items = g.items.filter((i) => (!i.clinicOnly || segmento === "clinica") && (!i.schoolOnly || segmento === "escolar"));
+      if (!items.length) return null;
+      return { ...g, items };
+    }).filter(Boolean) as SubGroup[],
+    [segmento],
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* ===== Desktop sidebar ===== */}
-      <aside className={`fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-border bg-sidebar transition-all duration-200 md:flex ${sidebarWidth}`}>
-        <div className="flex h-16 items-center gap-2 border-b border-border px-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-black shadow-glow ring-1 ring-primary/40">
-            <img src={alignIcon} alt="Align" className="h-9 w-9 object-contain" />
-          </div>
-          {!collapsed && (
-            <div className="leading-tight">
-              <div className="text-sm font-semibold tracking-tight">Align CRM</div>
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Sales · Marketing · IA</div>
+      {/* Ambient backdrop — barely-there glow, sets the premium mood */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-[var(--gradient-glow)] opacity-70 blur-3xl" />
+        <div className="absolute bottom-[-20%] right-[-10%] h-[420px] w-[420px] rounded-full bg-primary/[0.05] blur-3xl" />
+      </div>
+
+      {/* ===== Top bar (glass, minimal) ===== */}
+      <header
+        className="sticky top-0 z-30 border-b border-white/[0.04] bg-background/60 backdrop-blur-2xl"
+        style={{ paddingTop: "env(safe-area-inset-top)" }}
+      >
+        <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-3 px-4 md:h-16 md:px-8">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="grid h-9 w-9 place-items-center overflow-hidden rounded-2xl bg-black ring-1 ring-primary/30 shadow-glow">
+              <img src={alignIcon} alt="Align" className="h-9 w-9 object-contain" />
             </div>
-          )}
-          <button
-            onClick={() => setCollapsed((v) => !v)}
-            className="ml-auto grid h-7 w-7 place-items-center rounded-md text-muted-foreground transition hover:bg-surface-3 hover:text-foreground"
-            title={collapsed ? "Expandir" : "Colapsar"}
-          >
-            {collapsed ? <PanelLeftOpen className="h-3.5 w-3.5" /> : <PanelLeftClose className="h-3.5 w-3.5" />}
-          </button>
-        </div>
-
-        <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
-          {visibleGroups.map(({ group, items }) => {
-            const open = isGroupOpen(group);
-            const GIcon = group.icon;
-
-            if (items.length === 1 && (group.id === "inicio" || group.id === "config")) {
-              const item = items[0];
-              const Icon = item.icon;
-              const active = isActive(item.to);
-              return (
-                <Link
-                  key={group.id}
-                  to={item.to as any}
-                  title={collapsed ? item.label : undefined}
-                  className={[
-                    "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all",
-                    active ? "bg-surface-3 text-foreground shadow-card" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
-                  ].join(" ")}
-                >
-                  <Icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : ""}`} />
-                  {!collapsed && <span className="font-medium">{item.label}</span>}
-                  {active && !collapsed && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_oklch(0.685_0.175_45)]" />}
-                </Link>
-              );
-            }
-
-            return (
-              <div key={group.id} className="pt-1">
-                {collapsed ? (
-                  <div className="my-1 h-px bg-border/60" />
-                ) : (
-                  <button
-                    onClick={() => toggleGroup(group.id)}
-                    className={[
-                      "flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition",
-                      group.schoolOnly ? "text-primary hover:text-primary" : "text-muted-foreground/70 hover:text-foreground",
-                    ].join(" ")}
-                  >
-                    <GIcon className={`h-3 w-3 ${group.schoolOnly ? "text-primary" : ""}`} />
-                    <span className="flex-1 text-left">{group.label}</span>
-                    {group.schoolOnly && <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[8px] font-bold text-primary">EDU</span>}
-                    {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-                  </button>
-                )}
-                {(collapsed || open) && (
-                  <div className="space-y-0.5">
-                    {items.map(({ to, label, icon: Icon, badge }) => {
-                      const active = isActive(to);
-                      const showFinanceQuick = to === "/financeiro" && active && !collapsed;
-                      return (
-                        <div key={to}>
-                          <Link
-                            to={to as any}
-                            title={collapsed ? label : undefined}
-                            className={[
-                              "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all",
-                              active ? "bg-surface-3 text-foreground shadow-card" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
-                            ].join(" ")}
-                          >
-                            <Icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : ""}`} />
-                            {!collapsed && <span className="font-medium">{label}</span>}
-                            {!collapsed && badge && <span className="ml-auto rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-primary">{badge}</span>}
-                            {active && !collapsed && !badge && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_oklch(0.685_0.175_45)]" />}
-                          </Link>
-                          {showFinanceQuick && <FinanceQuickActions pathname={pathname} />}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </nav>
-
-        {isSuperAdmin && !collapsed && (
-          <Link
-            to="/super-admin"
-            className="mx-3 mb-2 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary/15"
-          >
-            <Shield className="h-3.5 w-3.5" />
-            Painel Super Admin
+            <div className="hidden leading-tight sm:block">
+              <div className="text-sm font-semibold tracking-tight">Align</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Launcher</div>
+            </div>
           </Link>
-        )}
 
-        {!collapsed && <SidebarCoachCard />}
-      </aside>
-
-      <div className={collapsed ? "md:pl-16" : "md:pl-64"}>
-        {/* ===== Mobile header ===== */}
-        <header className="sticky top-0 z-20 flex flex-col gap-2 border-b border-border bg-background/85 px-3 pt-2 pb-2 backdrop-blur-xl md:hidden"
-          style={{ paddingTop: "max(0.5rem, calc(env(safe-area-inset-top) + 0.25rem))" }}>
-          <div className="flex h-11 items-center gap-2">
-            <button
-              onClick={() => setMobileNavOpen(true)}
-              aria-label="Abrir menu"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-border bg-surface-1 text-foreground"
-            >
-              <Menu className="h-4 w-4" />
-            </button>
-            <Link to="/" className="flex items-center gap-2">
-              <div className="grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-black shadow-glow ring-1 ring-primary/40">
-                <img src={alignIcon} alt="Align" className="h-9 w-9 object-contain" />
-              </div>
-              <span className="text-sm font-semibold tracking-tight">Align</span>
-            </Link>
-            <div className="ml-auto flex items-center gap-1.5">
-              <Link
-                to="/leads"
-                aria-label="Novo lead"
-                className="grid h-10 w-10 place-items-center rounded-lg bg-primary text-primary-foreground shadow-glow"
-              >
-                <Plus className="h-4 w-4" />
-              </Link>
-              <button
-                onClick={toggleTheme}
-                aria-label="Tema"
-                className="grid h-10 w-10 place-items-center rounded-lg border border-border bg-surface-1 text-muted-foreground"
-              >
-                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </button>
-              <NotificationsPopover />
-            </div>
-          </div>
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative ml-2 hidden flex-1 md:block">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="search"
-              placeholder="Buscar leads, negócios, clientes..."
-              className="h-10 w-full rounded-lg border border-border bg-surface-1 pl-10 pr-3 text-sm placeholder:text-muted-foreground focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
+              placeholder="Buscar leads, negócios, clientes…"
+              className="h-10 w-full max-w-md rounded-2xl border border-white/[0.06] bg-white/[0.03] pl-10 pr-3 text-sm placeholder:text-muted-foreground focus:border-primary/40 focus:bg-white/[0.05] focus:outline-none focus:ring-2 focus:ring-primary/15"
             />
           </div>
-        </header>
 
-        {/* ===== Desktop header ===== */}
-        <header className="sticky top-0 z-20 hidden h-16 items-center gap-4 border-b border-border bg-background/80 px-5 backdrop-blur-xl md:flex md:px-8">
-          <div className="relative w-full max-w-sm">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="search"
-              placeholder="Buscar leads, negócios, clientes..."
-              className="h-10 w-full rounded-lg border border-border bg-surface-1 pl-10 pr-3 text-sm placeholder:text-muted-foreground focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1.5">
             <Link
               to="/leads"
-              className="hidden h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-xs font-medium text-muted-foreground transition hover:bg-surface-2 hover:text-foreground sm:flex"
+              aria-label="Novo lead"
+              className="hidden h-10 items-center gap-2 rounded-2xl bg-primary px-3.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 sm:inline-flex"
             >
-              <Plus className="h-3.5 w-3.5" /> Novo lead
+              <Plus className="h-3.5 w-3.5" /> Novo
+            </Link>
+            <Link
+              to="/leads"
+              aria-label="Novo lead"
+              className="grid h-10 w-10 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-glow sm:hidden"
+            >
+              <Plus className="h-4 w-4" />
             </Link>
             <button
               onClick={toggleTheme}
-              title={theme === "dark" ? "Modo claro" : "Modo escuro"}
               aria-label="Alternar tema"
-              className="grid h-9 w-9 place-items-center rounded-lg border border-border bg-surface-1 text-muted-foreground transition hover:text-foreground"
+              className="grid h-10 w-10 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground"
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             <NotificationsPopover />
-            <div className="flex items-center gap-2.5 rounded-lg border border-border bg-surface-1 py-1 pl-1 pr-3">
-              <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-primary to-[oklch(0.65_0.18_145)] text-xs font-bold text-primary-foreground">
+            <div className="hidden items-center gap-2.5 rounded-2xl border border-white/[0.06] bg-white/[0.03] py-1 pl-1 pr-3 md:flex">
+              <div className="grid h-7 w-7 place-items-center rounded-xl bg-gradient-to-br from-primary to-[oklch(0.65_0.18_145)] text-xs font-bold text-primary-foreground">
                 {initials}
               </div>
-              <div className="hidden leading-tight sm:block">
+              <div className="hidden leading-tight lg:block">
                 <div className="text-xs font-semibold">{displayName}</div>
-                <div className="text-[10px] text-muted-foreground capitalize">{commercialRole}</div>
+                <div className="text-[10px] capitalize text-muted-foreground">{commercialRole}</div>
               </div>
             </div>
             <button
               onClick={() => signOut()}
-              title="Sair"
-              className="grid h-9 w-9 place-items-center rounded-lg border border-border bg-surface-1 text-muted-foreground transition hover:text-foreground"
+              aria-label="Sair"
+              className="hidden h-10 w-10 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground md:grid"
             >
               <LogOut className="h-4 w-4" />
             </button>
           </div>
-        </header>
+        </div>
 
-        <main className="px-4 pb-24 pt-4 md:p-8 md:pb-8"
-          style={{ paddingBottom: "calc(5.5rem + env(safe-area-inset-bottom))" }}>
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-3 md:mb-6">
-            <div className="min-w-0">
-              <h1 className="truncate text-2xl font-semibold tracking-tight md:text-4xl">{title}</h1>
-              {subtitle && <p className="mt-1 text-xs text-muted-foreground md:text-sm">{subtitle}</p>}
-            </div>
-            {action && <div className="w-full sm:w-auto">{action}</div>}
+        {/* Mobile search row */}
+        <div className="px-4 pb-3 md:hidden">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="search"
+              placeholder="Buscar…"
+              className="h-10 w-full rounded-2xl border border-white/[0.06] bg-white/[0.03] pl-10 pr-3 text-sm placeholder:text-muted-foreground focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/15"
+            />
           </div>
-          <div className="min-w-0 overflow-x-hidden">{children}</div>
-        </main>
-      </div>
+        </div>
+      </header>
 
-      {/* ===== Mobile bottom tab bar (native app feel) ===== */}
-      <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-xl md:hidden"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-        aria-label="Navegação principal"
+      {/* ===== Main ===== */}
+      <main
+        className="mx-auto max-w-[1600px] px-4 pt-6 md:px-8 md:pt-10"
+        style={{ paddingBottom: "calc(7rem + env(safe-area-inset-bottom))" }}
       >
-        <ul className="mx-auto grid max-w-md grid-cols-5">
-          {MOBILE_TABS.map(({ to, label, icon: Icon }) => {
-            const active = isActive(to);
-            return (
-              <li key={to}>
-                <Link
-                  to={to as any}
-                  className="flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium"
-                >
-                  <div className={[
-                    "grid h-10 w-10 place-items-center rounded-xl transition",
-                    active ? "bg-primary/15 text-primary shadow-[0_0_12px_oklch(0.93_0.27_128/0.35)]" : "text-muted-foreground",
-                  ].join(" ")}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <span className={active ? "text-foreground" : "text-muted-foreground"}>{label}</span>
-                </Link>
-              </li>
-            );
-          })}
-          <li>
-            <button
-              onClick={() => setMoreOpen(true)}
-              className="flex w-full flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium"
-            >
-              <div className="grid h-10 w-10 place-items-center rounded-xl text-muted-foreground">
-                <MoreHorizontal className="h-5 w-5" />
-              </div>
-              <span className="text-muted-foreground">Mais</span>
-            </button>
-          </li>
-        </ul>
-      </nav>
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3 md:mb-8">
+          <div className="min-w-0">
+            <h1 className="truncate font-display text-3xl font-semibold tracking-tight md:text-[2.5rem] md:leading-[1.05]">{title}</h1>
+            {subtitle && <p className="mt-1.5 text-sm text-muted-foreground md:text-[15px]">{subtitle}</p>}
+          </div>
+          {action && <div className="w-full sm:w-auto">{action}</div>}
+        </div>
+        <div className="min-w-0 overflow-x-hidden animate-in fade-in duration-300">{children}</div>
+      </main>
 
-      {/* ===== Mobile nav drawer (left) ===== */}
-      {mobileNavOpen && (
-        <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in" onClick={() => setMobileNavOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-[85vw] max-w-[320px] flex-col border-r border-border bg-sidebar shadow-elevated animate-in slide-in-from-left">
-            <div className="flex h-14 items-center gap-2 border-b border-border px-4"
-              style={{ paddingTop: "max(0px, env(safe-area-inset-top))", height: "calc(3.5rem + env(safe-area-inset-top))" }}>
-              <div className="grid h-9 w-9 place-items-center overflow-hidden rounded-xl bg-black shadow-glow ring-1 ring-primary/40">
-                <img src={alignIcon} alt="Align" className="h-9 w-9 object-contain" />
-              </div>
-              <div className="leading-tight">
-                <div className="text-sm font-semibold">Align CRM</div>
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Sales · IA</div>
-              </div>
-              <button onClick={() => setMobileNavOpen(false)} aria-label="Fechar" className="ml-auto grid h-9 w-9 place-items-center rounded-lg text-muted-foreground hover:bg-surface-3">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
+      {/* ===== Liquid-glass floating dock ===== */}
+      <LiquidDock
+        active={{ home: isActive("/"), comercial: isComercialActive, tarefas: isActive("/tarefas"), financeiro: isActive("/financeiro") }}
+        onOpenComercial={() => { setMaisOpen(false); setComercialOpen((v) => !v); }}
+        onOpenMais={() => { setComercialOpen(false); setMaisOpen((v) => !v); }}
+        comercialOpen={comercialOpen}
+        maisOpen={maisOpen}
+      />
 
-            <div className="border-b border-border p-3">
-              <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-1 p-2.5">
-                <div className="grid h-10 w-10 place-items-center rounded-lg bg-gradient-to-br from-primary to-[oklch(0.65_0.18_145)] text-sm font-bold text-primary-foreground">
-                  {initials}
-                </div>
-                <div className="min-w-0 flex-1 leading-tight">
-                  <div className="truncate text-sm font-semibold">{displayName}</div>
-                  <div className="text-[10px] capitalize text-muted-foreground">{commercialRole}</div>
-                </div>
-                <button onClick={() => signOut()} aria-label="Sair" className="grid h-9 w-9 place-items-center rounded-lg border border-border text-muted-foreground">
-                  <LogOut className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-
-            <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-3">
-              {visibleGroups.map(({ group, items }) => (
-                <div key={group.id} className="pt-1">
-                  <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">
-                    {group.label}
-                  </div>
-                  <div className="space-y-0.5">
-                    {items.map(({ to, label, icon: Icon }) => {
-                      const active = isActive(to);
-                      return (
-                        <Link key={to} to={to as any}
-                          className={[
-                            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition",
-                            active ? "bg-surface-3 text-foreground" : "text-muted-foreground hover:bg-sidebar-accent",
-                          ].join(" ")}
-                        >
-                          <Icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : ""}`} />
-                          <span className="font-medium">{label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+      {/* Comercial popover */}
+      {comercialOpen && (
+        <DockSheet title="Comercial" onClose={() => setComercialOpen(false)} groups={filteredComercial} pathname={pathname} />
+      )}
+      {/* Mais popover */}
+      {maisOpen && (
+        <DockSheet
+          title="Mais"
+          onClose={() => setMaisOpen(false)}
+          groups={filteredMais}
+          pathname={pathname}
+          footer={
+            <div className="space-y-2">
               {isSuperAdmin && (
-                <Link to="/super-admin" className="mx-1 mt-3 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2.5 text-xs font-semibold text-primary">
-                  <Shield className="h-3.5 w-3.5" />
-                  Painel Super Admin
+                <Link to="/super-admin" className="flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/10 px-3.5 py-3 text-xs font-semibold text-primary">
+                  <Shield className="h-4 w-4" /> Painel Super Admin
                 </Link>
               )}
-            </nav>
-          </aside>
-        </div>
-      )}
-
-      {/* ===== Mobile "More" bottom sheet ===== */}
-      {moreOpen && (
-        <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in" onClick={() => setMoreOpen(false)} />
-          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-hidden rounded-t-2xl border-t border-border bg-background shadow-elevated animate-in slide-in-from-bottom"
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-            <div className="mx-auto my-2 h-1.5 w-10 rounded-full bg-border" />
-            <div className="flex items-center justify-between px-4 pb-2">
-              <div className="text-base font-semibold">Mais</div>
-              <button onClick={() => setMoreOpen(false)} aria-label="Fechar" className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground">
-                <X className="h-4 w-4" />
+              <button onClick={() => signOut()} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
+                <LogOut className="h-4 w-4" /> Sair da conta
               </button>
             </div>
-            <div className="max-h-[70vh] overflow-y-auto px-4 pb-6">
-              {visibleGroups.map(({ group, items }) => {
-                const remaining = items.filter((i) => !MOBILE_TABS.some((t) => t.to === i.to));
-                if (remaining.length === 0) return null;
-                return (
-                  <div key={group.id} className="mb-5">
-                    <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">{group.label}</div>
-                    <div className="grid grid-cols-4 gap-2">
-                      {remaining.map(({ to, label, icon: Icon }) => {
-                        const active = isActive(to);
-                        return (
-                          <Link key={to} to={to as any}
-                            className={[
-                              "flex flex-col items-center gap-1.5 rounded-xl border p-2.5 text-center transition",
-                              active ? "border-primary/40 bg-primary/10" : "border-border bg-surface-1 hover:bg-surface-2",
-                            ].join(" ")}
-                          >
-                            <Icon className={`h-5 w-5 ${active ? "text-primary" : "text-muted-foreground"}`} />
-                            <span className="line-clamp-2 text-[10px] font-medium leading-tight">{label}</span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-              <button onClick={() => signOut()} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface-1 px-4 py-3 text-sm font-semibold text-muted-foreground">
-                <LogOut className="h-4 w-4" />
-                Sair da conta
-              </button>
-            </div>
-          </div>
-        </div>
+          }
+        />
       )}
     </div>
   );
 }
 
-function SidebarCoachCard() {
-  const { data: leads = [] } = useLeads();
-  const quentes = leads.filter((l) => (l.ai_score ?? 0) >= 70 && l.status !== "fechado" && l.status !== "perdido").length;
+/* -------------------- Dock -------------------- */
+function LiquidDock({
+  active, onOpenComercial, onOpenMais, comercialOpen, maisOpen,
+}: {
+  active: { home: boolean; comercial: boolean; tarefas: boolean; financeiro: boolean };
+  onOpenComercial: () => void; onOpenMais: () => void; comercialOpen: boolean; maisOpen: boolean;
+}) {
   return (
-    <div className="m-3 rounded-xl border border-border bg-gradient-to-br from-surface-2 to-surface-1 p-4 shadow-card">
-      <div className="mb-2 flex items-center gap-2">
-        <Sparkles className="h-3.5 w-3.5 text-primary" />
-        <span className="text-xs font-semibold">Launch</span>
+    <nav
+      aria-label="Navegação principal"
+      className="fixed inset-x-0 z-40 flex justify-center px-3"
+      style={{ bottom: "calc(env(safe-area-inset-bottom) + 14px)" }}
+    >
+      <div className="relative">
+        {/* glow under the dock */}
+        <div aria-hidden className="pointer-events-none absolute -inset-6 -z-10 rounded-[40px] bg-primary/[0.06] blur-2xl" />
+        <ul
+          className="flex items-center gap-1 rounded-[28px] border border-white/[0.08] bg-white/[0.04] p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl backdrop-saturate-150 dark:bg-white/[0.04]"
+        >
+          <DockItem to="/" label="Dashboard" icon={LayoutDashboard} active={active.home} />
+          <DockButton label="Comercial" icon={ShoppingBag} active={active.comercial || comercialOpen} onClick={onOpenComercial} />
+          <DockItem to="/tarefas" label="Tarefas" icon={ListChecks} active={active.tarefas} />
+          <DockItem to="/financeiro" label="Financeiro" icon={Wallet} active={active.financeiro} />
+          <DockButton label="Mais" icon={MoreHorizontal} active={maisOpen} onClick={onOpenMais} />
+        </ul>
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">
-        Você tem <span className="font-semibold text-foreground">{quentes} {quentes === 1 ? "lead quente" : "leads quentes"}</span> aguardando ação hoje.
-      </p>
-      <AiCoachButton />
+    </nav>
+  );
+}
+
+function DockItem({ to, label, icon: Icon, active }: { to: string; label: string; icon: any; active: boolean }) {
+  return (
+    <li>
+      <Link
+        to={to as any}
+        aria-label={label}
+        className={[
+          "group relative flex h-12 items-center gap-2 rounded-[20px] px-3 transition-all duration-300 ease-out",
+          active
+            ? "bg-foreground/[0.08] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+            : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground active:scale-[0.96]",
+        ].join(" ")}
+      >
+        <Icon className={["h-[18px] w-[18px] transition-transform duration-300", active ? "text-primary" : ""].join(" ")} strokeWidth={active ? 2.5 : 2.2} />
+        <span className={["hidden text-[12.5px] font-medium tracking-tight md:inline", active ? "" : "opacity-90"].join(" ")}>{label}</span>
+      </Link>
+    </li>
+  );
+}
+
+function DockButton({ label, icon: Icon, active, onClick }: { label: string; icon: any; active: boolean; onClick: () => void }) {
+  return (
+    <li>
+      <button
+        onClick={onClick}
+        aria-label={label}
+        className={[
+          "group relative flex h-12 items-center gap-2 rounded-[20px] px-3 transition-all duration-300 ease-out",
+          active
+            ? "bg-foreground/[0.08] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+            : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground active:scale-[0.96]",
+        ].join(" ")}
+      >
+        <Icon className={["h-[18px] w-[18px]", active ? "text-primary" : ""].join(" ")} strokeWidth={active ? 2.5 : 2.2} />
+        <span className={["hidden text-[12.5px] font-medium tracking-tight md:inline"].join(" ")}>{label}</span>
+      </button>
+    </li>
+  );
+}
+
+/* -------------------- Sheet (popover for Comercial / Mais) -------------------- */
+function DockSheet({
+  title, onClose, groups, pathname, footer,
+}: {
+  title: string; onClose: () => void; groups: SubGroup[]; pathname: string; footer?: ReactNode;
+}) {
+  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
+
+  return (
+    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={title}>
+      {/* dimmer */}
+      <button
+        aria-label="Fechar"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/40 backdrop-blur-[6px] animate-in fade-in duration-200"
+      />
+      {/* sheet */}
+      <div
+        className="absolute inset-x-3 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-[min(900px,calc(100vw-32px))] rounded-[28px] border border-white/[0.08] bg-background/85 p-4 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-2xl backdrop-saturate-150 animate-in fade-in slide-in-from-bottom-4 duration-300 md:p-6"
+        style={{ bottom: "calc(env(safe-area-inset-bottom) + 82px)" }}
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Menu</div>
+            <h2 className="font-display text-xl font-semibold tracking-tight">{title}</h2>
+          </div>
+          <button onClick={onClose} aria-label="Fechar" className="grid h-10 w-10 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="max-h-[60vh] space-y-5 overflow-y-auto pr-1">
+          {groups.map((g) => {
+            const GIcon = g.icon;
+            return (
+              <section key={g.id}>
+                <div className="mb-2 flex items-center gap-2 px-1">
+                  <GIcon className="h-3.5 w-3.5 text-primary" />
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{g.label}</div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                  {g.items.map(({ to, label, icon: Icon }) => {
+                    const active = isActive(to);
+                    return (
+                      <Link
+                        key={to}
+                        to={to as any}
+                        className={[
+                          "group flex items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-200",
+                          active
+                            ? "border-primary/40 bg-primary/10 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                            : "border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:-translate-y-px hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-foreground",
+                        ].join(" ")}
+                      >
+                        <div className={["grid h-9 w-9 shrink-0 place-items-center rounded-xl transition", active ? "bg-primary/15 text-primary" : "bg-white/[0.04] text-muted-foreground group-hover:text-foreground"].join(" ")}>
+                          <Icon className="h-4 w-4" strokeWidth={2.4} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-[13px] font-medium tracking-tight">{label}</div>
+                        </div>
+                        <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-60" />
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+
+        {footer && <div className="mt-5 border-t border-white/[0.06] pt-4">{footer}</div>}
+      </div>
     </div>
   );
 }
 
+/* -------------------- Shared UI primitives (kept exports) -------------------- */
 export function PrimaryButton({ children, icon: Icon, ...rest }: { children: ReactNode; icon?: any } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button {...rest} className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110">
+    <button
+      {...rest}
+      className="inline-flex h-10 items-center gap-2 rounded-2xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 active:scale-[0.98]"
+    >
       {Icon && <Icon className="h-4 w-4" />}
       {children}
     </button>
@@ -586,46 +468,12 @@ export function StatusPill({ tone, children }: { tone: "success" | "warn" | "inf
     warn: "bg-warning/15 text-warning",
     info: "bg-[oklch(0.7_0.12_220)/0.15] text-[oklch(0.78_0.13_220)]",
     danger: "bg-destructive/15 text-destructive",
-    neutral: "bg-surface-3 text-muted-foreground",
+    neutral: "bg-white/[0.06] text-muted-foreground",
   };
   return (
-    <span className={["inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium", tones[tone]].join(" ")}>
+    <span className={["inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium", tones[tone]].join(" ")}>
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {children}
     </span>
-  );
-}
-
-const FINANCE_QUICK = [
-  { tab: "receber", label: "Contas a Receber" },
-  { tab: "pagar", label: "Contas a Pagar" },
-  { tab: "fluxo", label: "Fluxo de Caixa" },
-  { tab: "parcelas", label: "Parcelas" },
-] as const;
-
-function FinanceQuickActions({ pathname }: { pathname: string }) {
-  // Lê tab atual via URL para destacar
-  const current = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("tab") : null;
-  if (!pathname.startsWith("/financeiro")) return null;
-  return (
-    <div className="mb-1 ml-7 mt-1 space-y-0.5 border-l border-border/60 pl-2">
-      {FINANCE_QUICK.map((q) => {
-        const active = current === q.tab;
-        return (
-          <Link
-            key={q.tab}
-            to="/financeiro"
-            search={{ tab: q.tab } as any}
-            className={[
-              "flex items-center gap-2 rounded-md px-2 py-1 text-[11px] transition",
-              active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
-            ].join(" ")}
-          >
-            <span className={`h-1 w-1 rounded-full ${active ? "bg-primary" : "bg-muted-foreground/50"}`} />
-            {q.label}
-          </Link>
-        );
-      })}
-    </div>
   );
 }
