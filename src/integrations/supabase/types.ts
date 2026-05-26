@@ -1560,6 +1560,51 @@ export type Database = {
         }
         Relationships: []
       }
+      project_audit_logs: {
+        Row: {
+          action: string
+          affected_entries: Json
+          affected_leads: Json
+          affected_tasks: Json
+          created_at: string
+          details: Json
+          from_status: string | null
+          id: string
+          project_id: string
+          tenant_id: string
+          to_status: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          affected_entries?: Json
+          affected_leads?: Json
+          affected_tasks?: Json
+          created_at?: string
+          details?: Json
+          from_status?: string | null
+          id?: string
+          project_id: string
+          tenant_id: string
+          to_status?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          affected_entries?: Json
+          affected_leads?: Json
+          affected_tasks?: Json
+          created_at?: string
+          details?: Json
+          from_status?: string | null
+          id?: string
+          project_id?: string
+          tenant_id?: string
+          to_status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           client_id: string | null
