@@ -119,32 +119,9 @@ export function AppShell({ children, title, subtitle, action }: {
 
   const [comercialOpen, setComercialOpen] = useState(false);
   const [maisOpen, setMaisOpen] = useState(false);
+  const [launchOpen, setLaunchOpen] = useState(false);
 
-  useEffect(() => {
-    if (loading) return;
-    if (!user) { navigate({ to: "/auth" }); return; }
-    if (tenantLoading) return;
-    if (memberships.length === 0 && !isSuperAdmin) navigate({ to: "/onboarding" });
-  }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
-
-  // Close sheets on route change
-  useEffect(() => { setComercialOpen(false); setMaisOpen(false); }, [pathname]);
-
-  if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  const initials = (user.user_metadata?.full_name || user.email || "U")
-    .split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
-  const displayName = user.user_metadata?.full_name || user.email?.split("@")[0];
   const segmento = (current?.tenant as any)?.segmento;
-
-  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
-  const isComercialActive = COMERCIAL_PATHS.some((p) => pathname.startsWith(p));
 
   const filteredComercial = useMemo(
     () => COMERCIAL_GROUPS.map((g) => ({
@@ -162,6 +139,31 @@ export function AppShell({ children, title, subtitle, action }: {
     }).filter(Boolean) as SubGroup[],
     [segmento],
   );
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { navigate({ to: "/auth" }); return; }
+    if (tenantLoading) return;
+    if (memberships.length === 0 && !isSuperAdmin) navigate({ to: "/onboarding" });
+  }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
+
+  // Close sheets on route change
+  useEffect(() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
+
+  if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const initials = (user.user_metadata?.full_name || user.email || "U")
+    .split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
+  const displayName = user.user_metadata?.full_name || user.email?.split("@")[0];
+
+  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
+  const isComercialActive = COMERCIAL_PATHS.some((p) => pathname.startsWith(p));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
