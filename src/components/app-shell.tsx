@@ -14,6 +14,7 @@ import { useTenant } from "@/contexts/tenant-context";
 import { useTheme } from "@/contexts/theme-context";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { NotificationsPopover } from "@/components/notifications-popover";
+import { LaunchPanel } from "@/components/launch-panel";
 
 /* ============================================================
  * Align CRM — Liquid Glass shell (iOS 26-inspired)
@@ -118,32 +119,9 @@ export function AppShell({ children, title, subtitle, action }: {
 
   const [comercialOpen, setComercialOpen] = useState(false);
   const [maisOpen, setMaisOpen] = useState(false);
+  const [launchOpen, setLaunchOpen] = useState(false);
 
-  useEffect(() => {
-    if (loading) return;
-    if (!user) { navigate({ to: "/auth" }); return; }
-    if (tenantLoading) return;
-    if (memberships.length === 0 && !isSuperAdmin) navigate({ to: "/onboarding" });
-  }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
-
-  // Close sheets on route change
-  useEffect(() => { setComercialOpen(false); setMaisOpen(false); }, [pathname]);
-
-  if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  const initials = (user.user_metadata?.full_name || user.email || "U")
-    .split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
-  const displayName = user.user_metadata?.full_name || user.email?.split("@")[0];
   const segmento = (current?.tenant as any)?.segmento;
-
-  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
-  const isComercialActive = COMERCIAL_PATHS.some((p) => pathname.startsWith(p));
 
   const filteredComercial = useMemo(
     () => COMERCIAL_GROUPS.map((g) => ({
@@ -161,6 +139,31 @@ export function AppShell({ children, title, subtitle, action }: {
     }).filter(Boolean) as SubGroup[],
     [segmento],
   );
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { navigate({ to: "/auth" }); return; }
+    if (tenantLoading) return;
+    if (memberships.length === 0 && !isSuperAdmin) navigate({ to: "/onboarding" });
+  }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
+
+  // Close sheets on route change
+  useEffect(() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
+
+  if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const initials = (user.user_metadata?.full_name || user.email || "U")
+    .split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
+  const displayName = user.user_metadata?.full_name || user.email?.split("@")[0];
+
+  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
+  const isComercialActive = COMERCIAL_PATHS.some((p) => pathname.startsWith(p));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -268,10 +271,12 @@ export function AppShell({ children, title, subtitle, action }: {
       {/* ===== Liquid-glass floating dock ===== */}
       <LiquidDock
         active={{ home: isActive("/"), comercial: isComercialActive, tarefas: isActive("/tarefas"), financeiro: isActive("/financeiro") }}
-        onOpenComercial={() => { setMaisOpen(false); setComercialOpen((v) => !v); }}
-        onOpenMais={() => { setComercialOpen(false); setMaisOpen((v) => !v); }}
+        onOpenComercial={() => { setMaisOpen(false); setLaunchOpen(false); setComercialOpen((v) => !v); }}
+        onOpenMais={() => { setComercialOpen(false); setLaunchOpen(false); setMaisOpen((v) => !v); }}
+        onOpenLaunch={() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen((v) => !v); }}
         comercialOpen={comercialOpen}
         maisOpen={maisOpen}
+        launchOpen={launchOpen}
       />
 
       {/* Comercial popover */}
@@ -299,16 +304,19 @@ export function AppShell({ children, title, subtitle, action }: {
           }
         />
       )}
+
+      <LaunchPanel open={launchOpen} onClose={() => setLaunchOpen(false)} />
     </div>
   );
 }
 
 /* -------------------- Dock -------------------- */
 function LiquidDock({
-  active, onOpenComercial, onOpenMais, comercialOpen, maisOpen,
+  active, onOpenComercial, onOpenMais, onOpenLaunch, comercialOpen, maisOpen, launchOpen,
 }: {
   active: { home: boolean; comercial: boolean; tarefas: boolean; financeiro: boolean };
-  onOpenComercial: () => void; onOpenMais: () => void; comercialOpen: boolean; maisOpen: boolean;
+  onOpenComercial: () => void; onOpenMais: () => void; onOpenLaunch: () => void;
+  comercialOpen: boolean; maisOpen: boolean; launchOpen: boolean;
 }) {
   return (
     <nav
@@ -327,9 +335,39 @@ function LiquidDock({
           <DockItem to="/tarefas" label="Tarefas" icon={ListChecks} active={active.tarefas} />
           <DockItem to="/financeiro" label="Financeiro" icon={Wallet} active={active.financeiro} />
           <DockButton label="Mais" icon={MoreHorizontal} active={maisOpen} onClick={onOpenMais} />
+          {/* divider */}
+          <li aria-hidden className="mx-1 h-7 w-px bg-white/[0.08]" />
+          <LaunchDockButton active={launchOpen} onClick={onOpenLaunch} />
         </ul>
       </div>
     </nav>
+  );
+}
+
+function LaunchDockButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+  return (
+    <li>
+      <button
+        onClick={onClick}
+        aria-label="Launch — Inteligência"
+        className={[
+          "group relative flex h-12 items-center gap-2 overflow-hidden rounded-[20px] px-3.5 transition-all duration-300 ease-out",
+          "border border-white/[0.10] bg-gradient-to-b from-white/[0.08] to-white/[0.02]",
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_8px_24px_-10px_oklch(0.7_0.18_145_/_0.45)]",
+          "hover:from-white/[0.12] hover:to-white/[0.04] active:scale-[0.97]",
+          active ? "ring-1 ring-primary/50" : "",
+        ].join(" ")}
+      >
+        {/* aurora wash */}
+        <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[20px] bg-[radial-gradient(120%_120%_at_50%_0%,oklch(0.72_0.18_145_/_0.22),transparent_60%)]" />
+        {/* shimmer line */}
+        <span aria-hidden className="pointer-events-none absolute inset-x-2 top-px h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+        <span className="relative grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-primary/40 to-primary/5 ring-1 ring-primary/40 shadow-[0_0_14px_-2px_oklch(0.7_0.18_145_/_0.55)]">
+          <Sparkles className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} />
+        </span>
+        <span className="relative hidden text-[12.5px] font-semibold tracking-tight text-foreground md:inline">Launch</span>
+      </button>
+    </li>
   );
 }
 
