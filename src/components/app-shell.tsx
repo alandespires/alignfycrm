@@ -271,10 +271,12 @@ export function AppShell({ children, title, subtitle, action }: {
       {/* ===== Liquid-glass floating dock ===== */}
       <LiquidDock
         active={{ home: isActive("/"), comercial: isComercialActive, tarefas: isActive("/tarefas"), financeiro: isActive("/financeiro") }}
-        onOpenComercial={() => { setMaisOpen(false); setComercialOpen((v) => !v); }}
-        onOpenMais={() => { setComercialOpen(false); setMaisOpen((v) => !v); }}
+        onOpenComercial={() => { setMaisOpen(false); setLaunchOpen(false); setComercialOpen((v) => !v); }}
+        onOpenMais={() => { setComercialOpen(false); setLaunchOpen(false); setMaisOpen((v) => !v); }}
+        onOpenLaunch={() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen((v) => !v); }}
         comercialOpen={comercialOpen}
         maisOpen={maisOpen}
+        launchOpen={launchOpen}
       />
 
       {/* Comercial popover */}
