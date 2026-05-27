@@ -304,16 +304,19 @@ export function AppShell({ children, title, subtitle, action }: {
           }
         />
       )}
+
+      <LaunchPanel open={launchOpen} onClose={() => setLaunchOpen(false)} />
     </div>
   );
 }
 
 /* -------------------- Dock -------------------- */
 function LiquidDock({
-  active, onOpenComercial, onOpenMais, comercialOpen, maisOpen,
+  active, onOpenComercial, onOpenMais, onOpenLaunch, comercialOpen, maisOpen, launchOpen,
 }: {
   active: { home: boolean; comercial: boolean; tarefas: boolean; financeiro: boolean };
-  onOpenComercial: () => void; onOpenMais: () => void; comercialOpen: boolean; maisOpen: boolean;
+  onOpenComercial: () => void; onOpenMais: () => void; onOpenLaunch: () => void;
+  comercialOpen: boolean; maisOpen: boolean; launchOpen: boolean;
 }) {
   return (
     <nav
