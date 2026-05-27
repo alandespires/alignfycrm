@@ -344,6 +344,33 @@ function LiquidDock({
   );
 }
 
+function LaunchDockButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+  return (
+    <li>
+      <button
+        onClick={onClick}
+        aria-label="Launch — Inteligência"
+        className={[
+          "group relative flex h-12 items-center gap-2 overflow-hidden rounded-[20px] px-3.5 transition-all duration-300 ease-out",
+          "border border-white/[0.10] bg-gradient-to-b from-white/[0.08] to-white/[0.02]",
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_8px_24px_-10px_oklch(0.7_0.18_145_/_0.45)]",
+          "hover:from-white/[0.12] hover:to-white/[0.04] active:scale-[0.97]",
+          active ? "ring-1 ring-primary/50" : "",
+        ].join(" ")}
+      >
+        {/* aurora wash */}
+        <span aria-hidden className="pointer-events-none absolute inset-0 rounded-[20px] bg-[radial-gradient(120%_120%_at_50%_0%,oklch(0.72_0.18_145_/_0.22),transparent_60%)]" />
+        {/* shimmer line */}
+        <span aria-hidden className="pointer-events-none absolute inset-x-2 top-px h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+        <span className="relative grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-primary/40 to-primary/5 ring-1 ring-primary/40 shadow-[0_0_14px_-2px_oklch(0.7_0.18_145_/_0.55)]">
+          <Sparkles className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} />
+        </span>
+        <span className="relative hidden text-[12.5px] font-semibold tracking-tight text-foreground md:inline">Launch</span>
+      </button>
+    </li>
+  );
+}
+
 function DockItem({ to, label, icon: Icon, active }: { to: string; label: string; icon: any; active: boolean }) {
   return (
     <li>
