@@ -335,6 +335,9 @@ function LiquidDock({
           <DockItem to="/tarefas" label="Tarefas" icon={ListChecks} active={active.tarefas} />
           <DockItem to="/financeiro" label="Financeiro" icon={Wallet} active={active.financeiro} />
           <DockButton label="Mais" icon={MoreHorizontal} active={maisOpen} onClick={onOpenMais} />
+          {/* divider */}
+          <li aria-hidden className="mx-1 h-7 w-px bg-white/[0.08]" />
+          <LaunchDockButton active={launchOpen} onClick={onOpenLaunch} />
         </ul>
       </div>
     </nav>
