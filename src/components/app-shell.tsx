@@ -70,10 +70,10 @@ const MAIS_GROUPS: SubGroup[] = [
     ],
   },
   {
-    id: "inteligencia", label: "Inteligência", icon: Sparkles,
+    id: "inteligencia", label: "Inteligência", icon: LaunchIcon,
     items: [
       { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
-      { to: "/insights", label: "Launch", icon: Sparkles },
+      { to: "/insights", label: "Launch", icon: LaunchIcon },
       { to: "/dashboards", label: "Dashboards", icon: LineChart },
     ],
   },
