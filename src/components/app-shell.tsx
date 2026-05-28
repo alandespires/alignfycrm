@@ -151,6 +151,20 @@ export function AppShell({ children, title, subtitle, action }: {
   // Close sheets on route change
   useEffect(() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
 
+  // Global keyboard shortcut: Ctrl/Cmd+K toggles Launch panel
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
+        e.preventDefault();
+        setComercialOpen(false);
+        setMaisOpen(false);
+        setLaunchOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
     return (
       <div className="grid min-h-screen place-items-center bg-background">
