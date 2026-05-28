@@ -112,7 +112,7 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
     setLoading(true);
 
     // persist user msg (best-effort)
-    if (convId) appendMsg.mutate({ conversation_id: convId, role: "user", content: text }).catch?.(() => {});
+    if (convId) try { appendMsg.mutate({ conversation_id: convId, role: "user", content: text }); } catch {}
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -160,7 +160,7 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
         }
       }
       // persist assistant msg
-      if (convId && acc) appendMsg.mutate({ conversation_id: convId, role: "assistant", content: acc }).catch?.(() => {});
+      if (convId && acc) try { appendMsg.mutate({ conversation_id: convId, role: "assistant", content: acc }); } catch {}
     } catch {
       setMessages([...next, { role: "assistant", content: "Não consegui responder agora. Tente novamente." }]);
     } finally {
