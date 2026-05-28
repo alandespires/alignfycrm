@@ -378,7 +378,7 @@ function LaunchDockButton({ active, onClick }: { active: boolean; onClick: () =>
         {/* shimmer line */}
         <span aria-hidden className="pointer-events-none absolute inset-x-2 top-px h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
         <span className="relative grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-primary/40 to-primary/5 ring-1 ring-primary/40 shadow-[0_0_14px_-2px_oklch(0.7_0.18_145_/_0.55)]">
-          <Sparkles className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} />
+          <LaunchIcon className="h-4 w-4" />
         </span>
         <span className="relative hidden text-[12.5px] font-semibold tracking-tight text-foreground md:inline">Launch</span>
       </button>
