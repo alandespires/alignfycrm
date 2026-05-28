@@ -15,6 +15,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { NotificationsPopover } from "@/components/notifications-popover";
 import { LaunchPanel } from "@/components/launch-panel";
+import { LaunchIcon } from "@/components/launch-icon";
 
 /* ============================================================
  * Align CRM — Liquid Glass shell (iOS 26-inspired)
@@ -69,10 +70,10 @@ const MAIS_GROUPS: SubGroup[] = [
     ],
   },
   {
-    id: "inteligencia", label: "Inteligência", icon: Sparkles,
+    id: "inteligencia", label: "Inteligência", icon: LaunchIcon,
     items: [
       { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
-      { to: "/insights", label: "Launch", icon: Sparkles },
+      { to: "/insights", label: "Launch", icon: LaunchIcon },
       { to: "/dashboards", label: "Dashboards", icon: LineChart },
     ],
   },
@@ -149,6 +150,20 @@ export function AppShell({ children, title, subtitle, action }: {
 
   // Close sheets on route change
   useEffect(() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
+
+  // Global keyboard shortcut: Ctrl/Cmd+K toggles Launch panel
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
+        e.preventDefault();
+        setComercialOpen(false);
+        setMaisOpen(false);
+        setLaunchOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
     return (
@@ -363,7 +378,7 @@ function LaunchDockButton({ active, onClick }: { active: boolean; onClick: () =>
         {/* shimmer line */}
         <span aria-hidden className="pointer-events-none absolute inset-x-2 top-px h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
         <span className="relative grid h-6 w-6 place-items-center rounded-lg bg-gradient-to-br from-primary/40 to-primary/5 ring-1 ring-primary/40 shadow-[0_0_14px_-2px_oklch(0.7_0.18_145_/_0.55)]">
-          <Sparkles className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} />
+          <LaunchIcon className="h-4 w-4" />
         </span>
         <span className="relative hidden text-[12.5px] font-semibold tracking-tight text-foreground md:inline">Launch</span>
       </button>
