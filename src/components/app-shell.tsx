@@ -15,6 +15,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { NotificationsPopover } from "@/components/notifications-popover";
 import { LaunchPanel } from "@/components/launch-panel";
+import { LaunchIcon } from "@/components/launch-icon";
 
 /* ============================================================
  * Align CRM — Liquid Glass shell (iOS 26-inspired)
