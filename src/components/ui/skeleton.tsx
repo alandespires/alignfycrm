@@ -20,15 +20,17 @@ function Skeleton({ className, variant = "default", ...props }: SkeletonProps) {
   const base =
     "relative isolate overflow-hidden rounded-md bg-[oklch(from_var(--foreground)_l_c_h_/_0.06)]";
 
+  const sweep =
+    "before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(90deg,transparent,oklch(from_var(--foreground)_l_c_h_/_0.10),transparent)] before:animate-[ks-sweep_1.6s_ease-in-out_infinite]";
+  const sweepPrimary =
+    "before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(90deg,transparent,oklch(from_var(--primary)_l_c_h_/_0.22),transparent)] before:animate-[ks-sweep_1.6s_ease-in-out_infinite]";
+
   const variants: Record<Variant, string> = {
-    default:
-      "before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(90deg,transparent,oklch(from_var(--foreground)_l_c_h_/_0.10),transparent)] before:animate-[ks-shimmer_1.6s_ease-in-out_infinite]",
-    shine:
-      "bg-[oklch(from_var(--primary)_l_c_h_/_0.08)] before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(90deg,transparent,oklch(from_var(--primary)_l_c_h_/_0.22),transparent)] before:animate-[ks-shimmer_1.6s_ease-in-out_infinite]",
+    default: sweep,
+    shine: `bg-[oklch(from_var(--primary)_l_c_h_/_0.08)] ${sweepPrimary}`,
     pulse: "animate-pulse",
-    text: "h-3 rounded-full before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(90deg,transparent,oklch(from_var(--foreground)_l_c_h_/_0.10),transparent)] before:animate-[ks-shimmer_1.6s_ease-in-out_infinite]",
-    circle:
-      "aspect-square rounded-full before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(90deg,transparent,oklch(from_var(--foreground)_l_c_h_/_0.10),transparent)] before:animate-[ks-shimmer_1.6s_ease-in-out_infinite]",
+    text: `h-3 rounded-full ${sweep}`,
+    circle: `aspect-square rounded-full ${sweep}`,
   };
 
   return <div className={cn(base, variants[variant], className)} {...props} />;
