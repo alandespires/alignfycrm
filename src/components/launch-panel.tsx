@@ -138,6 +138,8 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
       let buf = ""; let acc = "";
+      // Accumulate tool_calls coming in streaming deltas
+      const toolCalls: Record<number, { name?: string; args: string }> = {};
       setMessages([...next, { role: "assistant", content: "" }]);
       while (true) {
         const { done, value } = await reader.read();
@@ -152,20 +154,74 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
           if (json === "[DONE]") continue;
           try {
             const p = JSON.parse(json);
-            const c = p.choices?.[0]?.delta?.content;
+            const delta = p.choices?.[0]?.delta;
+            const c = delta?.content;
             if (c) {
               acc += c;
               setMessages([...next, { role: "assistant", content: acc }]);
+            }
+            // Capture streamed tool_calls
+            const tcs = delta?.tool_calls;
+            if (Array.isArray(tcs)) {
+              for (const tc of tcs) {
+                const i = tc.index ?? 0;
+                if (!toolCalls[i]) toolCalls[i] = { args: "" };
+                if (tc.function?.name) toolCalls[i].name = tc.function.name;
+                if (tc.function?.arguments) toolCalls[i].args += tc.function.arguments;
+              }
             }
           } catch { buf = line + "\n" + buf; break; }
         }
       }
       // persist assistant msg
       if (convId && acc) try { appendMsg.mutate({ conversation_id: convId, role: "assistant", content: acc }); } catch {}
+
+      // If the AI called a tool, open the confirmation dialog pre-populated
+      const firstTool = Object.values(toolCalls)[0];
+      if (firstTool?.name) {
+        try {
+          const args = firstTool.args ? JSON.parse(firstTool.args) : {};
+          openPendingFromTool(firstTool.name, args);
+        } catch (err) {
+          console.warn("Falha ao parsear tool_call args:", err);
+        }
+      }
     } catch {
       setMessages([...next, { role: "assistant", content: "Não consegui responder agora. Tente novamente." }]);
     } finally {
       setLoading(false);
+    }
+  }
+
+  /** Translate an AI tool_call into a PendingAction and open the confirm dialog. */
+  function openPendingFromTool(name: string, args: any) {
+    if (name === "criar_lead") {
+      setPending({
+        kind: "criar_lead",
+        nome: String(args.nome ?? ""),
+        empresa: args.empresa ?? "",
+        valor_estimado: typeof args.valor_estimado === "number" ? args.valor_estimado : undefined,
+        email: args.email ?? "",
+        whatsapp: args.whatsapp ?? "",
+        status: (args.status as any) ?? "novo",
+      });
+    } else if (name === "criar_tarefa") {
+      setPending({
+        kind: "criar_tarefa",
+        titulo: String(args.titulo ?? ""),
+        descricao: args.descricao ?? "",
+        prioridade: (args.prioridade as any) ?? "media",
+        prazo_dias: typeof args.prazo_dias === "number" ? args.prazo_dias : 1,
+        lead_nome: args.lead_nome ?? "",
+      });
+    } else if (name === "mover_lead") {
+      setPending({
+        kind: "mover_lead",
+        lead_nome: String(args.lead_nome ?? ""),
+        novo_status: String(args.novo_status ?? "qualificacao"),
+      });
+    } else if (name === "gerar_relatorio") {
+      setPending({ kind: "gerar_relatorio", tipo: String(args.tipo ?? "geral") });
     }
   }
 
