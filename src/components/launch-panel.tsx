@@ -11,11 +11,12 @@ import {
   useAppendMessage,
   useDeleteConversation,
 } from "@/hooks/use-kassia-conversations";
-import { executarCriarTarefa, executarMoverLead } from "@/lib/kassia-actions";
+import { executarCriarTarefa, executarMoverLead, executarCriarLead } from "@/lib/kassia-actions";
 import { toast } from "sonner";
 
 type Msg = { role: "user" | "assistant" | "system"; content: string };
 type PendingAction =
+  | { kind: "criar_lead"; nome: string; empresa?: string; valor_estimado?: number; email?: string; whatsapp?: string; status: "novo" | "contato_inicial" | "qualificacao" | "proposta" | "negociacao" }
   | { kind: "criar_tarefa"; titulo: string; prioridade: "baixa" | "media" | "alta" | "urgente"; prazo_dias: number; lead_nome?: string; descricao?: string }
   | { kind: "mover_lead"; lead_nome: string; novo_status: string }
   | { kind: "gerar_relatorio"; tipo: string };
