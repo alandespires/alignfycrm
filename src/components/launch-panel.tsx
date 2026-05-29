@@ -421,6 +421,11 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
         <div className="relative flex flex-wrap items-center gap-1.5 border-t border-white/[0.06] px-3 pt-2.5 pb-1">
           <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mr-1">Ações</span>
           <QuickActionChip
+            icon={UserPlus}
+            label="Criar lead"
+            onClick={() => setPending({ kind: "criar_lead", nome: "", empresa: "", status: "novo" })}
+          />
+          <QuickActionChip
             icon={ListTodo}
             label="Criar tarefa"
             onClick={() => setPending({ kind: "criar_tarefa", titulo: "", prioridade: "media", prazo_dias: 1 })}
