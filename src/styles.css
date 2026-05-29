@@ -343,6 +343,10 @@
     0%   { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
+  @keyframes ks-sweep {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
   @keyframes ks-pulse-ring {
     0%   { box-shadow: 0 0 0 0 oklch(from var(--primary) l c h / 0.45); }
     70%  { box-shadow: 0 0 0 10px oklch(from var(--primary) l c h / 0); }
