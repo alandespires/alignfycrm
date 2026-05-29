@@ -280,7 +280,7 @@ export function AppShell({ children, title, subtitle, action }: {
           </div>
           {action && <div className="w-full sm:w-auto">{action}</div>}
         </div>
-        <div className="min-w-0 overflow-x-hidden animate-in fade-in duration-300">{children}</div>
+        <div key={pathname} className="min-w-0 overflow-x-hidden anim-fade-up">{children}</div>
       </main>
 
       {/* ===== Liquid-glass floating dock ===== */}
