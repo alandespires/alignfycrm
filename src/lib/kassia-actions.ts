@@ -61,3 +61,43 @@ export async function executarMoverLead(args: { lead_nome: string; novo_status: 
   if (error) throw error;
   return { lead_id: lead.id, nome: lead.nome, novo_status: args.novo_status };
 }
+
+/** Cria um novo lead a partir de comando conversacional. */
+export async function executarCriarLead(args: {
+  nome: string;
+  empresa?: string;
+  valor_estimado?: number;
+  email?: string;
+  whatsapp?: string;
+  origem?: string;
+  interesse?: string;
+  observacoes?: string;
+  status?: "novo" | "contato_inicial" | "qualificacao" | "proposta" | "negociacao" | "fechado" | "perdido";
+}) {
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) throw new Error("Não autenticado");
+  const tenant_id = requireTenantId();
+  if (!args.nome?.trim()) throw new Error("Nome do lead é obrigatório");
+
+  const { data, error } = await supabase
+    .from("leads")
+    .insert({
+      nome: args.nome.trim(),
+      empresa: args.empresa?.trim() || null,
+      valor_estimado: args.valor_estimado ?? null,
+      email: args.email?.trim() || null,
+      whatsapp: args.whatsapp?.trim() || null,
+      origem: args.origem ?? "launch_ia",
+      interesse: args.interesse ?? null,
+      observacoes: args.observacoes ?? null,
+      status: (args.status ?? "novo") as any,
+      tenant_id,
+      created_by: u.user.id,
+      owner_id: u.user.id,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
