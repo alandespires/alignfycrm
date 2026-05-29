@@ -510,6 +510,7 @@ function ActionConfirmDialog({
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Confirmar ação</div>
             <div className="font-display text-lg font-semibold tracking-tight">
+              {pending.kind === "criar_lead" && "Criar lead"}
               {pending.kind === "criar_tarefa" && "Criar tarefa"}
               {pending.kind === "mover_lead" && "Mover lead"}
               {pending.kind === "gerar_relatorio" && "Gerar relatório"}
@@ -518,6 +519,67 @@ function ActionConfirmDialog({
         </div>
 
         <div className="space-y-3">
+          {pending.kind === "criar_lead" && (
+            <>
+              <Field label="Nome">
+                <input
+                  autoFocus
+                  value={pending.nome}
+                  onChange={(e) => onChange({ ...pending, nome: e.target.value })}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                  placeholder="Nome do lead"
+                />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Empresa">
+                  <input
+                    value={pending.empresa ?? ""}
+                    onChange={(e) => onChange({ ...pending, empresa: e.target.value })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                    placeholder="Empresa"
+                  />
+                </Field>
+                <Field label="Valor estimado (R$)">
+                  <input
+                    type="number" min={0} step="100"
+                    value={pending.valor_estimado ?? ""}
+                    onChange={(e) => onChange({ ...pending, valor_estimado: e.target.value ? Number(e.target.value) : undefined })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                    placeholder="25000"
+                  />
+                </Field>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="E-mail">
+                  <input
+                    type="email"
+                    value={pending.email ?? ""}
+                    onChange={(e) => onChange({ ...pending, email: e.target.value })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                  />
+                </Field>
+                <Field label="WhatsApp">
+                  <input
+                    value={pending.whatsapp ?? ""}
+                    onChange={(e) => onChange({ ...pending, whatsapp: e.target.value })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                    placeholder="(11) 9..."
+                  />
+                </Field>
+              </div>
+              <Field label="Estágio inicial">
+                <select
+                  value={pending.status}
+                  onChange={(e) => onChange({ ...pending, status: e.target.value as any })}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                >
+                  {["novo","contato_inicial","qualificacao","proposta","negociacao"].map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </Field>
+            </>
+          )}
           {pending.kind === "criar_tarefa" && (
             <>
               <Field label="Título">
