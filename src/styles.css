@@ -311,6 +311,163 @@
 }
 
 /* =========================================================
+ * MOTION & MINIMALISM — Microinteractions design system
+ * Subtle, premium, AI-native feel. Used app-wide.
+ * Honors prefers-reduced-motion.
+ * ========================================================= */
+@layer utilities {
+  /* ---- Easing tokens (Apple/Linear-inspired) ---- */
+  :root {
+    --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-out-snap: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-fast: 140ms;
+    --dur-base: 220ms;
+    --dur-slow: 380ms;
+  }
+
+  /* ---- Keyframes ---- */
+  @keyframes ks-fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes ks-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes ks-scale-in {
+    from { opacity: 0; transform: scale(0.97); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  @keyframes ks-shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes ks-pulse-ring {
+    0%   { box-shadow: 0 0 0 0 oklch(from var(--primary) l c h / 0.45); }
+    70%  { box-shadow: 0 0 0 10px oklch(from var(--primary) l c h / 0); }
+    100% { box-shadow: 0 0 0 0 oklch(from var(--primary) l c h / 0); }
+  }
+  @keyframes ks-breathe {
+    0%, 100% { opacity: 0.85; transform: scale(1); }
+    50%      { opacity: 1;    transform: scale(1.015); }
+  }
+
+  /* ---- Utility classes ---- */
+  .anim-fade-up   { animation: ks-fade-up   var(--dur-slow) var(--ease-out-soft) both; }
+  .anim-fade-in   { animation: ks-fade-in   var(--dur-base) var(--ease-out-soft) both; }
+  .anim-scale-in  { animation: ks-scale-in  var(--dur-base) var(--ease-out-snap) both; }
+  .anim-breathe   { animation: ks-breathe   3.2s var(--ease-in-out-soft) infinite; }
+  .anim-pulse-ring{ animation: ks-pulse-ring 1.8s var(--ease-out-soft) infinite; }
+
+  /* Staggered children — apply to a parent: each direct child fades up with delay */
+  .stagger > * { animation: ks-fade-up var(--dur-slow) var(--ease-out-soft) both; }
+  .stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger > *:nth-child(2) { animation-delay: 40ms; }
+  .stagger > *:nth-child(3) { animation-delay: 80ms; }
+  .stagger > *:nth-child(4) { animation-delay: 120ms; }
+  .stagger > *:nth-child(5) { animation-delay: 160ms; }
+  .stagger > *:nth-child(6) { animation-delay: 200ms; }
+  .stagger > *:nth-child(7) { animation-delay: 240ms; }
+  .stagger > *:nth-child(8) { animation-delay: 280ms; }
+  .stagger > *:nth-child(n+9) { animation-delay: 320ms; }
+
+  /* Interactive primitives — subtle lift, press, glow */
+  .lift {
+    transition: transform var(--dur-base) var(--ease-out-soft),
+                box-shadow var(--dur-base) var(--ease-out-soft),
+                border-color var(--dur-base) var(--ease-out-soft);
+  }
+  .lift:hover { transform: translateY(-1px); box-shadow: var(--shadow-elevated); }
+  .lift:active { transform: translateY(0); transition-duration: var(--dur-fast); }
+
+  .press {
+    transition: transform var(--dur-fast) var(--ease-out-soft),
+                filter var(--dur-fast) var(--ease-out-soft);
+  }
+  .press:active:not(:disabled) { transform: scale(0.97); filter: brightness(0.96); }
+
+  .glow-on-hover {
+    transition: box-shadow var(--dur-base) var(--ease-out-soft);
+  }
+  .glow-on-hover:hover { box-shadow: var(--shadow-glow); }
+
+  /* Shimmer for skeletons & loading states */
+  .shimmer {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      oklch(from var(--foreground) l c h / 0.06) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: ks-shimmer 1.4s linear infinite;
+  }
+
+  /* Underline grow — link affordance */
+  .link-underline {
+    position: relative;
+    display: inline-block;
+  }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -2px;
+    width: 100%; height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--dur-base) var(--ease-out-soft);
+  }
+  .link-underline:hover::after { transform: scaleX(1); transform-origin: left; }
+
+  /* Focus ring — consistent, premium, accessible */
+  .focus-ring:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px oklch(from var(--primary) l c h / 0.55);
+    transition: box-shadow var(--dur-fast) var(--ease-out-soft);
+  }
+
+  /* Section reveal on scroll — pair with IntersectionObserver if needed */
+  .reveal { opacity: 0; transform: translateY(12px); transition: opacity var(--dur-slow) var(--ease-out-soft), transform var(--dur-slow) var(--ease-out-soft); }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  /* Density helpers — minimalist spacing rhythm */
+  .stack-tight > * + * { margin-top: 0.5rem; }
+  .stack > * + * { margin-top: 1rem; }
+  .stack-loose > * + * { margin-top: 1.75rem; }
+}
+
+/* Global interactive defaults — buttons & links feel alive */
+@layer base {
+  button, [role="button"], a {
+    transition: color var(--dur-fast) var(--ease-out-soft),
+                background-color var(--dur-fast) var(--ease-out-soft),
+                border-color var(--dur-fast) var(--ease-out-soft),
+                opacity var(--dur-fast) var(--ease-out-soft),
+                transform var(--dur-fast) var(--ease-out-soft);
+  }
+  button:active:not(:disabled), [role="button"]:active { transform: translateY(0.5px); }
+
+  /* Smoother text rendering */
+  body { text-rendering: optimizeLegibility; }
+
+  /* Smooth scroll for in-page anchors */
+  html { scroll-behavior: smooth; }
+}
+
+/* Respect users who prefer no motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+/* =========================================================
  * LAUNCHER ESCOLAR — Tema escopado (não afeta o restante do CRM)
  * Aplicado via .launcher-escolar-theme (alias .ks-escolar-theme).
  * ========================================================= */
