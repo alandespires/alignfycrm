@@ -236,7 +236,17 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
   async function confirmAction() {
     if (!pending) return;
     try {
-      if (pending.kind === "criar_tarefa") {
+      if (pending.kind === "criar_lead") {
+        await executarCriarLead({
+          nome: pending.nome,
+          empresa: pending.empresa,
+          valor_estimado: pending.valor_estimado,
+          email: pending.email,
+          whatsapp: pending.whatsapp,
+          status: pending.status,
+        });
+        toast.success(`Lead criado: ${pending.nome}`);
+      } else if (pending.kind === "criar_tarefa") {
         await executarCriarTarefa(pending);
         toast.success(`Tarefa criada: ${pending.titulo}`);
       } else if (pending.kind === "mover_lead") {
