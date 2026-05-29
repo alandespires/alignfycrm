@@ -152,6 +152,28 @@ ${JSON.stringify(ctx, null, 2)}`;
       {
         type: "function",
         function: {
+          name: "criar_lead",
+          description: "Cria um novo lead no CRM. Use quando o usuário pedir para adicionar/cadastrar/registrar um lead, contato ou prospect. Extraia o valor monetário inteligentemente (ex.: 'R$ 25.000', '25k', '25 mil' → 25000).",
+          parameters: {
+            type: "object",
+            properties: {
+              nome: { type: "string", description: "Nome completo do lead" },
+              empresa: { type: "string", description: "Empresa do lead (opcional)" },
+              valor_estimado: { type: "number", description: "Valor estimado da oportunidade em reais (apenas o número, sem R$)" },
+              email: { type: "string" },
+              whatsapp: { type: "string" },
+              interesse: { type: "string", description: "Produto/serviço de interesse" },
+              observacoes: { type: "string" },
+              status: { type: "string", enum: ["novo", "contato_inicial", "qualificacao", "proposta", "negociacao"] },
+            },
+            required: ["nome"],
+            additionalProperties: false,
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
           name: "criar_tarefa",
           description: "Cria uma tarefa/follow-up no CRM. Use quando o usuário pedir agendamento, follow-up ou ação a executar.",
           parameters: {
