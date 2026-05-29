@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { X, Send, Loader2, Plus, MessageSquare, Trash2, ListTodo, ArrowRightLeft, FileBarChart, ChevronLeft, Keyboard } from "lucide-react";
+import { X, Send, Loader2, Plus, MessageSquare, Trash2, ListTodo, ArrowRightLeft, FileBarChart, ChevronLeft, Keyboard, UserPlus } from "lucide-react";
 import { useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/tenant-context";
@@ -11,11 +11,12 @@ import {
   useAppendMessage,
   useDeleteConversation,
 } from "@/hooks/use-kassia-conversations";
-import { executarCriarTarefa, executarMoverLead } from "@/lib/kassia-actions";
+import { executarCriarTarefa, executarMoverLead, executarCriarLead } from "@/lib/kassia-actions";
 import { toast } from "sonner";
 
 type Msg = { role: "user" | "assistant" | "system"; content: string };
 type PendingAction =
+  | { kind: "criar_lead"; nome: string; empresa?: string; valor_estimado?: number; email?: string; whatsapp?: string; status: "novo" | "contato_inicial" | "qualificacao" | "proposta" | "negociacao" }
   | { kind: "criar_tarefa"; titulo: string; prioridade: "baixa" | "media" | "alta" | "urgente"; prazo_dias: number; lead_nome?: string; descricao?: string }
   | { kind: "mover_lead"; lead_nome: string; novo_status: string }
   | { kind: "gerar_relatorio"; tipo: string };
@@ -137,6 +138,8 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
       let buf = ""; let acc = "";
+      // Accumulate tool_calls coming in streaming deltas
+      const toolCalls: Record<number, { name?: string; args: string }> = {};
       setMessages([...next, { role: "assistant", content: "" }]);
       while (true) {
         const { done, value } = await reader.read();
@@ -151,20 +154,74 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
           if (json === "[DONE]") continue;
           try {
             const p = JSON.parse(json);
-            const c = p.choices?.[0]?.delta?.content;
+            const delta = p.choices?.[0]?.delta;
+            const c = delta?.content;
             if (c) {
               acc += c;
               setMessages([...next, { role: "assistant", content: acc }]);
+            }
+            // Capture streamed tool_calls
+            const tcs = delta?.tool_calls;
+            if (Array.isArray(tcs)) {
+              for (const tc of tcs) {
+                const i = tc.index ?? 0;
+                if (!toolCalls[i]) toolCalls[i] = { args: "" };
+                if (tc.function?.name) toolCalls[i].name = tc.function.name;
+                if (tc.function?.arguments) toolCalls[i].args += tc.function.arguments;
+              }
             }
           } catch { buf = line + "\n" + buf; break; }
         }
       }
       // persist assistant msg
       if (convId && acc) try { appendMsg.mutate({ conversation_id: convId, role: "assistant", content: acc }); } catch {}
+
+      // If the AI called a tool, open the confirmation dialog pre-populated
+      const firstTool = Object.values(toolCalls)[0];
+      if (firstTool?.name) {
+        try {
+          const args = firstTool.args ? JSON.parse(firstTool.args) : {};
+          openPendingFromTool(firstTool.name, args);
+        } catch (err) {
+          console.warn("Falha ao parsear tool_call args:", err);
+        }
+      }
     } catch {
       setMessages([...next, { role: "assistant", content: "Não consegui responder agora. Tente novamente." }]);
     } finally {
       setLoading(false);
+    }
+  }
+
+  /** Translate an AI tool_call into a PendingAction and open the confirm dialog. */
+  function openPendingFromTool(name: string, args: any) {
+    if (name === "criar_lead") {
+      setPending({
+        kind: "criar_lead",
+        nome: String(args.nome ?? ""),
+        empresa: args.empresa ?? "",
+        valor_estimado: typeof args.valor_estimado === "number" ? args.valor_estimado : undefined,
+        email: args.email ?? "",
+        whatsapp: args.whatsapp ?? "",
+        status: (args.status as any) ?? "novo",
+      });
+    } else if (name === "criar_tarefa") {
+      setPending({
+        kind: "criar_tarefa",
+        titulo: String(args.titulo ?? ""),
+        descricao: args.descricao ?? "",
+        prioridade: (args.prioridade as any) ?? "media",
+        prazo_dias: typeof args.prazo_dias === "number" ? args.prazo_dias : 1,
+        lead_nome: args.lead_nome ?? "",
+      });
+    } else if (name === "mover_lead") {
+      setPending({
+        kind: "mover_lead",
+        lead_nome: String(args.lead_nome ?? ""),
+        novo_status: String(args.novo_status ?? "qualificacao"),
+      });
+    } else if (name === "gerar_relatorio") {
+      setPending({ kind: "gerar_relatorio", tipo: String(args.tipo ?? "geral") });
     }
   }
 
@@ -179,7 +236,17 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
   async function confirmAction() {
     if (!pending) return;
     try {
-      if (pending.kind === "criar_tarefa") {
+      if (pending.kind === "criar_lead") {
+        await executarCriarLead({
+          nome: pending.nome,
+          empresa: pending.empresa,
+          valor_estimado: pending.valor_estimado,
+          email: pending.email,
+          whatsapp: pending.whatsapp,
+          status: pending.status,
+        });
+        toast.success(`Lead criado: ${pending.nome}`);
+      } else if (pending.kind === "criar_tarefa") {
         await executarCriarTarefa(pending);
         toast.success(`Tarefa criada: ${pending.titulo}`);
       } else if (pending.kind === "mover_lead") {
@@ -303,9 +370,10 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
                 </div>
                 <div className="mx-auto grid max-w-md gap-2">
                   {[
-                    "Resumo do meu funil esta semana",
-                    "Quais leads quentes preciso priorizar?",
-                    "Como está o financeiro do mês?",
+                    'Crie um lead para João da Acme com valor estimado de R$ 25.000',
+                    'Qual o status dos leads na etapa de Proposta?',
+                    'Gere um relatório de vendas do último trimestre',
+                    'Resumo do meu funil esta semana',
                   ].map((s) => (
                     <button
                       key={s}
@@ -352,6 +420,11 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
         {/* Quick actions */}
         <div className="relative flex flex-wrap items-center gap-1.5 border-t border-white/[0.06] px-3 pt-2.5 pb-1">
           <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mr-1">Ações</span>
+          <QuickActionChip
+            icon={UserPlus}
+            label="Criar lead"
+            onClick={() => setPending({ kind: "criar_lead", nome: "", empresa: "", status: "novo" })}
+          />
           <QuickActionChip
             icon={ListTodo}
             label="Criar tarefa"
@@ -437,6 +510,7 @@ function ActionConfirmDialog({
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Confirmar ação</div>
             <div className="font-display text-lg font-semibold tracking-tight">
+              {pending.kind === "criar_lead" && "Criar lead"}
               {pending.kind === "criar_tarefa" && "Criar tarefa"}
               {pending.kind === "mover_lead" && "Mover lead"}
               {pending.kind === "gerar_relatorio" && "Gerar relatório"}
@@ -445,6 +519,67 @@ function ActionConfirmDialog({
         </div>
 
         <div className="space-y-3">
+          {pending.kind === "criar_lead" && (
+            <>
+              <Field label="Nome">
+                <input
+                  autoFocus
+                  value={pending.nome}
+                  onChange={(e) => onChange({ ...pending, nome: e.target.value })}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                  placeholder="Nome do lead"
+                />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Empresa">
+                  <input
+                    value={pending.empresa ?? ""}
+                    onChange={(e) => onChange({ ...pending, empresa: e.target.value })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                    placeholder="Empresa"
+                  />
+                </Field>
+                <Field label="Valor estimado (R$)">
+                  <input
+                    type="number" min={0} step="100"
+                    value={pending.valor_estimado ?? ""}
+                    onChange={(e) => onChange({ ...pending, valor_estimado: e.target.value ? Number(e.target.value) : undefined })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                    placeholder="25000"
+                  />
+                </Field>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="E-mail">
+                  <input
+                    type="email"
+                    value={pending.email ?? ""}
+                    onChange={(e) => onChange({ ...pending, email: e.target.value })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                  />
+                </Field>
+                <Field label="WhatsApp">
+                  <input
+                    value={pending.whatsapp ?? ""}
+                    onChange={(e) => onChange({ ...pending, whatsapp: e.target.value })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                    placeholder="(11) 9..."
+                  />
+                </Field>
+              </div>
+              <Field label="Estágio inicial">
+                <select
+                  value={pending.status}
+                  onChange={(e) => onChange({ ...pending, status: e.target.value as any })}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                >
+                  {["novo","contato_inicial","qualificacao","proposta","negociacao"].map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </Field>
+            </>
+          )}
           {pending.kind === "criar_tarefa" && (
             <>
               <Field label="Título">
@@ -534,6 +669,7 @@ function ActionConfirmDialog({
           <button
             onClick={onConfirm}
             disabled={
+              (pending.kind === "criar_lead" && !pending.nome.trim()) ||
               (pending.kind === "criar_tarefa" && !pending.titulo.trim()) ||
               (pending.kind === "mover_lead" && !pending.lead_nome.trim())
             }

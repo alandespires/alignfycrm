@@ -126,19 +126,51 @@ CAPACIDADES:
 - Responder dúvidas sobre o CRM (leads, pipeline, clientes, tarefas, automação, financeiro).
 - Gerar relatórios sob demanda usando os dados reais do contexto.
 - Dar recomendações estratégicas.
-- Usar TOOLS para executar ações: 'criar_tarefa', 'gerar_relatorio', 'mover_lead'. Use proativamente quando o usuário pedir.
+- Usar TOOLS para executar ações: 'criar_lead', 'criar_tarefa', 'gerar_relatorio', 'mover_lead'. **CHAME A TOOL APROPRIADA SEMPRE** que o usuário expressar uma intenção de ação, mesmo que de forma informal.
+
+EXEMPLOS DE COMANDOS CONVERSACIONAIS → TOOLS:
+- "Crie um novo lead para João da Acme com valor estimado de R$ 25.000" → chame 'criar_lead' com { nome: "João", empresa: "Acme", valor_estimado: 25000 }
+- "Adicione um lead Maria Silva da Globo, R$ 80k" → 'criar_lead'
+- "Mova o lead Pedro para negociação" → 'mover_lead'
+- "Crie tarefa de follow-up com cliente X amanhã" → 'criar_tarefa' com prazo_dias: 1
+- "Gere relatório de vendas do último trimestre" → 'gerar_relatorio' com tipo: "faturamento"
+- "Qual o status dos leads na etapa de Proposta?" → responda em texto usando o contexto (NÃO use tool)
+- "Quantos leads quentes tenho?" → responda em texto
 
 REGRAS:
-- Markdown sempre (negrito, listas, tabelas) para clareza.
+- Quando chamar uma tool, NÃO descreva a ação em texto — apenas chame a tool. O sistema mostrará confirmação ao usuário.
+- Extraia valores monetários inteligentemente: "R$ 25.000", "25k", "25 mil" → 25000.
+- Markdown sempre (negrito, listas, tabelas) para respostas em texto.
 - Valores em R$ com separador de milhar.
 - Conciso. Não invente dados — se não souber, diga.
-- Para relatórios, estruture: título → KPIs principais → tabela → insights.
-- Quando usuário pedir "criar tarefa", "follow-up", "relatório", "adicionar ao pipeline", chame a tool correspondente.
+- Para relatórios em texto, estruture: título → KPIs principais → tabela → insights.
 
 CONTEXTO ATUAL (dados reais do CRM, filtrados):
 ${JSON.stringify(ctx, null, 2)}`;
 
     const tools = [
+      {
+        type: "function",
+        function: {
+          name: "criar_lead",
+          description: "Cria um novo lead no CRM. Use quando o usuário pedir para adicionar/cadastrar/registrar um lead, contato ou prospect. Extraia o valor monetário inteligentemente (ex.: 'R$ 25.000', '25k', '25 mil' → 25000).",
+          parameters: {
+            type: "object",
+            properties: {
+              nome: { type: "string", description: "Nome completo do lead" },
+              empresa: { type: "string", description: "Empresa do lead (opcional)" },
+              valor_estimado: { type: "number", description: "Valor estimado da oportunidade em reais (apenas o número, sem R$)" },
+              email: { type: "string" },
+              whatsapp: { type: "string" },
+              interesse: { type: "string", description: "Produto/serviço de interesse" },
+              observacoes: { type: "string" },
+              status: { type: "string", enum: ["novo", "contato_inicial", "qualificacao", "proposta", "negociacao"] },
+            },
+            required: ["nome"],
+            additionalProperties: false,
+          },
+        },
+      },
       {
         type: "function",
         function: {
