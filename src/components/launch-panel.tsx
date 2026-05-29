@@ -370,9 +370,10 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
                 </div>
                 <div className="mx-auto grid max-w-md gap-2">
                   {[
-                    "Resumo do meu funil esta semana",
-                    "Quais leads quentes preciso priorizar?",
-                    "Como está o financeiro do mês?",
+                    'Crie um lead para João da Acme com valor estimado de R$ 25.000',
+                    'Qual o status dos leads na etapa de Proposta?',
+                    'Gere um relatório de vendas do último trimestre',
+                    'Resumo do meu funil esta semana',
                   ].map((s) => (
                     <button
                       key={s}
