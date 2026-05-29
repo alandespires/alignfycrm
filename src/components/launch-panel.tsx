@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { X, Send, Loader2, Plus, MessageSquare, Trash2, ListTodo, ArrowRightLeft, FileBarChart, ChevronLeft, Keyboard } from "lucide-react";
+import { X, Send, Loader2, Plus, MessageSquare, Trash2, ListTodo, ArrowRightLeft, FileBarChart, ChevronLeft, Keyboard, UserPlus } from "lucide-react";
 import { useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/tenant-context";
