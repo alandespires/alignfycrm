@@ -669,6 +669,7 @@ function ActionConfirmDialog({
           <button
             onClick={onConfirm}
             disabled={
+              (pending.kind === "criar_lead" && !pending.nome.trim()) ||
               (pending.kind === "criar_tarefa" && !pending.titulo.trim()) ||
               (pending.kind === "mover_lead" && !pending.lead_nome.trim())
             }
