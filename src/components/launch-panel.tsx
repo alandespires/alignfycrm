@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { X, Send, Loader2, Plus, MessageSquare, Trash2, ListTodo, ArrowRightLeft, FileBarChart, ChevronLeft, Keyboard, UserPlus } from "lucide-react";
+import { X, Send, Loader2, Plus, MessageSquare, Trash2, ListTodo, ArrowRightLeft, FileBarChart, ChevronLeft, Keyboard, UserPlus, FolderPlus, CalendarClock, Wallet, Sparkles } from "lucide-react";
 import { useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/tenant-context";
@@ -11,13 +11,19 @@ import {
   useAppendMessage,
   useDeleteConversation,
 } from "@/hooks/use-kassia-conversations";
-import { executarCriarTarefa, executarMoverLead, executarCriarLead } from "@/lib/kassia-actions";
+import { executarCriarTarefa, executarMoverLead, executarCriarLead, executarCriarProjeto, executarAgendarFollowup, executarRegistrarPagamento } from "@/lib/kassia-actions";
+import { useTasks } from "@/hooks/use-tasks";
+import { useLeads } from "@/hooks/use-leads";
+import { useProjects } from "@/hooks/use-projects";
 import { toast } from "sonner";
 
 type Msg = { role: "user" | "assistant" | "system"; content: string };
 type PendingAction =
   | { kind: "criar_lead"; nome: string; empresa?: string; valor_estimado?: number; email?: string; whatsapp?: string; status: "novo" | "contato_inicial" | "qualificacao" | "proposta" | "negociacao" }
-  | { kind: "criar_tarefa"; titulo: string; prioridade: "baixa" | "media" | "alta" | "urgente"; prazo_dias: number; lead_nome?: string; descricao?: string }
+  | { kind: "criar_tarefa"; titulo: string; prioridade: "baixa" | "media" | "alta" | "urgente"; prazo_dias: number; lead_nome?: string; descricao?: string; project_titulo?: string }
+  | { kind: "criar_projeto"; titulo: string; descricao?: string; prazo_dias?: number; valor_total?: number; lead_nome?: string }
+  | { kind: "agendar_followup"; lead_nome: string; canal: "ligacao" | "whatsapp" | "email" | "reuniao"; dias: number; observacao?: string }
+  | { kind: "registrar_pagamento"; entry_descricao: string; valor: number; forma?: "pix" | "boleto" | "cartao" | "transferencia" | "dinheiro" }
   | { kind: "mover_lead"; lead_nome: string; novo_status: string }
   | { kind: "gerar_relatorio"; tipo: string };
 
@@ -42,6 +48,47 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
   const createConv = useCreateConversation();
   const appendMsg = useAppendMessage();
   const deleteConv = useDeleteConversation();
+
+  // Proactive context data
+  const { data: allTasks = [] } = useTasks();
+  const { data: allLeads = [] } = useLeads();
+  const { data: allProjects = [] } = useProjects();
+
+  // Build proactive suggestions based on current CRM state
+  const proactiveSuggestions = useMemo(() => {
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
+    const out: { icon: any; label: string; tone: "danger" | "warn" | "info" | "success"; prompt: string }[] = [];
+    const overdueTasks = allTasks.filter((t) => t.prazo && new Date(t.prazo) < now && t.status !== "concluida" && t.status !== "cancelada");
+    if (overdueTasks.length > 0) {
+      out.push({ icon: ListTodo, label: `${overdueTasks.length} tarefa${overdueTasks.length > 1 ? "s" : ""} atrasada${overdueTasks.length > 1 ? "s" : ""}`, tone: "danger",
+        prompt: `Liste minhas tarefas atrasadas em ordem de prioridade e sugira ações para destravar cada uma.` });
+    }
+    const hotLeads = allLeads.filter((l) => (l.ai_score ?? 0) >= 70 && !["fechado", "perdido"].includes(l.status));
+    if (hotLeads.length > 0) {
+      out.push({ icon: Sparkles, label: `${hotLeads.length} lead${hotLeads.length > 1 ? "s" : ""} quente${hotLeads.length > 1 ? "s" : ""}`, tone: "success",
+        prompt: `Quem são meus leads mais quentes e qual o próximo passo recomendado para cada um?` });
+    }
+    const staleLeads = allLeads.filter((l) => {
+      const last = l.ultimo_contato_em ? new Date(l.ultimo_contato_em) : new Date(l.updated_at);
+      return last < sevenDaysAgo && !["fechado", "perdido"].includes(l.status);
+    });
+    if (staleLeads.length > 0) {
+      out.push({ icon: CalendarClock, label: `${staleLeads.length} lead${staleLeads.length > 1 ? "s" : ""} parado${staleLeads.length > 1 ? "s" : ""} há 7d+`, tone: "warn",
+        prompt: `Quais leads estão parados há mais de 7 dias? Sugira um plano de reativação.` });
+    }
+    const projectsAtRisk = allProjects.filter((p) => {
+      if (p.status !== "em_andamento" || !p.prazo) return false;
+      const prazo = new Date(p.prazo + "T12:00:00");
+      const daysLeft = (prazo.getTime() - now.getTime()) / 86400000;
+      return daysLeft <= 7 && p.progresso < 80;
+    });
+    if (projectsAtRisk.length > 0) {
+      out.push({ icon: FolderPlus, label: `${projectsAtRisk.length} projeto${projectsAtRisk.length > 1 ? "s" : ""} em risco`, tone: "warn",
+        prompt: `Analise meus projetos em risco e sugira ações para acelerar a entrega.` });
+    }
+    return out.slice(0, 3);
+  }, [allTasks, allLeads, allProjects]);
 
   // When user opens a past conversation, hydrate messages
   useEffect(() => {
@@ -213,6 +260,31 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
         prioridade: (args.prioridade as any) ?? "media",
         prazo_dias: typeof args.prazo_dias === "number" ? args.prazo_dias : 1,
         lead_nome: args.lead_nome ?? "",
+        project_titulo: args.project_titulo ?? "",
+      });
+    } else if (name === "criar_projeto") {
+      setPending({
+        kind: "criar_projeto",
+        titulo: String(args.titulo ?? ""),
+        descricao: args.descricao ?? "",
+        prazo_dias: typeof args.prazo_dias === "number" ? args.prazo_dias : 30,
+        valor_total: typeof args.valor_total === "number" ? args.valor_total : undefined,
+        lead_nome: args.lead_nome ?? "",
+      });
+    } else if (name === "agendar_followup") {
+      setPending({
+        kind: "agendar_followup",
+        lead_nome: String(args.lead_nome ?? ""),
+        canal: (args.canal as any) ?? "ligacao",
+        dias: typeof args.dias === "number" ? args.dias : 2,
+        observacao: args.observacao ?? "",
+      });
+    } else if (name === "registrar_pagamento") {
+      setPending({
+        kind: "registrar_pagamento",
+        entry_descricao: String(args.entry_descricao ?? ""),
+        valor: typeof args.valor === "number" ? args.valor : 0,
+        forma: args.forma,
       });
     } else if (name === "mover_lead") {
       setPending({
@@ -252,6 +324,25 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
       } else if (pending.kind === "mover_lead") {
         await executarMoverLead({ lead_nome: pending.lead_nome, novo_status: pending.novo_status });
         toast.success(`Lead "${pending.lead_nome}" movido para ${pending.novo_status}`);
+      } else if (pending.kind === "criar_projeto") {
+        const proj = await executarCriarProjeto({
+          titulo: pending.titulo, descricao: pending.descricao,
+          prazo_dias: pending.prazo_dias, valor_total: pending.valor_total,
+          lead_nome: pending.lead_nome,
+        });
+        toast.success(`Projeto criado: ${proj.titulo}`);
+      } else if (pending.kind === "agendar_followup") {
+        await executarAgendarFollowup({
+          lead_nome: pending.lead_nome, canal: pending.canal,
+          dias: pending.dias, observacao: pending.observacao,
+        });
+        toast.success(`Follow-up agendado com ${pending.lead_nome}`);
+      } else if (pending.kind === "registrar_pagamento") {
+        await executarRegistrarPagamento({
+          entry_descricao: pending.entry_descricao,
+          valor: pending.valor, forma: pending.forma,
+        });
+        toast.success(`Pagamento registrado: R$ ${pending.valor.toLocaleString("pt-BR")}`);
       } else if (pending.kind === "gerar_relatorio") {
         await send(`Gere um relatório do tipo "${pending.tipo}" usando os dados reais do CRM, com KPIs, tabela e insights.`);
       }
@@ -363,17 +454,44 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
           {/* Messages */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
             {messages.length === 0 && (
-              <div className="space-y-4 py-6">
+              <div className="space-y-5 py-6">
                 <div className="text-center">
                   <div className="font-display text-xl font-semibold tracking-tight">Olá. Sou o Launch.</div>
-                  <p className="mx-auto mt-1.5 max-w-sm text-sm text-muted-foreground">Seu copiloto operacional. Pergunte sobre leads, pipeline, financeiro ou peça ações.</p>
+                  <p className="mx-auto mt-1.5 max-w-sm text-sm text-muted-foreground">Seu copiloto operacional. Pergunte sobre leads, pipeline, projetos ou peça ações.</p>
                 </div>
+
+                {proactiveSuggestions.length > 0 && (
+                  <div className="mx-auto max-w-md space-y-2">
+                    <div className="px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      ✨ Análise proativa do seu CRM
+                    </div>
+                    {proactiveSuggestions.map((s, i) => {
+                      const toneCls =
+                        s.tone === "danger" ? "border-destructive/30 bg-destructive/5 hover:bg-destructive/10"
+                        : s.tone === "warn" ? "border-warning/30 bg-warning/5 hover:bg-warning/10"
+                        : s.tone === "success" ? "border-success/30 bg-success/5 hover:bg-success/10"
+                        : "border-primary/30 bg-primary/5 hover:bg-primary/10";
+                      return (
+                        <button key={i} onClick={() => send(s.prompt)}
+                          className={["flex w-full items-center gap-3 rounded-2xl border px-4 py-2.5 text-left transition", toneCls].join(" ")}>
+                          <s.icon className="h-4 w-4 shrink-0 text-foreground/70" />
+                          <span className="flex-1 text-[13px] font-medium">{s.label}</span>
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">analisar →</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
                 <div className="mx-auto grid max-w-md gap-2">
+                  <div className="px-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Sugestões
+                  </div>
                   {[
                     'Crie um lead para João da Acme com valor estimado de R$ 25.000',
-                    'Qual o status dos leads na etapa de Proposta?',
+                    'Agende follow-up por whatsapp com a Maria em 3 dias',
+                    'Crie um projeto de implantação para a Acme com prazo de 30 dias',
                     'Gere um relatório de vendas do último trimestre',
-                    'Resumo do meu funil esta semana',
                   ].map((s) => (
                     <button
                       key={s}
@@ -434,6 +552,21 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
             icon={ArrowRightLeft}
             label="Mover lead"
             onClick={() => setPending({ kind: "mover_lead", lead_nome: "", novo_status: "qualificacao" })}
+          />
+          <QuickActionChip
+            icon={FolderPlus}
+            label="Criar projeto"
+            onClick={() => setPending({ kind: "criar_projeto", titulo: "", descricao: "", prazo_dias: 30 })}
+          />
+          <QuickActionChip
+            icon={CalendarClock}
+            label="Follow-up"
+            onClick={() => setPending({ kind: "agendar_followup", lead_nome: "", canal: "whatsapp", dias: 2 })}
+          />
+          <QuickActionChip
+            icon={Wallet}
+            label="Registrar pagamento"
+            onClick={() => setPending({ kind: "registrar_pagamento", entry_descricao: "", valor: 0 })}
           />
           <QuickActionChip
             icon={FileBarChart}
@@ -512,6 +645,9 @@ function ActionConfirmDialog({
             <div className="font-display text-lg font-semibold tracking-tight">
               {pending.kind === "criar_lead" && "Criar lead"}
               {pending.kind === "criar_tarefa" && "Criar tarefa"}
+              {pending.kind === "criar_projeto" && "Criar projeto"}
+              {pending.kind === "agendar_followup" && "Agendar follow-up"}
+              {pending.kind === "registrar_pagamento" && "Registrar pagamento"}
               {pending.kind === "mover_lead" && "Mover lead"}
               {pending.kind === "gerar_relatorio" && "Gerar relatório"}
             </div>
@@ -646,6 +782,85 @@ function ActionConfirmDialog({
               </Field>
             </>
           )}
+          {pending.kind === "criar_projeto" && (
+            <>
+              <Field label="Título">
+                <input autoFocus value={pending.titulo} onChange={(e) => onChange({ ...pending, titulo: e.target.value })}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                  placeholder="Implantação ACME" />
+              </Field>
+              <Field label="Descrição">
+                <textarea value={pending.descricao ?? ""} onChange={(e) => onChange({ ...pending, descricao: e.target.value })} rows={2}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none" />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Prazo (dias)">
+                  <input type="number" min={1} value={pending.prazo_dias ?? 30}
+                    onChange={(e) => onChange({ ...pending, prazo_dias: Number(e.target.value) || 30 })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none" />
+                </Field>
+                <Field label="Valor total (R$)">
+                  <input type="number" min={0} step="100" value={pending.valor_total ?? ""}
+                    onChange={(e) => onChange({ ...pending, valor_total: e.target.value ? Number(e.target.value) : undefined })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none" />
+                </Field>
+              </div>
+              <Field label="Lead vinculado (opcional)">
+                <input value={pending.lead_nome ?? ""} onChange={(e) => onChange({ ...pending, lead_nome: e.target.value })}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                  placeholder="Nome do lead" />
+              </Field>
+            </>
+          )}
+          {pending.kind === "agendar_followup" && (
+            <>
+              <Field label="Nome do lead">
+                <input autoFocus value={pending.lead_nome} onChange={(e) => onChange({ ...pending, lead_nome: e.target.value })}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none" />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Canal">
+                  <select value={pending.canal} onChange={(e) => onChange({ ...pending, canal: e.target.value as any })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none">
+                    {["whatsapp", "ligacao", "email", "reuniao"].map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </Field>
+                <Field label="Em quantos dias">
+                  <input type="number" min={0} value={pending.dias}
+                    onChange={(e) => onChange({ ...pending, dias: Number(e.target.value) || 0 })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none" />
+                </Field>
+              </div>
+              <Field label="Observação (opcional)">
+                <textarea value={pending.observacao ?? ""} onChange={(e) => onChange({ ...pending, observacao: e.target.value })} rows={2}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none" />
+              </Field>
+            </>
+          )}
+          {pending.kind === "registrar_pagamento" && (
+            <>
+              <Field label="Descrição da entrada">
+                <input autoFocus value={pending.entry_descricao}
+                  onChange={(e) => onChange({ ...pending, entry_descricao: e.target.value })}
+                  className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none"
+                  placeholder="Mensalidade ACME" />
+              </Field>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Valor (R$)">
+                  <input type="number" min={0} step="0.01" value={pending.valor || ""}
+                    onChange={(e) => onChange({ ...pending, valor: Number(e.target.value) || 0 })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none" />
+                </Field>
+                <Field label="Forma">
+                  <select value={pending.forma ?? ""} onChange={(e) => onChange({ ...pending, forma: (e.target.value || undefined) as any })}
+                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-sm focus:border-primary/40 focus:outline-none">
+                    <option value="">—</option>
+                    {["pix", "boleto", "cartao", "transferencia", "dinheiro"].map((f) => <option key={f} value={f}>{f}</option>)}
+                  </select>
+                </Field>
+              </div>
+            </>
+          )}
           {pending.kind === "gerar_relatorio" && (
             <Field label="Tipo de relatório">
               <select
@@ -671,6 +886,9 @@ function ActionConfirmDialog({
             disabled={
               (pending.kind === "criar_lead" && !pending.nome.trim()) ||
               (pending.kind === "criar_tarefa" && !pending.titulo.trim()) ||
+              (pending.kind === "criar_projeto" && !pending.titulo.trim()) ||
+              (pending.kind === "agendar_followup" && !pending.lead_nome.trim()) ||
+              (pending.kind === "registrar_pagamento" && (!pending.entry_descricao.trim() || pending.valor <= 0)) ||
               (pending.kind === "mover_lead" && !pending.lead_nome.trim())
             }
             className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow hover:brightness-110 disabled:opacity-40"

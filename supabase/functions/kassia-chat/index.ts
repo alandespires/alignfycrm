@@ -120,30 +120,33 @@ Deno.serve(async (req) => {
       },
     };
 
-    const systemPrompt = `Você é a KassIA, assistente de IA do KS CRM. Fala português do Brasil de forma direta, profissional e calorosa.
+    const systemPrompt = `Você é a Launch IA, copiloto operacional do Align CRM. Fala português do Brasil de forma direta, profissional e calorosa.
 
 CAPACIDADES:
-- Responder dúvidas sobre o CRM (leads, pipeline, clientes, tarefas, automação, financeiro).
-- Gerar relatórios sob demanda usando os dados reais do contexto.
-- Dar recomendações estratégicas.
-- Usar TOOLS para executar ações: 'criar_lead', 'criar_tarefa', 'gerar_relatorio', 'mover_lead'. **CHAME A TOOL APROPRIADA SEMPRE** que o usuário expressar uma intenção de ação, mesmo que de forma informal.
+- Responder dúvidas sobre o CRM (leads, pipeline, clientes, tarefas, projetos, automação, financeiro) usando os DADOS REAIS do contexto abaixo.
+- Gerar relatórios sob demanda.
+- Dar recomendações estratégicas baseadas nos dados reais.
+- Usar TOOLS para executar ações: 'criar_lead', 'criar_tarefa', 'criar_projeto', 'agendar_followup', 'mover_lead', 'registrar_pagamento', 'gerar_relatorio'. **CHAME A TOOL APROPRIADA SEMPRE** que o usuário expressar uma intenção de ação, mesmo informal.
 
 EXEMPLOS DE COMANDOS CONVERSACIONAIS → TOOLS:
-- "Crie um novo lead para João da Acme com valor estimado de R$ 25.000" → chame 'criar_lead' com { nome: "João", empresa: "Acme", valor_estimado: 25000 }
+- "Crie um novo lead para João da Acme com valor estimado de R$ 25.000" → 'criar_lead'
 - "Adicione um lead Maria Silva da Globo, R$ 80k" → 'criar_lead'
 - "Mova o lead Pedro para negociação" → 'mover_lead'
 - "Crie tarefa de follow-up com cliente X amanhã" → 'criar_tarefa' com prazo_dias: 1
+- "Crie um projeto de implantação para a Acme, prazo 30 dias" → 'criar_projeto'
+- "Agende follow-up por whatsapp com a Maria em 3 dias" → 'agendar_followup'
+- "Marca o pagamento da entrada Mensalidade da Acme como pago, R$ 1500" → 'registrar_pagamento'
 - "Gere relatório de vendas do último trimestre" → 'gerar_relatorio' com tipo: "faturamento"
-- "Qual o status dos leads na etapa de Proposta?" → responda em texto usando o contexto (NÃO use tool)
+- "Qual o status dos leads em Proposta?" → responda em texto usando o contexto (NÃO use tool)
 - "Quantos leads quentes tenho?" → responda em texto
 
 REGRAS:
 - Quando chamar uma tool, NÃO descreva a ação em texto — apenas chame a tool. O sistema mostrará confirmação ao usuário.
 - Extraia valores monetários inteligentemente: "R$ 25.000", "25k", "25 mil" → 25000.
+- Use os IDs e nomes REAIS do CONTEXTO para identificar leads/clientes/projetos. Não invente.
 - Markdown sempre (negrito, listas, tabelas) para respostas em texto.
 - Valores em R$ com separador de milhar.
-- Conciso. Não invente dados — se não souber, diga.
-- Para relatórios em texto, estruture: título → KPIs principais → tabela → insights.
+- Conciso. Se não souber, diga.
 
 CONTEXTO ATUAL (dados reais do CRM, filtrados):
 ${JSON.stringify(ctx, null, 2)}`;
@@ -175,7 +178,7 @@ ${JSON.stringify(ctx, null, 2)}`;
         type: "function",
         function: {
           name: "criar_tarefa",
-          description: "Cria uma tarefa/follow-up no CRM. Use quando o usuário pedir agendamento, follow-up ou ação a executar.",
+          description: "Cria uma tarefa/follow-up no CRM. Use quando o usuário pedir agendamento, follow-up ou ação a executar. Pode vincular a um lead e/ou projeto pelo nome.",
           parameters: {
             type: "object",
             properties: {
@@ -184,8 +187,63 @@ ${JSON.stringify(ctx, null, 2)}`;
               prioridade: { type: "string", enum: ["baixa", "media", "alta", "urgente"] },
               prazo_dias: { type: "number", description: "Dias a partir de hoje" },
               lead_nome: { type: "string", description: "Nome do lead para vincular (opcional)" },
+              project_titulo: { type: "string", description: "Título do projeto para vincular (opcional)" },
             },
             required: ["titulo"],
+            additionalProperties: false,
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "criar_projeto",
+          description: "Cria um novo projeto. Use quando o usuário quiser iniciar uma implantação, campanha, sprint ou trabalho com prazo definido.",
+          parameters: {
+            type: "object",
+            properties: {
+              titulo: { type: "string" },
+              descricao: { type: "string" },
+              prazo_dias: { type: "number", description: "Duração em dias" },
+              valor_total: { type: "number", description: "Valor total do projeto em reais" },
+              lead_nome: { type: "string", description: "Lead vinculado (opcional)" },
+            },
+            required: ["titulo"],
+            additionalProperties: false,
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "agendar_followup",
+          description: "Agenda um follow-up com um lead específico — cria tarefa de alta prioridade + registro de atividade.",
+          parameters: {
+            type: "object",
+            properties: {
+              lead_nome: { type: "string" },
+              canal: { type: "string", enum: ["ligacao", "whatsapp", "email", "reuniao"] },
+              dias: { type: "number", description: "Em quantos dias" },
+              observacao: { type: "string" },
+            },
+            required: ["lead_nome"],
+            additionalProperties: false,
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "registrar_pagamento",
+          description: "Registra um pagamento recebido para uma entrada financeira existente, identificada pela descrição.",
+          parameters: {
+            type: "object",
+            properties: {
+              entry_descricao: { type: "string", description: "Trecho da descrição da entrada" },
+              valor: { type: "number", description: "Valor pago em reais" },
+              forma: { type: "string", enum: ["pix", "boleto", "cartao", "transferencia", "dinheiro"] },
+            },
+            required: ["entry_descricao", "valor"],
             additionalProperties: false,
           },
         },
