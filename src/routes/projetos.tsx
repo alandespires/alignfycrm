@@ -15,8 +15,9 @@ import { useAllPayments } from "@/hooks/use-payments";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import {
   Briefcase, Plus, X, Loader2, Trash2, DollarSign, Target, CheckCircle2,
-  ListChecks, Wallet, Search, Filter, History, AlertCircle, Ban,
+  ListChecks, Wallet, Search, Filter, History, AlertCircle, Ban, Sparkles,
 } from "lucide-react";
+import { ProjectTemplatesGallery } from "@/components/project-templates-gallery";
 
 export const Route = createFileRoute("/projetos")({
   head: () => ({ meta: [{ title: "Controle de Projetos — Align CRM" }] }),
@@ -44,6 +45,7 @@ function ProjetosPage() {
   const bulk = useBulkUpdateProjects();
 
   const [open, setOpen] = useState(false);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
   const [selected, setSelected] = useState<ProjectRow | null>(null);
 
   // Filters
@@ -102,7 +104,15 @@ function ProjetosPage() {
     <AppShell
       title="Controle de Projetos"
       subtitle="Gestão integrada de projetos, tarefas e financeiro"
-      action={<PrimaryButton icon={Plus} onClick={() => setOpen(true)}>Novo projeto</PrimaryButton>}
+      action={
+        <div className="flex items-center gap-2">
+          <button onClick={() => setTemplatesOpen(true)}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-xs font-semibold transition hover:border-primary/50">
+            <Sparkles className="h-3.5 w-3.5 text-primary" /> Templates
+          </button>
+          <PrimaryButton icon={Plus} onClick={() => setOpen(true)}>Novo projeto</PrimaryButton>
+        </div>
+      }
     >
       <div className="mb-5 grid gap-3 sm:grid-cols-4">
         <KpiCard icon={Briefcase} label="Total" value={String(stats.total)} />
@@ -250,6 +260,7 @@ function ProjetosPage() {
       )}
 
       {open && <ProjectFormModal onClose={() => setOpen(false)} />}
+      {templatesOpen && <ProjectTemplatesGallery onClose={() => setTemplatesOpen(false)} />}
       {selected && (
         <ProjectDetailDrawer
           project={selected}
