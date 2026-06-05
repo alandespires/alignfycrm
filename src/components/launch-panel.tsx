@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { X, Send, Loader2, Plus, MessageSquare, Trash2, ListTodo, ArrowRightLeft, FileBarChart, ChevronLeft, Keyboard, UserPlus } from "lucide-react";
+import { X, Send, Loader2, Plus, MessageSquare, Trash2, ListTodo, ArrowRightLeft, FileBarChart, ChevronLeft, Keyboard, UserPlus, FolderPlus, CalendarClock, Wallet, Sparkles } from "lucide-react";
 import { useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/tenant-context";
@@ -11,13 +11,19 @@ import {
   useAppendMessage,
   useDeleteConversation,
 } from "@/hooks/use-kassia-conversations";
-import { executarCriarTarefa, executarMoverLead, executarCriarLead } from "@/lib/kassia-actions";
+import { executarCriarTarefa, executarMoverLead, executarCriarLead, executarCriarProjeto, executarAgendarFollowup, executarRegistrarPagamento } from "@/lib/kassia-actions";
+import { useTasks } from "@/hooks/use-tasks";
+import { useLeads } from "@/hooks/use-leads";
+import { useProjects } from "@/hooks/use-projects";
 import { toast } from "sonner";
 
 type Msg = { role: "user" | "assistant" | "system"; content: string };
 type PendingAction =
   | { kind: "criar_lead"; nome: string; empresa?: string; valor_estimado?: number; email?: string; whatsapp?: string; status: "novo" | "contato_inicial" | "qualificacao" | "proposta" | "negociacao" }
-  | { kind: "criar_tarefa"; titulo: string; prioridade: "baixa" | "media" | "alta" | "urgente"; prazo_dias: number; lead_nome?: string; descricao?: string }
+  | { kind: "criar_tarefa"; titulo: string; prioridade: "baixa" | "media" | "alta" | "urgente"; prazo_dias: number; lead_nome?: string; descricao?: string; project_titulo?: string }
+  | { kind: "criar_projeto"; titulo: string; descricao?: string; prazo_dias?: number; valor_total?: number; lead_nome?: string }
+  | { kind: "agendar_followup"; lead_nome: string; canal: "ligacao" | "whatsapp" | "email" | "reuniao"; dias: number; observacao?: string }
+  | { kind: "registrar_pagamento"; entry_descricao: string; valor: number; forma?: "pix" | "boleto" | "cartao" | "transferencia" | "dinheiro" }
   | { kind: "mover_lead"; lead_nome: string; novo_status: string }
   | { kind: "gerar_relatorio"; tipo: string };
 
@@ -213,6 +219,31 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
         prioridade: (args.prioridade as any) ?? "media",
         prazo_dias: typeof args.prazo_dias === "number" ? args.prazo_dias : 1,
         lead_nome: args.lead_nome ?? "",
+        project_titulo: args.project_titulo ?? "",
+      });
+    } else if (name === "criar_projeto") {
+      setPending({
+        kind: "criar_projeto",
+        titulo: String(args.titulo ?? ""),
+        descricao: args.descricao ?? "",
+        prazo_dias: typeof args.prazo_dias === "number" ? args.prazo_dias : 30,
+        valor_total: typeof args.valor_total === "number" ? args.valor_total : undefined,
+        lead_nome: args.lead_nome ?? "",
+      });
+    } else if (name === "agendar_followup") {
+      setPending({
+        kind: "agendar_followup",
+        lead_nome: String(args.lead_nome ?? ""),
+        canal: (args.canal as any) ?? "ligacao",
+        dias: typeof args.dias === "number" ? args.dias : 2,
+        observacao: args.observacao ?? "",
+      });
+    } else if (name === "registrar_pagamento") {
+      setPending({
+        kind: "registrar_pagamento",
+        entry_descricao: String(args.entry_descricao ?? ""),
+        valor: typeof args.valor === "number" ? args.valor : 0,
+        forma: args.forma,
       });
     } else if (name === "mover_lead") {
       setPending({
