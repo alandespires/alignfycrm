@@ -537,7 +537,7 @@ function DockSheet({
           </button>
         </div>
 
-        <div className="max-h-[60vh] space-y-5 overflow-y-auto pr-1">
+        <div className="max-h-[min(70vh,calc(100dvh-12rem))] space-y-5 overflow-y-auto overscroll-contain pr-1">
           {groups.map((g) => {
             const GIcon = g.icon;
             return (
@@ -546,7 +546,7 @@ function DockSheet({
                   <GIcon className="h-3.5 w-3.5 text-primary" />
                   <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{g.label}</div>
                 </div>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {g.items.map(({ to, label, icon: Icon }) => {
                     const active = isActive(to);
                     return (
@@ -554,19 +554,22 @@ function DockSheet({
                         key={to}
                         to={to as any}
                         className={[
-                          "group flex items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-200",
+                          "group relative flex min-h-[52px] items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-200",
                           active
-                            ? "border-primary/40 bg-primary/10 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                            ? "border-primary/50 bg-primary/15 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_oklch(var(--primary)/0.25)]"
                             : "border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:-translate-y-px hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-foreground",
                         ].join(" ")}
                       >
-                        <div className={["grid h-9 w-9 shrink-0 place-items-center rounded-xl transition", active ? "bg-primary/15 text-primary" : "bg-white/[0.04] text-muted-foreground group-hover:text-foreground"].join(" ")}>
+                        {active && (
+                          <span aria-hidden className="absolute left-0 top-1/2 h-7 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />
+                        )}
+                        <div className={["grid h-9 w-9 shrink-0 place-items-center rounded-xl transition", active ? "bg-primary/25 text-primary" : "bg-white/[0.04] text-muted-foreground group-hover:text-foreground"].join(" ")}>
                           <Icon className="h-4 w-4" strokeWidth={2.4} />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-[13px] font-medium tracking-tight">{label}</div>
                         </div>
-                        <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-60" />
+                        <ChevronRight className={["h-3.5 w-3.5 shrink-0 transition", active ? "text-primary opacity-80" : "opacity-0 group-hover:translate-x-0.5 group-hover:opacity-60"].join(" ")} />
                       </Link>
                     );
                   })}
@@ -575,6 +578,7 @@ function DockSheet({
             );
           })}
         </div>
+
 
         {footer && <div className="mt-5 border-t border-white/[0.06] pt-4">{footer}</div>}
       </div>
