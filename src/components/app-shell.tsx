@@ -50,8 +50,15 @@ const COMERCIAL_GROUPS: SubGroup[] = [
   },
 ];
 
-// Items under "Mais" dock slot
-const MAIS_GROUPS: SubGroup[] = [
+// Items under "Operacional" dock slot
+const OPERACIONAL_GROUPS: SubGroup[] = [
+  {
+    id: "trabalho", label: "Trabalho", icon: Briefcase,
+    items: [
+      { to: "/projetos", label: "Projetos", icon: Briefcase },
+      { to: "/tarefas", label: "Tarefas", icon: ListChecks },
+    ],
+  },
   {
     id: "marketing", label: "Marketing", icon: Megaphone,
     items: [
@@ -69,18 +76,16 @@ const MAIS_GROUPS: SubGroup[] = [
       { to: "/chat", label: "Chat", icon: MessageCircle },
     ],
   },
+];
+
+// Items under "Mais" dock slot
+const MAIS_GROUPS: SubGroup[] = [
   {
     id: "inteligencia", label: "Inteligência", icon: LaunchIcon,
     items: [
       { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
       { to: "/insights", label: "Launch", icon: LaunchIcon },
       { to: "/dashboards", label: "Dashboards", icon: LineChart },
-    ],
-  },
-  {
-    id: "operacional", label: "Operacional", icon: Briefcase,
-    items: [
-      { to: "/projetos", label: "Projetos", icon: Briefcase },
     ],
   },
   {
@@ -107,6 +112,8 @@ const MAIS_GROUPS: SubGroup[] = [
 ];
 
 const COMERCIAL_PATHS = ["/leads", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas"];
+const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/campanhas", "/email-marketing", "/landing-pages", "/automacao", "/tickets", "/base-conhecimento", "/chat"];
+
 
 export function AppShell({ children, title, subtitle, action }: {
   children: ReactNode; title: string; subtitle?: string; action?: ReactNode;
@@ -119,6 +126,7 @@ export function AppShell({ children, title, subtitle, action }: {
   const navigate = useNavigate();
 
   const [comercialOpen, setComercialOpen] = useState(false);
+  const [operacionalOpen, setOperacionalOpen] = useState(false);
   const [maisOpen, setMaisOpen] = useState(false);
   const [launchOpen, setLaunchOpen] = useState(false);
 
@@ -126,6 +134,13 @@ export function AppShell({ children, title, subtitle, action }: {
 
   const filteredComercial = useMemo(
     () => COMERCIAL_GROUPS.map((g) => ({
+      ...g,
+      items: g.items.filter((i) => (!i.clinicOnly || segmento === "clinica") && (!i.schoolOnly || segmento === "escolar")),
+    })).filter((g) => g.items.length),
+    [segmento],
+  );
+  const filteredOperacional = useMemo(
+    () => OPERACIONAL_GROUPS.map((g) => ({
       ...g,
       items: g.items.filter((i) => (!i.clinicOnly || segmento === "clinica") && (!i.schoolOnly || segmento === "escolar")),
     })).filter((g) => g.items.length),
@@ -141,6 +156,7 @@ export function AppShell({ children, title, subtitle, action }: {
     [segmento],
   );
 
+
   useEffect(() => {
     if (loading) return;
     if (!user) { navigate({ to: "/auth" }); return; }
@@ -149,7 +165,7 @@ export function AppShell({ children, title, subtitle, action }: {
   }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
 
   // Close sheets on route change
-  useEffect(() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
+  useEffect(() => { setComercialOpen(false); setOperacionalOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
 
   // Global keyboard shortcut: Ctrl/Cmd+K toggles Launch panel
   useEffect(() => {
@@ -157,6 +173,7 @@ export function AppShell({ children, title, subtitle, action }: {
       if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
         e.preventDefault();
         setComercialOpen(false);
+        setOperacionalOpen(false);
         setMaisOpen(false);
         setLaunchOpen((v) => !v);
       }
@@ -164,6 +181,7 @@ export function AppShell({ children, title, subtitle, action }: {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
 
   if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
     return (
@@ -179,6 +197,8 @@ export function AppShell({ children, title, subtitle, action }: {
 
   const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
   const isComercialActive = COMERCIAL_PATHS.some((p) => pathname.startsWith(p));
+  const isOperacionalActive = OPERACIONAL_PATHS.some((p) => pathname.startsWith(p));
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -285,11 +305,13 @@ export function AppShell({ children, title, subtitle, action }: {
 
       {/* ===== Liquid-glass floating dock ===== */}
       <LiquidDock
-        active={{ home: isActive("/"), comercial: isComercialActive, tarefas: isActive("/tarefas"), financeiro: isActive("/financeiro") }}
-        onOpenComercial={() => { setMaisOpen(false); setLaunchOpen(false); setComercialOpen((v) => !v); }}
-        onOpenMais={() => { setComercialOpen(false); setLaunchOpen(false); setMaisOpen((v) => !v); }}
-        onOpenLaunch={() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen((v) => !v); }}
+        active={{ home: isActive("/"), comercial: isComercialActive, operacional: isOperacionalActive, financeiro: isActive("/financeiro") }}
+        onOpenComercial={() => { setOperacionalOpen(false); setMaisOpen(false); setLaunchOpen(false); setComercialOpen((v) => !v); }}
+        onOpenOperacional={() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); setOperacionalOpen((v) => !v); }}
+        onOpenMais={() => { setComercialOpen(false); setOperacionalOpen(false); setLaunchOpen(false); setMaisOpen((v) => !v); }}
+        onOpenLaunch={() => { setComercialOpen(false); setOperacionalOpen(false); setMaisOpen(false); setLaunchOpen((v) => !v); }}
         comercialOpen={comercialOpen}
+        operacionalOpen={operacionalOpen}
         maisOpen={maisOpen}
         launchOpen={launchOpen}
       />
@@ -298,6 +320,11 @@ export function AppShell({ children, title, subtitle, action }: {
       {comercialOpen && (
         <DockSheet title="Comercial" onClose={() => setComercialOpen(false)} groups={filteredComercial} pathname={pathname} />
       )}
+      {/* Operacional popover */}
+      {operacionalOpen && (
+        <DockSheet title="Operacional" onClose={() => setOperacionalOpen(false)} groups={filteredOperacional} pathname={pathname} />
+      )}
+
       {/* Mais popover */}
       {maisOpen && (
         <DockSheet
@@ -327,11 +354,11 @@ export function AppShell({ children, title, subtitle, action }: {
 
 /* -------------------- Dock -------------------- */
 function LiquidDock({
-  active, onOpenComercial, onOpenMais, onOpenLaunch, comercialOpen, maisOpen, launchOpen,
+  active, onOpenComercial, onOpenOperacional, onOpenMais, onOpenLaunch, comercialOpen, operacionalOpen, maisOpen, launchOpen,
 }: {
-  active: { home: boolean; comercial: boolean; tarefas: boolean; financeiro: boolean };
-  onOpenComercial: () => void; onOpenMais: () => void; onOpenLaunch: () => void;
-  comercialOpen: boolean; maisOpen: boolean; launchOpen: boolean;
+  active: { home: boolean; comercial: boolean; operacional: boolean; financeiro: boolean };
+  onOpenComercial: () => void; onOpenOperacional: () => void; onOpenMais: () => void; onOpenLaunch: () => void;
+  comercialOpen: boolean; operacionalOpen: boolean; maisOpen: boolean; launchOpen: boolean;
 }) {
   return (
     <nav
@@ -347,9 +374,10 @@ function LiquidDock({
         >
           <DockItem to="/" label="Dashboard" icon={LayoutDashboard} active={active.home} />
           <DockButton label="Comercial" icon={ShoppingBag} active={active.comercial || comercialOpen} onClick={onOpenComercial} />
-          <DockItem to="/tarefas" label="Tarefas" icon={ListChecks} active={active.tarefas} />
+          <DockButton label="Operacional" icon={Briefcase} active={active.operacional || operacionalOpen} onClick={onOpenOperacional} />
           <DockItem to="/financeiro" label="Financeiro" icon={Wallet} active={active.financeiro} />
           <DockButton label="Mais" icon={MoreHorizontal} active={maisOpen} onClick={onOpenMais} />
+
           {/* divider */}
           <li aria-hidden className="mx-1 h-7 w-px bg-white/[0.08]" />
           <LaunchDockButton active={launchOpen} onClick={onOpenLaunch} />
