@@ -177,23 +177,49 @@ export function AppShell({ children, title, subtitle, action }: {
     if (memberships.length === 0 && !isSuperAdmin) navigate({ to: "/onboarding" });
   }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
 
-  // Close sheets on route change
-  useEffect(() => { setComercialOpen(false); setOperacionalOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
+  // Close transient sheets on route change (Operacional persists per user setting)
+  useEffect(() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
 
-  // Global keyboard shortcut: Ctrl/Cmd+K toggles Launch panel
+  // Global keyboard shortcuts
   useEffect(() => {
+    const isTyping = (t: EventTarget | null) => {
+      const el = t as HTMLElement | null;
+      if (!el) return false;
+      const tag = el.tagName;
+      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+    };
     const onKey = (e: KeyboardEvent) => {
+      // Cmd/Ctrl+K → Launch
       if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
         e.preventDefault();
-        setComercialOpen(false);
-        setOperacionalOpen(false);
-        setMaisOpen(false);
+        setComercialOpen(false); setOperacionalOpen(false); setMaisOpen(false);
         setLaunchOpen((v) => !v);
+        return;
+      }
+      if (isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
+      // Shift+O → toggle Operacional
+      if (e.shiftKey && (e.key === "O" || e.key === "o")) {
+        e.preventDefault();
+        setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false);
+        setOperacionalOpen((v) => !v);
+        return;
+      }
+      // Shift+P → Projetos, Shift+T → Tarefas
+      if (e.shiftKey && (e.key === "P" || e.key === "p")) {
+        e.preventDefault();
+        navigate({ to: "/projetos" });
+        return;
+      }
+      if (e.shiftKey && (e.key === "T" || e.key === "t")) {
+        e.preventDefault();
+        navigate({ to: "/tarefas" });
+        return;
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [navigate]);
+
 
 
   if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
