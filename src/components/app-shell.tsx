@@ -126,6 +126,7 @@ export function AppShell({ children, title, subtitle, action }: {
   const navigate = useNavigate();
 
   const [comercialOpen, setComercialOpen] = useState(false);
+  const [operacionalOpen, setOperacionalOpen] = useState(false);
   const [maisOpen, setMaisOpen] = useState(false);
   const [launchOpen, setLaunchOpen] = useState(false);
 
@@ -133,6 +134,13 @@ export function AppShell({ children, title, subtitle, action }: {
 
   const filteredComercial = useMemo(
     () => COMERCIAL_GROUPS.map((g) => ({
+      ...g,
+      items: g.items.filter((i) => (!i.clinicOnly || segmento === "clinica") && (!i.schoolOnly || segmento === "escolar")),
+    })).filter((g) => g.items.length),
+    [segmento],
+  );
+  const filteredOperacional = useMemo(
+    () => OPERACIONAL_GROUPS.map((g) => ({
       ...g,
       items: g.items.filter((i) => (!i.clinicOnly || segmento === "clinica") && (!i.schoolOnly || segmento === "escolar")),
     })).filter((g) => g.items.length),
@@ -147,6 +155,7 @@ export function AppShell({ children, title, subtitle, action }: {
     }).filter(Boolean) as SubGroup[],
     [segmento],
   );
+
 
   useEffect(() => {
     if (loading) return;
