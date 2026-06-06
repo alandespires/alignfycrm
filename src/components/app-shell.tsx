@@ -395,38 +395,40 @@ export function AppShell({ children, title, subtitle, action }: {
 
 /* -------------------- Dock -------------------- */
 function LiquidDock({
-  active, onOpenComercial, onOpenOperacional, onOpenMais, onOpenLaunch, comercialOpen, operacionalOpen, maisOpen, launchOpen,
+  active, onOpenComercial, onOpenOperacional, onOpenMais, onOpenLaunch, comercialOpen, operacionalOpen, maisOpen, launchOpen, operacionalBadge,
 }: {
   active: { home: boolean; comercial: boolean; operacional: boolean; financeiro: boolean };
   onOpenComercial: () => void; onOpenOperacional: () => void; onOpenMais: () => void; onOpenLaunch: () => void;
   comercialOpen: boolean; operacionalOpen: boolean; maisOpen: boolean; launchOpen: boolean;
+  operacionalBadge?: number;
 }) {
   return (
     <nav
       aria-label="Navegação principal"
-      className="fixed inset-x-0 z-40 flex justify-center px-3"
+      className="fixed inset-x-0 z-40 flex justify-center px-2 sm:px-3"
       style={{ bottom: "calc(env(safe-area-inset-bottom) + 14px)" }}
     >
-      <div className="relative">
+      <div className="relative w-full max-w-[calc(100vw-1rem)] sm:w-auto">
         {/* glow under the dock */}
         <div aria-hidden className="pointer-events-none absolute -inset-6 -z-10 rounded-[40px] bg-primary/[0.06] blur-2xl" />
         <ul
-          className="flex items-center gap-1 rounded-[28px] border border-white/[0.08] bg-white/[0.04] p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl backdrop-saturate-150 dark:bg-white/[0.04]"
+          className="flex items-center justify-between gap-0.5 overflow-x-auto rounded-[28px] border border-white/[0.08] bg-white/[0.04] p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl backdrop-saturate-150 dark:bg-white/[0.04] sm:gap-1 sm:justify-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <DockItem to="/" label="Dashboard" icon={LayoutDashboard} active={active.home} />
           <DockButton label="Comercial" icon={ShoppingBag} active={active.comercial || comercialOpen} onClick={onOpenComercial} />
-          <DockButton label="Operacional" icon={Briefcase} active={active.operacional || operacionalOpen} onClick={onOpenOperacional} />
+          <DockButton label="Operacional" icon={Briefcase} active={active.operacional || operacionalOpen} onClick={onOpenOperacional} badge={operacionalBadge} />
           <DockItem to="/financeiro" label="Financeiro" icon={Wallet} active={active.financeiro} />
           <DockButton label="Mais" icon={MoreHorizontal} active={maisOpen} onClick={onOpenMais} />
 
           {/* divider */}
-          <li aria-hidden className="mx-1 h-7 w-px bg-white/[0.08]" />
+          <li aria-hidden className="mx-1 hidden h-7 w-px bg-white/[0.08] sm:block" />
           <LaunchDockButton active={launchOpen} onClick={onOpenLaunch} />
         </ul>
       </div>
     </nav>
   );
 }
+
 
 function LaunchDockButton({ active, onClick }: { active: boolean; onClick: () => void }) {
   return (
