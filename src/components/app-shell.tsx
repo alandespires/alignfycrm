@@ -464,7 +464,7 @@ function DockItem({ to, label, icon: Icon, active }: { to: string; label: string
         to={to as any}
         aria-label={label}
         className={[
-          "group relative flex h-12 items-center gap-2 rounded-[20px] px-3 transition-all duration-300 ease-out",
+          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-all duration-300 ease-out",
           active
             ? "bg-foreground/[0.08] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
             : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground active:scale-[0.96]",
