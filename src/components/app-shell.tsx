@@ -353,7 +353,9 @@ export function AppShell({ children, title, subtitle, action }: {
         operacionalOpen={operacionalOpen}
         maisOpen={maisOpen}
         launchOpen={launchOpen}
+        operacionalBadge={opBadgeTotal}
       />
+
 
       {/* Comercial popover */}
       {comercialOpen && (
