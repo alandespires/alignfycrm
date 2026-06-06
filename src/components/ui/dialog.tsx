@@ -38,15 +38,16 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        // Full-screen safe sizing: never exceed viewport, scroll inside
+        // Full-screen safe sizing: never exceed viewport, scroll inside, leave room for floating dock
         "fixed left-1/2 top-1/2 z-50 grid w-[calc(100vw-1.5rem)] max-w-lg -translate-x-1/2 -translate-y-1/2",
-        "max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain",
+        "max-h-[calc(100dvh-8rem-env(safe-area-inset-bottom))] overflow-y-auto overscroll-contain",
         "gap-4 rounded-2xl border border-border bg-popover p-6 text-popover-foreground shadow-elevated",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         "sm:w-full",
         className,
       )}
       {...props}
+
     >
       {children}
       <DialogPrimitive.Close className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition hover:bg-surface-3 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring">

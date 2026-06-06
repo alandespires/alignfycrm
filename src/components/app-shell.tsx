@@ -13,9 +13,11 @@ import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
 import { useTheme } from "@/contexts/theme-context";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
+import { useOperacionalBadges } from "@/hooks/use-operacional-badges";
 import { NotificationsPopover } from "@/components/notifications-popover";
 import { LaunchPanel } from "@/components/launch-panel";
 import { LaunchIcon } from "@/components/launch-icon";
+
 
 /* ============================================================
  * Align CRM — Liquid Glass shell (iOS 26-inspired)
@@ -126,9 +128,20 @@ export function AppShell({ children, title, subtitle, action }: {
   const navigate = useNavigate();
 
   const [comercialOpen, setComercialOpen] = useState(false);
-  const [operacionalOpen, setOperacionalOpen] = useState(false);
+  const [operacionalOpen, setOperacionalOpen] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("align:operacionalOpen") === "1";
+  });
   const [maisOpen, setMaisOpen] = useState(false);
   const [launchOpen, setLaunchOpen] = useState(false);
+  const { data: opBadges } = useOperacionalBadges();
+  const opBadgeTotal = (opBadges?.tasksOverdue ?? 0) + (opBadges?.projectsAtRisk ?? 0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("align:operacionalOpen", operacionalOpen ? "1" : "0");
+  }, [operacionalOpen]);
+
 
   const segmento = (current?.tenant as any)?.segmento;
 
@@ -164,23 +177,49 @@ export function AppShell({ children, title, subtitle, action }: {
     if (memberships.length === 0 && !isSuperAdmin) navigate({ to: "/onboarding" });
   }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
 
-  // Close sheets on route change
-  useEffect(() => { setComercialOpen(false); setOperacionalOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
+  // Close transient sheets on route change (Operacional persists per user setting)
+  useEffect(() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
 
-  // Global keyboard shortcut: Ctrl/Cmd+K toggles Launch panel
+  // Global keyboard shortcuts
   useEffect(() => {
+    const isTyping = (t: EventTarget | null) => {
+      const el = t as HTMLElement | null;
+      if (!el) return false;
+      const tag = el.tagName;
+      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+    };
     const onKey = (e: KeyboardEvent) => {
+      // Cmd/Ctrl+K → Launch
       if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
         e.preventDefault();
-        setComercialOpen(false);
-        setOperacionalOpen(false);
-        setMaisOpen(false);
+        setComercialOpen(false); setOperacionalOpen(false); setMaisOpen(false);
         setLaunchOpen((v) => !v);
+        return;
+      }
+      if (isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
+      // Shift+O → toggle Operacional
+      if (e.shiftKey && (e.key === "O" || e.key === "o")) {
+        e.preventDefault();
+        setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false);
+        setOperacionalOpen((v) => !v);
+        return;
+      }
+      // Shift+P → Projetos, Shift+T → Tarefas
+      if (e.shiftKey && (e.key === "P" || e.key === "p")) {
+        e.preventDefault();
+        navigate({ to: "/projetos" });
+        return;
+      }
+      if (e.shiftKey && (e.key === "T" || e.key === "t")) {
+        e.preventDefault();
+        navigate({ to: "/tarefas" });
+        return;
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [navigate]);
+
 
 
   if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
@@ -314,7 +353,9 @@ export function AppShell({ children, title, subtitle, action }: {
         operacionalOpen={operacionalOpen}
         maisOpen={maisOpen}
         launchOpen={launchOpen}
+        operacionalBadge={opBadgeTotal}
       />
+
 
       {/* Comercial popover */}
       {comercialOpen && (
@@ -354,38 +395,40 @@ export function AppShell({ children, title, subtitle, action }: {
 
 /* -------------------- Dock -------------------- */
 function LiquidDock({
-  active, onOpenComercial, onOpenOperacional, onOpenMais, onOpenLaunch, comercialOpen, operacionalOpen, maisOpen, launchOpen,
+  active, onOpenComercial, onOpenOperacional, onOpenMais, onOpenLaunch, comercialOpen, operacionalOpen, maisOpen, launchOpen, operacionalBadge,
 }: {
   active: { home: boolean; comercial: boolean; operacional: boolean; financeiro: boolean };
   onOpenComercial: () => void; onOpenOperacional: () => void; onOpenMais: () => void; onOpenLaunch: () => void;
   comercialOpen: boolean; operacionalOpen: boolean; maisOpen: boolean; launchOpen: boolean;
+  operacionalBadge?: number;
 }) {
   return (
     <nav
       aria-label="Navegação principal"
-      className="fixed inset-x-0 z-40 flex justify-center px-3"
+      className="fixed inset-x-0 z-40 flex justify-center px-2 sm:px-3"
       style={{ bottom: "calc(env(safe-area-inset-bottom) + 14px)" }}
     >
-      <div className="relative">
+      <div className="relative w-full max-w-[calc(100vw-1rem)] sm:w-auto">
         {/* glow under the dock */}
         <div aria-hidden className="pointer-events-none absolute -inset-6 -z-10 rounded-[40px] bg-primary/[0.06] blur-2xl" />
         <ul
-          className="flex items-center gap-1 rounded-[28px] border border-white/[0.08] bg-white/[0.04] p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl backdrop-saturate-150 dark:bg-white/[0.04]"
+          className="flex items-center justify-between gap-0.5 overflow-x-auto rounded-[28px] border border-white/[0.08] bg-white/[0.04] p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl backdrop-saturate-150 dark:bg-white/[0.04] sm:gap-1 sm:justify-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <DockItem to="/" label="Dashboard" icon={LayoutDashboard} active={active.home} />
           <DockButton label="Comercial" icon={ShoppingBag} active={active.comercial || comercialOpen} onClick={onOpenComercial} />
-          <DockButton label="Operacional" icon={Briefcase} active={active.operacional || operacionalOpen} onClick={onOpenOperacional} />
+          <DockButton label="Operacional" icon={Briefcase} active={active.operacional || operacionalOpen} onClick={onOpenOperacional} badge={operacionalBadge} />
           <DockItem to="/financeiro" label="Financeiro" icon={Wallet} active={active.financeiro} />
           <DockButton label="Mais" icon={MoreHorizontal} active={maisOpen} onClick={onOpenMais} />
 
           {/* divider */}
-          <li aria-hidden className="mx-1 h-7 w-px bg-white/[0.08]" />
+          <li aria-hidden className="mx-1 hidden h-7 w-px bg-white/[0.08] sm:block" />
           <LaunchDockButton active={launchOpen} onClick={onOpenLaunch} />
         </ul>
       </div>
     </nav>
   );
 }
+
 
 function LaunchDockButton({ active, onClick }: { active: boolean; onClick: () => void }) {
   return (
@@ -421,7 +464,7 @@ function DockItem({ to, label, icon: Icon, active }: { to: string; label: string
         to={to as any}
         aria-label={label}
         className={[
-          "group relative flex h-12 items-center gap-2 rounded-[20px] px-3 transition-all duration-300 ease-out",
+          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-all duration-300 ease-out",
           active
             ? "bg-foreground/[0.08] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
             : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground active:scale-[0.96]",
@@ -434,14 +477,14 @@ function DockItem({ to, label, icon: Icon, active }: { to: string; label: string
   );
 }
 
-function DockButton({ label, icon: Icon, active, onClick }: { label: string; icon: any; active: boolean; onClick: () => void }) {
+function DockButton({ label, icon: Icon, active, onClick, badge }: { label: string; icon: any; active: boolean; onClick: () => void; badge?: number }) {
   return (
     <li>
       <button
         onClick={onClick}
-        aria-label={label}
+        aria-label={badge ? `${label} (${badge} item${badge === 1 ? "" : "s"} pendente${badge === 1 ? "" : "s"})` : label}
         className={[
-          "group relative flex h-12 items-center gap-2 rounded-[20px] px-3 transition-all duration-300 ease-out",
+          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-all duration-300 ease-out",
           active
             ? "bg-foreground/[0.08] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
             : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground active:scale-[0.96]",
@@ -449,10 +492,19 @@ function DockButton({ label, icon: Icon, active, onClick }: { label: string; ico
       >
         <Icon className={["h-[18px] w-[18px]", active ? "text-primary" : ""].join(" ")} strokeWidth={active ? 2.5 : 2.2} />
         <span className={["hidden text-[12.5px] font-medium tracking-tight md:inline"].join(" ")}>{label}</span>
+        {!!badge && badge > 0 && (
+          <span
+            aria-hidden
+            className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-none text-destructive-foreground ring-2 ring-background"
+          >
+            {badge > 99 ? "99+" : badge}
+          </span>
+        )}
       </button>
     </li>
   );
 }
+
 
 /* -------------------- Sheet (popover for Comercial / Mais) -------------------- */
 function DockSheet({
@@ -485,7 +537,7 @@ function DockSheet({
           </button>
         </div>
 
-        <div className="max-h-[60vh] space-y-5 overflow-y-auto pr-1">
+        <div className="max-h-[min(70vh,calc(100dvh-12rem))] space-y-5 overflow-y-auto overscroll-contain pr-1">
           {groups.map((g) => {
             const GIcon = g.icon;
             return (
@@ -494,7 +546,7 @@ function DockSheet({
                   <GIcon className="h-3.5 w-3.5 text-primary" />
                   <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{g.label}</div>
                 </div>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {g.items.map(({ to, label, icon: Icon }) => {
                     const active = isActive(to);
                     return (
@@ -502,19 +554,22 @@ function DockSheet({
                         key={to}
                         to={to as any}
                         className={[
-                          "group flex items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-200",
+                          "group relative flex min-h-[52px] items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all duration-200",
                           active
-                            ? "border-primary/40 bg-primary/10 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                            ? "border-primary/50 bg-primary/15 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_oklch(var(--primary)/0.25)]"
                             : "border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:-translate-y-px hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-foreground",
                         ].join(" ")}
                       >
-                        <div className={["grid h-9 w-9 shrink-0 place-items-center rounded-xl transition", active ? "bg-primary/15 text-primary" : "bg-white/[0.04] text-muted-foreground group-hover:text-foreground"].join(" ")}>
+                        {active && (
+                          <span aria-hidden className="absolute left-0 top-1/2 h-7 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />
+                        )}
+                        <div className={["grid h-9 w-9 shrink-0 place-items-center rounded-xl transition", active ? "bg-primary/25 text-primary" : "bg-white/[0.04] text-muted-foreground group-hover:text-foreground"].join(" ")}>
                           <Icon className="h-4 w-4" strokeWidth={2.4} />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-[13px] font-medium tracking-tight">{label}</div>
                         </div>
-                        <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-60" />
+                        <ChevronRight className={["h-3.5 w-3.5 shrink-0 transition", active ? "text-primary opacity-80" : "opacity-0 group-hover:translate-x-0.5 group-hover:opacity-60"].join(" ")} />
                       </Link>
                     );
                   })}
@@ -523,6 +578,7 @@ function DockSheet({
             );
           })}
         </div>
+
 
         {footer && <div className="mt-5 border-t border-white/[0.06] pt-4">{footer}</div>}
       </div>
