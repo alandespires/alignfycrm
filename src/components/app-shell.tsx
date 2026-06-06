@@ -50,8 +50,15 @@ const COMERCIAL_GROUPS: SubGroup[] = [
   },
 ];
 
-// Items under "Mais" dock slot
-const MAIS_GROUPS: SubGroup[] = [
+// Items under "Operacional" dock slot
+const OPERACIONAL_GROUPS: SubGroup[] = [
+  {
+    id: "trabalho", label: "Trabalho", icon: Briefcase,
+    items: [
+      { to: "/projetos", label: "Projetos", icon: Briefcase },
+      { to: "/tarefas", label: "Tarefas", icon: ListChecks },
+    ],
+  },
   {
     id: "marketing", label: "Marketing", icon: Megaphone,
     items: [
@@ -69,18 +76,16 @@ const MAIS_GROUPS: SubGroup[] = [
       { to: "/chat", label: "Chat", icon: MessageCircle },
     ],
   },
+];
+
+// Items under "Mais" dock slot
+const MAIS_GROUPS: SubGroup[] = [
   {
     id: "inteligencia", label: "Inteligência", icon: LaunchIcon,
     items: [
       { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
       { to: "/insights", label: "Launch", icon: LaunchIcon },
       { to: "/dashboards", label: "Dashboards", icon: LineChart },
-    ],
-  },
-  {
-    id: "operacional", label: "Operacional", icon: Briefcase,
-    items: [
-      { to: "/projetos", label: "Projetos", icon: Briefcase },
     ],
   },
   {
@@ -107,6 +112,8 @@ const MAIS_GROUPS: SubGroup[] = [
 ];
 
 const COMERCIAL_PATHS = ["/leads", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas"];
+const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/campanhas", "/email-marketing", "/landing-pages", "/automacao", "/tickets", "/base-conhecimento", "/chat"];
+
 
 export function AppShell({ children, title, subtitle, action }: {
   children: ReactNode; title: string; subtitle?: string; action?: ReactNode;
