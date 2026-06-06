@@ -197,6 +197,8 @@ export function AppShell({ children, title, subtitle, action }: {
 
   const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
   const isComercialActive = COMERCIAL_PATHS.some((p) => pathname.startsWith(p));
+  const isOperacionalActive = OPERACIONAL_PATHS.some((p) => pathname.startsWith(p));
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
