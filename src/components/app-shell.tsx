@@ -165,7 +165,7 @@ export function AppShell({ children, title, subtitle, action }: {
   }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
 
   // Close sheets on route change
-  useEffect(() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
+  useEffect(() => { setComercialOpen(false); setOperacionalOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
 
   // Global keyboard shortcut: Ctrl/Cmd+K toggles Launch panel
   useEffect(() => {
@@ -173,6 +173,7 @@ export function AppShell({ children, title, subtitle, action }: {
       if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
         e.preventDefault();
         setComercialOpen(false);
+        setOperacionalOpen(false);
         setMaisOpen(false);
         setLaunchOpen((v) => !v);
       }
@@ -180,6 +181,7 @@ export function AppShell({ children, title, subtitle, action }: {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
 
   if (loading || !user || tenantLoading || (memberships.length === 0 && !isSuperAdmin)) {
     return (
