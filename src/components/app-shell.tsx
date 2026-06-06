@@ -128,9 +128,20 @@ export function AppShell({ children, title, subtitle, action }: {
   const navigate = useNavigate();
 
   const [comercialOpen, setComercialOpen] = useState(false);
-  const [operacionalOpen, setOperacionalOpen] = useState(false);
+  const [operacionalOpen, setOperacionalOpen] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("align:operacionalOpen") === "1";
+  });
   const [maisOpen, setMaisOpen] = useState(false);
   const [launchOpen, setLaunchOpen] = useState(false);
+  const { data: opBadges } = useOperacionalBadges();
+  const opBadgeTotal = (opBadges?.tasksOverdue ?? 0) + (opBadges?.projectsAtRisk ?? 0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem("align:operacionalOpen", operacionalOpen ? "1" : "0");
+  }, [operacionalOpen]);
+
 
   const segmento = (current?.tenant as any)?.segmento;
 
