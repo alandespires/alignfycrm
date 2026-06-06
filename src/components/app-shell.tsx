@@ -305,11 +305,13 @@ export function AppShell({ children, title, subtitle, action }: {
 
       {/* ===== Liquid-glass floating dock ===== */}
       <LiquidDock
-        active={{ home: isActive("/"), comercial: isComercialActive, tarefas: isActive("/tarefas"), financeiro: isActive("/financeiro") }}
-        onOpenComercial={() => { setMaisOpen(false); setLaunchOpen(false); setComercialOpen((v) => !v); }}
-        onOpenMais={() => { setComercialOpen(false); setLaunchOpen(false); setMaisOpen((v) => !v); }}
-        onOpenLaunch={() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen((v) => !v); }}
+        active={{ home: isActive("/"), comercial: isComercialActive, operacional: isOperacionalActive, financeiro: isActive("/financeiro") }}
+        onOpenComercial={() => { setOperacionalOpen(false); setMaisOpen(false); setLaunchOpen(false); setComercialOpen((v) => !v); }}
+        onOpenOperacional={() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); setOperacionalOpen((v) => !v); }}
+        onOpenMais={() => { setComercialOpen(false); setOperacionalOpen(false); setLaunchOpen(false); setMaisOpen((v) => !v); }}
+        onOpenLaunch={() => { setComercialOpen(false); setOperacionalOpen(false); setMaisOpen(false); setLaunchOpen((v) => !v); }}
         comercialOpen={comercialOpen}
+        operacionalOpen={operacionalOpen}
         maisOpen={maisOpen}
         launchOpen={launchOpen}
       />
@@ -318,6 +320,11 @@ export function AppShell({ children, title, subtitle, action }: {
       {comercialOpen && (
         <DockSheet title="Comercial" onClose={() => setComercialOpen(false)} groups={filteredComercial} pathname={pathname} />
       )}
+      {/* Operacional popover */}
+      {operacionalOpen && (
+        <DockSheet title="Operacional" onClose={() => setOperacionalOpen(false)} groups={filteredOperacional} pathname={pathname} />
+      )}
+
       {/* Mais popover */}
       {maisOpen && (
         <DockSheet
