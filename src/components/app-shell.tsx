@@ -354,11 +354,11 @@ export function AppShell({ children, title, subtitle, action }: {
 
 /* -------------------- Dock -------------------- */
 function LiquidDock({
-  active, onOpenComercial, onOpenMais, onOpenLaunch, comercialOpen, maisOpen, launchOpen,
+  active, onOpenComercial, onOpenOperacional, onOpenMais, onOpenLaunch, comercialOpen, operacionalOpen, maisOpen, launchOpen,
 }: {
-  active: { home: boolean; comercial: boolean; tarefas: boolean; financeiro: boolean };
-  onOpenComercial: () => void; onOpenMais: () => void; onOpenLaunch: () => void;
-  comercialOpen: boolean; maisOpen: boolean; launchOpen: boolean;
+  active: { home: boolean; comercial: boolean; operacional: boolean; financeiro: boolean };
+  onOpenComercial: () => void; onOpenOperacional: () => void; onOpenMais: () => void; onOpenLaunch: () => void;
+  comercialOpen: boolean; operacionalOpen: boolean; maisOpen: boolean; launchOpen: boolean;
 }) {
   return (
     <nav
@@ -374,9 +374,10 @@ function LiquidDock({
         >
           <DockItem to="/" label="Dashboard" icon={LayoutDashboard} active={active.home} />
           <DockButton label="Comercial" icon={ShoppingBag} active={active.comercial || comercialOpen} onClick={onOpenComercial} />
-          <DockItem to="/tarefas" label="Tarefas" icon={ListChecks} active={active.tarefas} />
+          <DockButton label="Operacional" icon={Briefcase} active={active.operacional || operacionalOpen} onClick={onOpenOperacional} />
           <DockItem to="/financeiro" label="Financeiro" icon={Wallet} active={active.financeiro} />
           <DockButton label="Mais" icon={MoreHorizontal} active={maisOpen} onClick={onOpenMais} />
+
           {/* divider */}
           <li aria-hidden className="mx-1 h-7 w-px bg-white/[0.08]" />
           <LaunchDockButton active={launchOpen} onClick={onOpenLaunch} />
