@@ -73,7 +73,7 @@ const OPERACIONAL_GROUPS: SubGroup[] = [
   {
     id: "consultor", label: "Consultor", icon: Briefcase,
     items: [
-      { to: "/consultor", label: "Painel", icon: TrendingUpIcon },
+      { to: "/consultor", label: "Painel", icon: LineChart },
       { to: "/consultor/simulador", label: "Simulador", icon: Calculator },
       { to: "/consultor/cotas", label: "Cotas", icon: ListChecks },
       { to: "/consultor/contemplacoes", label: "Contemplações", icon: Award },
