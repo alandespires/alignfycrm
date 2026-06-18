@@ -504,6 +504,484 @@ export type Database = {
         }
         Relationships: []
       }
+      consortium_administrators: {
+        Row: {
+          ativo: boolean
+          cnpj: string | null
+          contato: string | null
+          created_at: string
+          created_by: string | null
+          fundo_reserva_padrao: number | null
+          id: string
+          nome: string
+          observacoes: string | null
+          seguro_padrao: number | null
+          taxa_adm_padrao: number | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          cnpj?: string | null
+          contato?: string | null
+          created_at?: string
+          created_by?: string | null
+          fundo_reserva_padrao?: number | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          seguro_padrao?: number | null
+          taxa_adm_padrao?: number | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          cnpj?: string | null
+          contato?: string | null
+          created_at?: string
+          created_by?: string | null
+          fundo_reserva_padrao?: number | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          seguro_padrao?: number | null
+          taxa_adm_padrao?: number | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consortium_administrators_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consortium_contemplations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          data: string
+          id: string
+          observacao: string | null
+          quota_id: string
+          tenant_id: string
+          tipo: Database["public"]["Enums"]["contemplation_type"]
+          valor_lance: number | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          id?: string
+          observacao?: string | null
+          quota_id: string
+          tenant_id: string
+          tipo: Database["public"]["Enums"]["contemplation_type"]
+          valor_lance?: number | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          id?: string
+          observacao?: string | null
+          quota_id?: string
+          tenant_id?: string
+          tipo?: Database["public"]["Enums"]["contemplation_type"]
+          valor_lance?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consortium_contemplations_quota_id_fkey"
+            columns: ["quota_id"]
+            isOneToOne: false
+            referencedRelation: "consortium_quotas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consortium_contemplations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consortium_groups: {
+        Row: {
+          administrator_id: string | null
+          assembleia_dia: number | null
+          codigo: string
+          created_at: string
+          id: string
+          observacoes: string | null
+          prazo_meses: number
+          segmento: Database["public"]["Enums"]["consortium_segment"]
+          status: string
+          tenant_id: string
+          updated_at: string
+          vagas: number | null
+          valor_credito: number
+        }
+        Insert: {
+          administrator_id?: string | null
+          assembleia_dia?: number | null
+          codigo: string
+          created_at?: string
+          id?: string
+          observacoes?: string | null
+          prazo_meses: number
+          segmento: Database["public"]["Enums"]["consortium_segment"]
+          status?: string
+          tenant_id: string
+          updated_at?: string
+          vagas?: number | null
+          valor_credito: number
+        }
+        Update: {
+          administrator_id?: string | null
+          assembleia_dia?: number | null
+          codigo?: string
+          created_at?: string
+          id?: string
+          observacoes?: string | null
+          prazo_meses?: number
+          segmento?: Database["public"]["Enums"]["consortium_segment"]
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          vagas?: number | null
+          valor_credito?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consortium_groups_administrator_id_fkey"
+            columns: ["administrator_id"]
+            isOneToOne: false
+            referencedRelation: "consortium_administrators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consortium_groups_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consortium_quotas: {
+        Row: {
+          administrator_id: string | null
+          client_id: string | null
+          contemplada_em: string | null
+          created_at: string
+          created_by: string | null
+          group_id: string | null
+          id: string
+          lance_ofertado: number | null
+          lance_tipo: Database["public"]["Enums"]["contemplation_type"] | null
+          lead_id: string | null
+          numero_cota: string | null
+          observacoes: string | null
+          owner_id: string | null
+          parcela_atual: number | null
+          parcela_total: number
+          parcela_valor: number
+          proximo_vencimento: string | null
+          segmento: Database["public"]["Enums"]["consortium_segment"]
+          status: Database["public"]["Enums"]["quota_status"]
+          tenant_id: string
+          updated_at: string
+          valor_credito: number
+        }
+        Insert: {
+          administrator_id?: string | null
+          client_id?: string | null
+          contemplada_em?: string | null
+          created_at?: string
+          created_by?: string | null
+          group_id?: string | null
+          id?: string
+          lance_ofertado?: number | null
+          lance_tipo?: Database["public"]["Enums"]["contemplation_type"] | null
+          lead_id?: string | null
+          numero_cota?: string | null
+          observacoes?: string | null
+          owner_id?: string | null
+          parcela_atual?: number | null
+          parcela_total: number
+          parcela_valor: number
+          proximo_vencimento?: string | null
+          segmento: Database["public"]["Enums"]["consortium_segment"]
+          status?: Database["public"]["Enums"]["quota_status"]
+          tenant_id: string
+          updated_at?: string
+          valor_credito: number
+        }
+        Update: {
+          administrator_id?: string | null
+          client_id?: string | null
+          contemplada_em?: string | null
+          created_at?: string
+          created_by?: string | null
+          group_id?: string | null
+          id?: string
+          lance_ofertado?: number | null
+          lance_tipo?: Database["public"]["Enums"]["contemplation_type"] | null
+          lead_id?: string | null
+          numero_cota?: string | null
+          observacoes?: string | null
+          owner_id?: string | null
+          parcela_atual?: number | null
+          parcela_total?: number
+          parcela_valor?: number
+          proximo_vencimento?: string | null
+          segmento?: Database["public"]["Enums"]["consortium_segment"]
+          status?: Database["public"]["Enums"]["quota_status"]
+          tenant_id?: string
+          updated_at?: string
+          valor_credito?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consortium_quotas_administrator_id_fkey"
+            columns: ["administrator_id"]
+            isOneToOne: false
+            referencedRelation: "consortium_administrators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consortium_quotas_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consortium_quotas_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "consortium_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consortium_quotas_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consortium_quotas_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consortium_simulations: {
+        Row: {
+          administrator_id: string | null
+          client_id: string | null
+          created_at: string
+          created_by: string | null
+          credito: number
+          enviada_em: string | null
+          fundo_reserva: number
+          id: string
+          lance_embutido_pct: number | null
+          lead_id: string | null
+          parcela_com_lance: number | null
+          parcela_estimada: number
+          payload: Json
+          pdf_url: string | null
+          prazo_meses: number
+          segmento: Database["public"]["Enums"]["consortium_segment"]
+          seguro_mensal: number | null
+          taxa_adm: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          administrator_id?: string | null
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          credito: number
+          enviada_em?: string | null
+          fundo_reserva?: number
+          id?: string
+          lance_embutido_pct?: number | null
+          lead_id?: string | null
+          parcela_com_lance?: number | null
+          parcela_estimada: number
+          payload?: Json
+          pdf_url?: string | null
+          prazo_meses: number
+          segmento: Database["public"]["Enums"]["consortium_segment"]
+          seguro_mensal?: number | null
+          taxa_adm: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          administrator_id?: string | null
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          credito?: number
+          enviada_em?: string | null
+          fundo_reserva?: number
+          id?: string
+          lance_embutido_pct?: number | null
+          lead_id?: string | null
+          parcela_com_lance?: number | null
+          parcela_estimada?: number
+          payload?: Json
+          pdf_url?: string | null
+          prazo_meses?: number
+          segmento?: Database["public"]["Enums"]["consortium_segment"]
+          seguro_mensal?: number | null
+          taxa_adm?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consortium_simulations_administrator_id_fkey"
+            columns: ["administrator_id"]
+            isOneToOne: false
+            referencedRelation: "consortium_administrators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consortium_simulations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consortium_simulations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consortium_simulations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultor_commissions: {
+        Row: {
+          base: number
+          consultor_id: string | null
+          created_at: string
+          created_by: string | null
+          deal_id: string | null
+          descricao: string
+          financial_entry_id: string | null
+          id: string
+          lead_id: string | null
+          observacoes: string | null
+          paga_em: string | null
+          pagar_em: string | null
+          percentual: number
+          quota_id: string | null
+          status: Database["public"]["Enums"]["commission_status"]
+          tenant_id: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          base: number
+          consultor_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deal_id?: string | null
+          descricao: string
+          financial_entry_id?: string | null
+          id?: string
+          lead_id?: string | null
+          observacoes?: string | null
+          paga_em?: string | null
+          pagar_em?: string | null
+          percentual: number
+          quota_id?: string | null
+          status?: Database["public"]["Enums"]["commission_status"]
+          tenant_id: string
+          updated_at?: string
+          valor: number
+        }
+        Update: {
+          base?: number
+          consultor_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          deal_id?: string | null
+          descricao?: string
+          financial_entry_id?: string | null
+          id?: string
+          lead_id?: string | null
+          observacoes?: string | null
+          paga_em?: string | null
+          pagar_em?: string | null
+          percentual?: number
+          quota_id?: string | null
+          status?: Database["public"]["Enums"]["commission_status"]
+          tenant_id?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultor_commissions_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultor_commissions_financial_entry_id_fkey"
+            columns: ["financial_entry_id"]
+            isOneToOne: false
+            referencedRelation: "financial_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultor_commissions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultor_commissions_quota_id_fkey"
+            columns: ["quota_id"]
+            isOneToOne: false
+            referencedRelation: "consortium_quotas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultor_commissions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contacts: {
         Row: {
           cargo: string | null
@@ -559,6 +1037,151 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_products: {
+        Row: {
+          ativo: boolean
+          banco: string | null
+          comissao_pct: number | null
+          created_at: string
+          id: string
+          nome: string
+          observacoes: string | null
+          prazo_max: number | null
+          prazo_min: number | null
+          taxa_max: number | null
+          taxa_min: number | null
+          tenant_id: string
+          tipo: Database["public"]["Enums"]["credit_product_type"]
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          banco?: string | null
+          comissao_pct?: number | null
+          created_at?: string
+          id?: string
+          nome: string
+          observacoes?: string | null
+          prazo_max?: number | null
+          prazo_min?: number | null
+          taxa_max?: number | null
+          taxa_min?: number | null
+          tenant_id: string
+          tipo: Database["public"]["Enums"]["credit_product_type"]
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          banco?: string | null
+          comissao_pct?: number | null
+          created_at?: string
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          prazo_max?: number | null
+          prazo_min?: number | null
+          taxa_max?: number | null
+          taxa_min?: number | null
+          tenant_id?: string
+          tipo?: Database["public"]["Enums"]["credit_product_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_products_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_simulations: {
+        Row: {
+          cet_anual: number | null
+          client_id: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          lead_id: string | null
+          parcela: number
+          payload: Json
+          pdf_url: string | null
+          prazo_meses: number
+          product_id: string | null
+          taxa_mensal: number
+          tenant_id: string
+          total_pago: number
+          updated_at: string
+          valor_solicitado: number
+        }
+        Insert: {
+          cet_anual?: number | null
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead_id?: string | null
+          parcela: number
+          payload?: Json
+          pdf_url?: string | null
+          prazo_meses: number
+          product_id?: string | null
+          taxa_mensal: number
+          tenant_id: string
+          total_pago: number
+          updated_at?: string
+          valor_solicitado: number
+        }
+        Update: {
+          cet_anual?: number | null
+          client_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead_id?: string | null
+          parcela?: number
+          payload?: Json
+          pdf_url?: string | null
+          prazo_meses?: number
+          product_id?: string | null
+          taxa_mensal?: number
+          tenant_id?: string
+          total_pago?: number
+          updated_at?: string
+          valor_solicitado?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_simulations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_simulations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_simulations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "credit_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_simulations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -2870,6 +3493,19 @@ export type Database = {
         | "procedimento"
       commercial_role: "admin" | "comercial" | "visualizador"
       commission_status: "pendente" | "aprovada" | "paga" | "cancelada"
+      consortium_segment: "imovel" | "veiculo" | "servicos" | "pesado" | "moto"
+      contemplation_type:
+        | "sorteio"
+        | "lance_livre"
+        | "lance_fixo"
+        | "lance_embutido"
+      credit_product_type:
+        | "consignado"
+        | "fgts"
+        | "home_equity"
+        | "refin_veicular"
+        | "pessoal"
+        | "antecipacao_ir"
       financial_entry_category:
         | "venda"
         | "assinatura"
@@ -2924,6 +3560,13 @@ export type Database = {
         | "pausado"
         | "concluido"
         | "cancelado"
+      quota_status:
+        | "ativa"
+        | "contemplada"
+        | "quitada"
+        | "cancelada"
+        | "transferida"
+        | "atrasada"
       school_assessment_type:
         | "prova"
         | "trabalho"
@@ -3115,6 +3758,21 @@ export const Constants = {
       ],
       commercial_role: ["admin", "comercial", "visualizador"],
       commission_status: ["pendente", "aprovada", "paga", "cancelada"],
+      consortium_segment: ["imovel", "veiculo", "servicos", "pesado", "moto"],
+      contemplation_type: [
+        "sorteio",
+        "lance_livre",
+        "lance_fixo",
+        "lance_embutido",
+      ],
+      credit_product_type: [
+        "consignado",
+        "fgts",
+        "home_equity",
+        "refin_veicular",
+        "pessoal",
+        "antecipacao_ir",
+      ],
       financial_entry_category: [
         "venda",
         "assinatura",
@@ -3174,6 +3832,14 @@ export const Constants = {
         "pausado",
         "concluido",
         "cancelado",
+      ],
+      quota_status: [
+        "ativa",
+        "contemplada",
+        "quitada",
+        "cancelada",
+        "transferida",
+        "atrasada",
       ],
       school_assessment_type: [
         "prova",

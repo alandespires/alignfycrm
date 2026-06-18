@@ -178,3 +178,108 @@ export async function executarRegistrarPagamento(args: {
   if (error) throw error;
   return { entry_id: entry.id, descricao: entry.descricao, valor: args.valor };
 }
+
+/** Gera simulação de consórcio via IA. */
+export async function executarSimularConsorcio(args: {
+  segmento: "imovel" | "veiculo" | "servicos" | "pesado" | "moto";
+  credito: number; prazo_meses: number;
+  taxa_adm?: number; fundo_reserva?: number; lance_embutido_pct?: number;
+  lead_nome?: string;
+}) {
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) throw new Error("Não autenticado");
+  const tenant_id = requireTenantId();
+
+  let lead_id: string | null = null;
+  if (args.lead_nome) {
+    const { data: leads } = await supabase.from("leads").select("id").eq("tenant_id", tenant_id)
+      .ilike("nome", `%${args.lead_nome}%`).limit(1);
+    lead_id = leads?.[0]?.id ?? null;
+  }
+  const taxa_adm = args.taxa_adm ?? 18;
+  const fr = args.fundo_reserva ?? 2;
+  const lance = (args.lance_embutido_pct ?? 0) / 100;
+  const total = args.credito * (1 + taxa_adm / 100 + fr / 100);
+  const parcela = Math.round((total / args.prazo_meses) * 100) / 100;
+  const parcelaLance = Math.round(((args.credito * (1 - lance) * (1 + taxa_adm / 100 + fr / 100)) / args.prazo_meses) * 100) / 100;
+
+  const { data, error } = await (supabase as any).from("consortium_simulations").insert({
+    tenant_id, created_by: u.user.id, lead_id,
+    segmento: args.segmento, credito: args.credito, prazo_meses: args.prazo_meses,
+    taxa_adm, fundo_reserva: fr, lance_embutido_pct: args.lance_embutido_pct ?? 0,
+    parcela_estimada: parcela, parcela_com_lance: args.lance_embutido_pct ? parcelaLance : null,
+    payload: { fonte: "launch_ia" },
+  }).select().single();
+  if (error) throw error;
+  return { id: data.id, parcela, lead_vinculado: !!lead_id };
+}
+
+/** Registra contemplação localizando cota por número ou por lead. */
+export async function executarRegistrarContemplacao(args: {
+  numero_cota?: string; lead_nome?: string;
+  tipo: "sorteio" | "lance_livre" | "lance_fixo" | "lance_embutido";
+  valor_lance?: number; observacao?: string;
+}) {
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) throw new Error("Não autenticado");
+  const tenant_id = requireTenantId();
+
+  let quotaId: string | null = null;
+  if (args.numero_cota) {
+    const { data } = await (supabase as any).from("consortium_quotas").select("id")
+      .eq("tenant_id", tenant_id).eq("numero_cota", args.numero_cota).limit(1);
+    quotaId = data?.[0]?.id ?? null;
+  }
+  if (!quotaId && args.lead_nome) {
+    const { data: leads } = await supabase.from("leads").select("id").eq("tenant_id", tenant_id)
+      .ilike("nome", `%${args.lead_nome}%`).limit(1);
+    if (leads?.[0]) {
+      const { data: qs } = await (supabase as any).from("consortium_quotas").select("id")
+        .eq("tenant_id", tenant_id).eq("lead_id", leads[0].id).eq("status", "ativa").limit(1);
+      quotaId = qs?.[0]?.id ?? null;
+    }
+  }
+  if (!quotaId) throw new Error("Cota não encontrada");
+
+  const data = new Date().toISOString().slice(0, 10);
+  await (supabase as any).from("consortium_contemplations").insert({
+    tenant_id, created_by: u.user.id, quota_id: quotaId,
+    tipo: args.tipo, data, valor_lance: args.valor_lance ?? null,
+    observacao: args.observacao ?? null,
+  });
+  await (supabase as any).from("consortium_quotas").update({
+    status: "contemplada", contemplada_em: data,
+    lance_tipo: args.tipo, lance_ofertado: args.valor_lance ?? null,
+  }).eq("id", quotaId);
+
+  return { quota_id: quotaId, tipo: args.tipo };
+}
+
+/** Registra comissão (opcionalmente já aprovada, o que gera entrada financeira). */
+export async function executarLiberarComissao(args: {
+  descricao: string; base: number; percentual: number;
+  lead_nome?: string; pagar_em_dias?: number; aprovar_agora?: boolean;
+}) {
+  const { data: u } = await supabase.auth.getUser();
+  if (!u.user) throw new Error("Não autenticado");
+  const tenant_id = requireTenantId();
+
+  let lead_id: string | null = null;
+  if (args.lead_nome) {
+    const { data: leads } = await supabase.from("leads").select("id").eq("tenant_id", tenant_id)
+      .ilike("nome", `%${args.lead_nome}%`).limit(1);
+    lead_id = leads?.[0]?.id ?? null;
+  }
+
+  const valor = Math.round(args.base * (args.percentual / 100) * 100) / 100;
+  const pagar_em = args.pagar_em_dias
+    ? new Date(Date.now() + args.pagar_em_dias * 86400000).toISOString().slice(0, 10) : null;
+
+  const { data, error } = await (supabase as any).from("consultor_commissions").insert({
+    tenant_id, created_by: u.user.id, consultor_id: u.user.id,
+    descricao: args.descricao, base: args.base, percentual: args.percentual, valor,
+    lead_id, pagar_em, status: args.aprovar_agora ? "aprovada" : "pendente",
+  }).select().single();
+  if (error) throw error;
+  return { id: data.id, valor, aprovada: !!args.aprovar_agora };
+}

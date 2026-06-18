@@ -303,6 +303,66 @@ ${JSON.stringify(ctx, null, 2)}`;
           },
         },
       },
+      {
+        type: "function",
+        function: {
+          name: "simular_consorcio",
+          description: "Gera uma simulação de consórcio para um lead/cliente. Use quando o usuário pedir uma simulação, carta de crédito ou cotação de consórcio. Calcula automaticamente a parcela.",
+          parameters: {
+            type: "object",
+            properties: {
+              segmento: { type: "string", enum: ["imovel", "veiculo", "servicos", "pesado", "moto"] },
+              credito: { type: "number", description: "Valor da carta de crédito em reais" },
+              prazo_meses: { type: "number", description: "Prazo em meses (60-240)" },
+              taxa_adm: { type: "number", description: "Taxa de administração em % (padrão 18)" },
+              fundo_reserva: { type: "number", description: "Fundo de reserva em % (padrão 2)" },
+              lance_embutido_pct: { type: "number", description: "Lance embutido em % (0-25)" },
+              lead_nome: { type: "string", description: "Nome do lead/cliente para vincular" },
+            },
+            required: ["segmento", "credito", "prazo_meses"],
+            additionalProperties: false,
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "registrar_contemplacao",
+          description: "Marca uma cota como contemplada. Identifica a cota pelo número ou pelo nome do cliente.",
+          parameters: {
+            type: "object",
+            properties: {
+              numero_cota: { type: "string", description: "Número da cota (preferencial)" },
+              lead_nome: { type: "string", description: "Nome do lead (se não souber o número)" },
+              tipo: { type: "string", enum: ["sorteio", "lance_livre", "lance_fixo", "lance_embutido"] },
+              valor_lance: { type: "number" },
+              observacao: { type: "string" },
+            },
+            required: ["tipo"],
+            additionalProperties: false,
+          },
+        },
+      },
+      {
+        type: "function",
+        function: {
+          name: "liberar_comissao",
+          description: "Registra uma nova comissão do consultor com base/percentual; ao aprovar gera automaticamente entrada no financeiro.",
+          parameters: {
+            type: "object",
+            properties: {
+              descricao: { type: "string" },
+              base: { type: "number", description: "Valor base sobre o qual calcular a comissão" },
+              percentual: { type: "number", description: "Percentual da comissão (ex: 1.5)" },
+              lead_nome: { type: "string" },
+              pagar_em_dias: { type: "number", description: "Dias até o pagamento" },
+              aprovar_agora: { type: "boolean", description: "Se true, já aprova e gera entrada financeira" },
+            },
+            required: ["descricao", "base", "percentual"],
+            additionalProperties: false,
+          },
+        },
+      },
     ];
 
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

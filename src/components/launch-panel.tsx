@@ -11,7 +11,7 @@ import {
   useAppendMessage,
   useDeleteConversation,
 } from "@/hooks/use-kassia-conversations";
-import { executarCriarTarefa, executarMoverLead, executarCriarLead, executarCriarProjeto, executarAgendarFollowup, executarRegistrarPagamento } from "@/lib/kassia-actions";
+import { executarCriarTarefa, executarMoverLead, executarCriarLead, executarCriarProjeto, executarAgendarFollowup, executarRegistrarPagamento, executarSimularConsorcio, executarRegistrarContemplacao, executarLiberarComissao } from "@/lib/kassia-actions";
 import { useTasks } from "@/hooks/use-tasks";
 import { useLeads } from "@/hooks/use-leads";
 import { useProjects } from "@/hooks/use-projects";
@@ -294,6 +294,12 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
       });
     } else if (name === "gerar_relatorio") {
       setPending({ kind: "gerar_relatorio", tipo: String(args.tipo ?? "geral") });
+    } else if (name === "simular_consorcio") {
+      executarSimularConsorcio(args).then(r => toast.success(`Simulação gerada · parcela ~ R$ ${r.parcela.toLocaleString("pt-BR")}`)).catch(e => toast.error(e.message ?? "Erro"));
+    } else if (name === "registrar_contemplacao") {
+      executarRegistrarContemplacao(args).then(() => toast.success("🎉 Contemplação registrada")).catch(e => toast.error(e.message ?? "Erro"));
+    } else if (name === "liberar_comissao") {
+      executarLiberarComissao(args).then(r => toast.success(`Comissão ${r.aprovada ? "aprovada" : "registrada"}: R$ ${r.valor.toLocaleString("pt-BR")}`)).catch(e => toast.error(e.message ?? "Erro"));
     }
   }
 

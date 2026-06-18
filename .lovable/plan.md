@@ -1,140 +1,76 @@
-# Plano: Tarefas + Projetos + Launch IA — versão Pro
+# Módulo Consultor — Consórcios & Crédito
 
-Como o escopo é amplo, divido em **4 fases entregáveis e independentes**. Cada fase é funcional sozinha; você pode pausar entre elas.
+Um módulo dedicado a Consultor de Consórcios / Financeiro, com ferramentas específicas do dia a dia (simulações, cartas, contemplações, comissões) totalmente plugado em Leads, Clientes, Projetos, Tarefas, Financeiro e Launch IA.
 
----
+## 1. Banco de dados (migração)
 
-## Fase 1 — Fundação de dados (schema)
+Novas tabelas no schema `public` (todas com tenant_id, RLS por tenant, GRANTs):
 
-Migração única adicionando o que falta no Postgres. Sem isso, o resto não funciona.
+- `consortium_administrators` — administradoras (Porto, Embracon, Itaú etc.): nome, cnpj, taxa_adm_padrao, fundo_reserva_padrao, observacoes.
+- `consortium_groups` — grupos: administrator_id, codigo, segmento (`imovel|veiculo|servicos|pesado`), prazo_meses, valor_credito, vagas, status.
+- `consortium_quotas` — cotas/cartas dos clientes: lead_id, client_id, group_id, numero_cota, valor_credito, parcela_atual, parcela_total, parcela_valor, status (`ativa|contemplada|quitada|cancelada|transferida`), contemplada_em, lance_ofertado, lance_tipo.
+- `consortium_simulations` — simulações geradas (PDF-ready): lead_id, administrator, segmento, credito, prazo, parcela_estimada, taxa_adm, fundo_reserva, seguro, payload(jsonb), pdf_url.
+- `consortium_contemplations` — eventos de contemplação: quota_id, tipo (`sorteio|lance_livre|lance_fixo|lance_embutido`), data, valor_lance, observacao.
+- `consultor_commissions` — comissões do consultor: lead_id/quota_id/deal_id, base, percentual, valor, status (`prevista|liberada|paga`), pagar_em, paga_em — gera entrada em `financial_entries` ao liberar.
+- `credit_products` — produtos de crédito (consignado, FGTS, home equity, refin veicular): nome, tipo, taxa_min, taxa_max, prazo_min, prazo_max, banco.
+- `credit_simulations` — simulações de crédito vinculadas a lead/cliente.
 
-**Novas colunas em `tasks`:**
-- `parent_task_id` (subtarefas)
-- `project_id` (vínculo direto com projeto)
-- `checklist` jsonb `[{id,texto,feito}]`
-- `dependencies` uuid[] (depende de outras tarefas)
-- `watchers` uuid[] (seguidores)
-- `assignees` uuid[] (múltiplos responsáveis, mantém `assignee_id` como principal)
-- `horas_estimadas`, `horas_realizadas` numeric
-- `progresso` int (0–100, autocalculado por checklist/subtarefas)
-- `ordem` int (kanban/ordenação)
+Todas seguem o padrão CREATE TABLE → GRANT (authenticated + service_role, sem anon) → ENABLE RLS → POLICIES via `is_tenant_member`/`can_edit_commercial`, com triggers `set_updated_at`.
 
-**Novas tabelas:**
-- `task_comments` — comentários com `@menções` (array de user_ids)
-- `task_attachments` — anexos (nome, url, tamanho, mime)
-- `task_time_entries` — apontamentos de tempo (start, end, duração, billable)
-- `project_templates` — templates reutilizáveis (etapas + tarefas padrão como jsonb)
-- `pipeline_stage_automations` — auto-criar tarefas quando lead muda de estágio
+Triggers de integração:
+- ao criar `consortium_quota` a partir de um lead `fechado` → cria `project` automaticamente (tipo "Acompanhamento de cota") e `financial_entries` recorrentes para as parcelas.
+- ao marcar `contemplada` → notificação tenant + tarefa "Preparar documentação de crédito".
+- ao mudar `consultor_commissions.status = liberada` → cria `financial_entries` (receita).
 
-**Storage bucket:** `task-attachments` (privado, RLS por tenant).
+## 2. Promoção do usuário
 
-**Triggers:**
-- Recalcular `progresso` da tarefa quando checklist/subtarefas mudam
-- Recalcular `progresso` do projeto pela média das tarefas
-- Ao lead virar "fechado" → opcionalmente criar projeto a partir de template
-- Ao mudar estágio do lead → executar `pipeline_stage_automations`
+`alandespires@gmail.com` → INSERT em `user_roles` (`super_admin`) **e** em `user_commercial_roles` (`admin`) para todos os tenants em que ele participa. Idempotente via `ON CONFLICT`.
 
-Todas com RLS por tenant + GRANTs.
+## 3. Hooks
 
----
+`src/hooks/use-consortium.ts`, `use-consortium-simulations.ts`, `use-consortium-quotas.ts`, `use-consultor-commissions.ts`, `use-credit-products.ts` — todos com React Query + tenant scoping + realtime.
 
-## Fase 2 — Tarefas Pro
+## 4. UI / Rotas
 
-**Visão lista + Kanban + Calendário** (toggle no topo da página `/tarefas`).
+Rota raiz com sub-abas (TanStack layout):
 
-**Drawer de detalhe da tarefa** (substitui o atual):
-- Checklist inline (adicionar/marcar/reordenar)
-- Subtarefas (com progresso agregado)
-- Dependências ("bloqueada por X", "bloqueia Y") com aviso visual
-- Múltiplos assignees + watchers (avatares)
-- Comentários com `@menções` (autocomplete)
-- Anexos (drag & drop, preview)
-- Timer integrado (start/stop) + lista de apontamentos
-- Horas estimadas vs realizadas (barra)
-- Atividade/auditoria
+- `/consultor` — Dashboard do consultor: KPIs (cotas ativas, contempladas no mês, comissão prevista vs paga, conversão simulação→venda, ticket médio) + funil simulação→proposta→cota ativa + próximas contemplações.
+- `/consultor/simulador` — Simulador interativo de consórcio: form (segmento, crédito, prazo, administradora) → cálculo de parcela, taxa adm, fundo reserva, seguro, lance embutido, gera PDF via `kassia-pdf` e vincula ao lead.
+- `/consultor/cotas` — Carteira de cotas: tabela rica com filtros por status/administradora/segmento, drawer de detalhes (parcelas, contemplações, anexos, timeline), ações: registrar contemplação, registrar lance, transferir cota.
+- `/consultor/contemplacoes` — Calendário/lista de contemplações + assembleias.
+- `/consultor/comissoes` — Comissões: previstas/liberadas/pagas, com botão "lançar no financeiro".
+- `/consultor/credito` — Simulador de crédito (consignado, FGTS, refin) com catálogo `credit_products`.
 
-**Métricas no topo:** atrasadas, vencendo hoje, throughput semanal, tempo médio.
+## 5. Bottombar
 
----
+Adicionar grupo "Consultor" no menu **Operacional** existente (junto a Projetos/Tarefas), com badge de contemplações da semana e cotas em atraso. Item só aparece para usuários com role `admin`/`comercial` E flag de feature `consultor` ligada por tenant (via setting simples no localStorage por enquanto, e habilitado por padrão para tenants do super_admin).
 
-## Fase 3 — Projetos Pro
+## 6. Integração com módulos existentes
 
-**Drawer do projeto reformulado:**
-- Aba **Visão geral**: progresso, KPIs (tarefas, horas, financeiro)
-- Aba **Tarefas**: subview do módulo Tarefas filtrado
-- Aba **Timeline/Gantt**: barras por etapa/tarefa com dependências, drag para mover datas
-- Aba **Entregas**: marcos com data, status, vinculadas a receita
-- Aba **Financeiro**: receitas (financial_entries) + custos + margem
-- Aba **Equipe**: assignees agregados de todas as tarefas
-- Aba **Arquivos**: anexos do projeto
-- Aba **Atividade**: auditoria existente
+- **Leads**: novo card "Simulações de consórcio" no `lead-detail-drawer` + ação "Gerar simulação" → abre simulador pré-preenchido.
+- **Clientes**: aba "Cotas & Crédito" lista cotas ativas/contempladas.
+- **Projetos**: template novo "Acompanhamento de Consórcio" (12 etapas: KYC, assinatura, 1ª parcela, assembleia, contemplação, uso do crédito etc.).
+- **Financeiro**: parcelas e comissões viram entradas, marcadas com `categoria='consorcio'` para relatórios.
+- **Launch IA**: 3 novas tools no `kassia-chat`:
+  - `simular_consorcio({lead, segmento, credito, prazo})`
+  - `registrar_contemplacao({cota, tipo, valor_lance})`
+  - `liberar_comissao({lead, valor, percentual})`
+  - Sugestões proativas: "Lead X simulou ontem e não recebeu follow-up", "3 cotas contempláveis nesta assembleia".
 
-**Templates de projeto:**
-- Galeria em modal: "Onboarding cliente", "Implantação SaaS", "Campanha", "Sprint" + custom
-- Aplicar template cria etapas + tarefas pré-configuradas com prazos relativos
+## 7. Detalhes técnicos
 
-**Conversão automática lead → projeto:**
-- Quando lead vai para "fechado", abre modal "Criar projeto a partir deste lead?" com seleção de template
+- Cálculo de parcela: `parcela = (credito * (1 + taxa_adm + fundo_reserva)) / prazo + seguro_mensal`. Lance embutido: até 25% do crédito reduz parcela.
+- PDF de simulação reusa `src/lib/kassia-pdf.ts` com novo template `simulacao-consorcio`.
+- Realtime nas tabelas `consortium_quotas` e `consultor_commissions`.
+- Server function `gerar-simulacao.functions.ts` para cálculo seguro + persistência.
 
-**Auto-tarefas por estágio do pipeline:**
-- Tela `/automacao` ganha aba "Por estágio": "Quando lead entra em [Proposta] criar tarefas [X, Y, Z]"
+## 8. Entregáveis nesta thread
 
-**Receita do projeto no financeiro:**
-- Botão "Adicionar receita/parcela" gera `financial_entries` linkados via `project_id`
-- KPI de margem no drawer (receita - custos via horas × custo/hora)
+1. Migração do schema + GRANTs + RLS + triggers.
+2. Promoção do usuário (insert).
+3. Hooks + rotas + componentes principais.
+4. Integração no bottombar (Operacional → Consultor).
+5. Tools novas no `kassia-chat` + ações no `kassia-actions.ts`.
+6. Cards integrados em Leads/Clientes.
 
-**Dashboard:** novo widget "Projetos & Tarefas" — burndown, throughput, on-time rate, projetos por status.
-
----
-
-## Fase 4 — Launch IA realista
-
-**Edge function `kassia-chat` reformulada:**
-
-1. **RAG real do tenant** — antes da chamada ao LLM, busca contexto:
-   - Top 10 leads recentes/quentes
-   - Tarefas atrasadas e vencendo
-   - Projetos ativos
-   - Métricas do mês (faturamento, conversão)
-   - Conversas recentes (histórico)
-   - Injetadas como system context com IDs reais para citação
-
-2. **Streaming melhorado** — indicador "pensando" com fases (analisando dados → consultando CRM → gerando resposta), tokens fluindo char-a-char com cursor.
-
-3. **Mais ferramentas (tool-calling):**
-   - `criar_lead` (já existe)
-   - `criar_tarefa` (já existe) — agora aceita projeto, checklist, assignees
-   - `criar_projeto` (novo, com template)
-   - `criar_subtarefa` (novo)
-   - `agendar_followup` (novo — atividade + tarefa)
-   - `mover_lead` (já existe)
-   - `registrar_pagamento` (novo)
-   - `gerar_relatorio` (já existe) — agora com filtros reais
-   - `buscar_no_crm` (novo — RAG sob demanda)
-
-4. **Sugestões proativas contextuais** — ao abrir o painel, IA analisa a rota atual e mostra 2–3 cards: "Você tem 3 tarefas atrasadas", "Lead X parou há 7d", "Projeto Y atinge o prazo amanhã" — cada um com ação clicável.
-
-5. **Citações com fontes** — respostas que usam dados do CRM mostram chips clicáveis abaixo ("Lead: João Silva", "Tarefa #42") que abrem o drawer correspondente.
-
----
-
-## Detalhes técnicos
-
-- **DB:** migração única na Fase 1 (CREATE TABLE + GRANT + RLS + policies + triggers + storage bucket).
-- **Hooks novos:** `use-task-comments`, `use-task-attachments`, `use-task-time`, `use-project-templates`, `use-launch-context`.
-- **UI:** reusa shadcn (`Dialog`, `Drawer`, `Tabs`, `Command` para @menções). Gantt: componente custom leve com SVG (sem libs novas pesadas).
-- **Storage:** bucket `task-attachments` (privado, ≤10MB/arquivo).
-- **Launch IA:** edge function `kassia-chat` reescrita; novo `lib/launch-context.ts` para RAG client-side.
-- **Design system:** mantém tokens existentes (`--primary`, glass, shimmer); zero cor hardcoded.
-- **Tudo multi-tenant** (tenant_id + RLS) e em PT-BR.
-
----
-
-## Ordem de entrega
-
-1. Plano aprovado → **Fase 1** (migração) — 1 turno
-2. **Fase 2** (Tarefas Pro) — 1–2 turnos
-3. **Fase 3** (Projetos Pro) — 1–2 turnos
-4. **Fase 4** (Launch IA) — 1 turno
-
-Posso começar pela Fase 1 assim que aprovar — quer todas as 4 fases sequenciais ou prefere validar cada uma antes da próxima?
+Após aprovação rodo migração primeiro (aprovação separada), depois implemento código.

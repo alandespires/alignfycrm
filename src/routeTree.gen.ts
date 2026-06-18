@@ -29,6 +29,7 @@ import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EmailMarketingRouteImport } from './routes/email-marketing'
 import { Route as DashboardsRouteImport } from './routes/dashboards'
 import { Route as ContatosRouteImport } from './routes/contatos'
+import { Route as ConsultorRouteImport } from './routes/consultor'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as ClinicasRouteImport } from './routes/clinicas'
 import { Route as ClientesRouteImport } from './routes/clientes'
@@ -39,6 +40,7 @@ import { Route as AutomacaoRouteImport } from './routes/automacao'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EscolarIndexRouteImport } from './routes/escolar.index'
+import { Route as ConsultorIndexRouteImport } from './routes/consultor.index'
 import { Route as ClinicasIndexRouteImport } from './routes/clinicas.index'
 import { Route as TTenantSlugRouteImport } from './routes/t.$tenantSlug'
 import { Route as EscolarTurmasRouteImport } from './routes/escolar.turmas'
@@ -51,6 +53,11 @@ import { Route as EscolarConfiguracoesRouteImport } from './routes/escolar.confi
 import { Route as EscolarComunicacaoRouteImport } from './routes/escolar.comunicacao'
 import { Route as EscolarAvaliacoesRouteImport } from './routes/escolar.avaliacoes'
 import { Route as EscolarAlunosRouteImport } from './routes/escolar.alunos'
+import { Route as ConsultorSimuladorRouteImport } from './routes/consultor.simulador'
+import { Route as ConsultorCreditoRouteImport } from './routes/consultor.credito'
+import { Route as ConsultorCotasRouteImport } from './routes/consultor.cotas'
+import { Route as ConsultorContemplacoesRouteImport } from './routes/consultor.contemplacoes'
+import { Route as ConsultorComissoesRouteImport } from './routes/consultor.comissoes'
 import { Route as ClinicasProntuariosRouteImport } from './routes/clinicas.prontuarios'
 import { Route as ClinicasPacientesRouteImport } from './routes/clinicas.pacientes'
 import { Route as ClinicasConfiguracoesRouteImport } from './routes/clinicas.configuracoes'
@@ -158,6 +165,11 @@ const ContatosRoute = ContatosRouteImport.update({
   path: '/contatos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsultorRoute = ConsultorRouteImport.update({
+  id: '/consultor',
+  path: '/consultor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -207,6 +219,11 @@ const EscolarIndexRoute = EscolarIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => EscolarRoute,
+} as any)
+const ConsultorIndexRoute = ConsultorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ConsultorRoute,
 } as any)
 const ClinicasIndexRoute = ClinicasIndexRouteImport.update({
   id: '/',
@@ -268,6 +285,31 @@ const EscolarAlunosRoute = EscolarAlunosRouteImport.update({
   path: '/alunos',
   getParentRoute: () => EscolarRoute,
 } as any)
+const ConsultorSimuladorRoute = ConsultorSimuladorRouteImport.update({
+  id: '/simulador',
+  path: '/simulador',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorCreditoRoute = ConsultorCreditoRouteImport.update({
+  id: '/credito',
+  path: '/credito',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorCotasRoute = ConsultorCotasRouteImport.update({
+  id: '/cotas',
+  path: '/cotas',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorContemplacoesRoute = ConsultorContemplacoesRouteImport.update({
+  id: '/contemplacoes',
+  path: '/contemplacoes',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorComissoesRoute = ConsultorComissoesRouteImport.update({
+  id: '/comissoes',
+  path: '/comissoes',
+  getParentRoute: () => ConsultorRoute,
+} as any)
 const ClinicasProntuariosRoute = ClinicasProntuariosRouteImport.update({
   id: '/prontuarios',
   path: '/prontuarios',
@@ -309,6 +351,7 @@ export interface FileRoutesByFullPath {
   '/clientes': typeof ClientesRoute
   '/clinicas': typeof ClinicasRouteWithChildren
   '/configuracoes': typeof ConfiguracoesRoute
+  '/consultor': typeof ConsultorRouteWithChildren
   '/contatos': typeof ContatosRoute
   '/dashboards': typeof DashboardsRoute
   '/email-marketing': typeof EmailMarketingRoute
@@ -333,6 +376,11 @@ export interface FileRoutesByFullPath {
   '/clinicas/configuracoes': typeof ClinicasConfiguracoesRoute
   '/clinicas/pacientes': typeof ClinicasPacientesRoute
   '/clinicas/prontuarios': typeof ClinicasProntuariosRoute
+  '/consultor/comissoes': typeof ConsultorComissoesRoute
+  '/consultor/contemplacoes': typeof ConsultorContemplacoesRoute
+  '/consultor/cotas': typeof ConsultorCotasRoute
+  '/consultor/credito': typeof ConsultorCreditoRoute
+  '/consultor/simulador': typeof ConsultorSimuladorRoute
   '/escolar/alunos': typeof EscolarAlunosRoute
   '/escolar/avaliacoes': typeof EscolarAvaliacoesRoute
   '/escolar/comunicacao': typeof EscolarComunicacaoRoute
@@ -345,6 +393,7 @@ export interface FileRoutesByFullPath {
   '/escolar/turmas': typeof EscolarTurmasRoute
   '/t/$tenantSlug': typeof TTenantSlugRouteWithChildren
   '/clinicas/': typeof ClinicasIndexRoute
+  '/consultor/': typeof ConsultorIndexRoute
   '/escolar/': typeof EscolarIndexRoute
   '/escolar/turma/$classId': typeof EscolarTurmaClassIdRoute
   '/t/$tenantSlug/': typeof TTenantSlugIndexRoute
@@ -381,6 +430,11 @@ export interface FileRoutesByTo {
   '/clinicas/configuracoes': typeof ClinicasConfiguracoesRoute
   '/clinicas/pacientes': typeof ClinicasPacientesRoute
   '/clinicas/prontuarios': typeof ClinicasProntuariosRoute
+  '/consultor/comissoes': typeof ConsultorComissoesRoute
+  '/consultor/contemplacoes': typeof ConsultorContemplacoesRoute
+  '/consultor/cotas': typeof ConsultorCotasRoute
+  '/consultor/credito': typeof ConsultorCreditoRoute
+  '/consultor/simulador': typeof ConsultorSimuladorRoute
   '/escolar/alunos': typeof EscolarAlunosRoute
   '/escolar/avaliacoes': typeof EscolarAvaliacoesRoute
   '/escolar/comunicacao': typeof EscolarComunicacaoRoute
@@ -392,6 +446,7 @@ export interface FileRoutesByTo {
   '/escolar/professores': typeof EscolarProfessoresRoute
   '/escolar/turmas': typeof EscolarTurmasRoute
   '/clinicas': typeof ClinicasIndexRoute
+  '/consultor': typeof ConsultorIndexRoute
   '/escolar': typeof EscolarIndexRoute
   '/escolar/turma/$classId': typeof EscolarTurmaClassIdRoute
   '/t/$tenantSlug': typeof TTenantSlugIndexRoute
@@ -407,6 +462,7 @@ export interface FileRoutesById {
   '/clientes': typeof ClientesRoute
   '/clinicas': typeof ClinicasRouteWithChildren
   '/configuracoes': typeof ConfiguracoesRoute
+  '/consultor': typeof ConsultorRouteWithChildren
   '/contatos': typeof ContatosRoute
   '/dashboards': typeof DashboardsRoute
   '/email-marketing': typeof EmailMarketingRoute
@@ -431,6 +487,11 @@ export interface FileRoutesById {
   '/clinicas/configuracoes': typeof ClinicasConfiguracoesRoute
   '/clinicas/pacientes': typeof ClinicasPacientesRoute
   '/clinicas/prontuarios': typeof ClinicasProntuariosRoute
+  '/consultor/comissoes': typeof ConsultorComissoesRoute
+  '/consultor/contemplacoes': typeof ConsultorContemplacoesRoute
+  '/consultor/cotas': typeof ConsultorCotasRoute
+  '/consultor/credito': typeof ConsultorCreditoRoute
+  '/consultor/simulador': typeof ConsultorSimuladorRoute
   '/escolar/alunos': typeof EscolarAlunosRoute
   '/escolar/avaliacoes': typeof EscolarAvaliacoesRoute
   '/escolar/comunicacao': typeof EscolarComunicacaoRoute
@@ -443,6 +504,7 @@ export interface FileRoutesById {
   '/escolar/turmas': typeof EscolarTurmasRoute
   '/t/$tenantSlug': typeof TTenantSlugRouteWithChildren
   '/clinicas/': typeof ClinicasIndexRoute
+  '/consultor/': typeof ConsultorIndexRoute
   '/escolar/': typeof EscolarIndexRoute
   '/escolar/turma/$classId': typeof EscolarTurmaClassIdRoute
   '/t/$tenantSlug/': typeof TTenantSlugIndexRoute
@@ -459,6 +521,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/clinicas'
     | '/configuracoes'
+    | '/consultor'
     | '/contatos'
     | '/dashboards'
     | '/email-marketing'
@@ -483,6 +546,11 @@ export interface FileRouteTypes {
     | '/clinicas/configuracoes'
     | '/clinicas/pacientes'
     | '/clinicas/prontuarios'
+    | '/consultor/comissoes'
+    | '/consultor/contemplacoes'
+    | '/consultor/cotas'
+    | '/consultor/credito'
+    | '/consultor/simulador'
     | '/escolar/alunos'
     | '/escolar/avaliacoes'
     | '/escolar/comunicacao'
@@ -495,6 +563,7 @@ export interface FileRouteTypes {
     | '/escolar/turmas'
     | '/t/$tenantSlug'
     | '/clinicas/'
+    | '/consultor/'
     | '/escolar/'
     | '/escolar/turma/$classId'
     | '/t/$tenantSlug/'
@@ -531,6 +600,11 @@ export interface FileRouteTypes {
     | '/clinicas/configuracoes'
     | '/clinicas/pacientes'
     | '/clinicas/prontuarios'
+    | '/consultor/comissoes'
+    | '/consultor/contemplacoes'
+    | '/consultor/cotas'
+    | '/consultor/credito'
+    | '/consultor/simulador'
     | '/escolar/alunos'
     | '/escolar/avaliacoes'
     | '/escolar/comunicacao'
@@ -542,6 +616,7 @@ export interface FileRouteTypes {
     | '/escolar/professores'
     | '/escolar/turmas'
     | '/clinicas'
+    | '/consultor'
     | '/escolar'
     | '/escolar/turma/$classId'
     | '/t/$tenantSlug'
@@ -556,6 +631,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/clinicas'
     | '/configuracoes'
+    | '/consultor'
     | '/contatos'
     | '/dashboards'
     | '/email-marketing'
@@ -580,6 +656,11 @@ export interface FileRouteTypes {
     | '/clinicas/configuracoes'
     | '/clinicas/pacientes'
     | '/clinicas/prontuarios'
+    | '/consultor/comissoes'
+    | '/consultor/contemplacoes'
+    | '/consultor/cotas'
+    | '/consultor/credito'
+    | '/consultor/simulador'
     | '/escolar/alunos'
     | '/escolar/avaliacoes'
     | '/escolar/comunicacao'
@@ -592,6 +673,7 @@ export interface FileRouteTypes {
     | '/escolar/turmas'
     | '/t/$tenantSlug'
     | '/clinicas/'
+    | '/consultor/'
     | '/escolar/'
     | '/escolar/turma/$classId'
     | '/t/$tenantSlug/'
@@ -607,6 +689,7 @@ export interface RootRouteChildren {
   ClientesRoute: typeof ClientesRoute
   ClinicasRoute: typeof ClinicasRouteWithChildren
   ConfiguracoesRoute: typeof ConfiguracoesRoute
+  ConsultorRoute: typeof ConsultorRouteWithChildren
   ContatosRoute: typeof ContatosRoute
   DashboardsRoute: typeof DashboardsRoute
   EmailMarketingRoute: typeof EmailMarketingRoute
@@ -772,6 +855,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContatosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/consultor': {
+      id: '/consultor'
+      path: '/consultor'
+      fullPath: '/consultor'
+      preLoaderRoute: typeof ConsultorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/configuracoes': {
       id: '/configuracoes'
       path: '/configuracoes'
@@ -841,6 +931,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/escolar/'
       preLoaderRoute: typeof EscolarIndexRouteImport
       parentRoute: typeof EscolarRoute
+    }
+    '/consultor/': {
+      id: '/consultor/'
+      path: '/'
+      fullPath: '/consultor/'
+      preLoaderRoute: typeof ConsultorIndexRouteImport
+      parentRoute: typeof ConsultorRoute
     }
     '/clinicas/': {
       id: '/clinicas/'
@@ -926,6 +1023,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EscolarAlunosRouteImport
       parentRoute: typeof EscolarRoute
     }
+    '/consultor/simulador': {
+      id: '/consultor/simulador'
+      path: '/simulador'
+      fullPath: '/consultor/simulador'
+      preLoaderRoute: typeof ConsultorSimuladorRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/credito': {
+      id: '/consultor/credito'
+      path: '/credito'
+      fullPath: '/consultor/credito'
+      preLoaderRoute: typeof ConsultorCreditoRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/cotas': {
+      id: '/consultor/cotas'
+      path: '/cotas'
+      fullPath: '/consultor/cotas'
+      preLoaderRoute: typeof ConsultorCotasRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/contemplacoes': {
+      id: '/consultor/contemplacoes'
+      path: '/contemplacoes'
+      fullPath: '/consultor/contemplacoes'
+      preLoaderRoute: typeof ConsultorContemplacoesRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/comissoes': {
+      id: '/consultor/comissoes'
+      path: '/comissoes'
+      fullPath: '/consultor/comissoes'
+      preLoaderRoute: typeof ConsultorComissoesRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
     '/clinicas/prontuarios': {
       id: '/clinicas/prontuarios'
       path: '/prontuarios'
@@ -991,6 +1123,28 @@ const ClinicasRouteWithChildren = ClinicasRoute._addFileChildren(
   ClinicasRouteChildren,
 )
 
+interface ConsultorRouteChildren {
+  ConsultorComissoesRoute: typeof ConsultorComissoesRoute
+  ConsultorContemplacoesRoute: typeof ConsultorContemplacoesRoute
+  ConsultorCotasRoute: typeof ConsultorCotasRoute
+  ConsultorCreditoRoute: typeof ConsultorCreditoRoute
+  ConsultorSimuladorRoute: typeof ConsultorSimuladorRoute
+  ConsultorIndexRoute: typeof ConsultorIndexRoute
+}
+
+const ConsultorRouteChildren: ConsultorRouteChildren = {
+  ConsultorComissoesRoute: ConsultorComissoesRoute,
+  ConsultorContemplacoesRoute: ConsultorContemplacoesRoute,
+  ConsultorCotasRoute: ConsultorCotasRoute,
+  ConsultorCreditoRoute: ConsultorCreditoRoute,
+  ConsultorSimuladorRoute: ConsultorSimuladorRoute,
+  ConsultorIndexRoute: ConsultorIndexRoute,
+}
+
+const ConsultorRouteWithChildren = ConsultorRoute._addFileChildren(
+  ConsultorRouteChildren,
+)
+
 interface EscolarRouteChildren {
   EscolarAlunosRoute: typeof EscolarAlunosRoute
   EscolarAvaliacoesRoute: typeof EscolarAvaliacoesRoute
@@ -1046,6 +1200,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesRoute: ClientesRoute,
   ClinicasRoute: ClinicasRouteWithChildren,
   ConfiguracoesRoute: ConfiguracoesRoute,
+  ConsultorRoute: ConsultorRouteWithChildren,
   ContatosRoute: ContatosRoute,
   DashboardsRoute: DashboardsRoute,
   EmailMarketingRoute: EmailMarketingRoute,
@@ -1071,12 +1226,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
