@@ -5,7 +5,7 @@ import {
   Stethoscope, Target, FileText, UserCircle, Building, History, Megaphone, Mail,
   Globe, LifeBuoy, BookOpen, MessageCircle, LineChart, Briefcase, GraduationCap,
   BookMarked, ClipboardList, CalendarCheck, Bell, IdCard, MoreHorizontal, X,
-  ShoppingBag, ChevronRight,
+  ShoppingBag, ChevronRight, Calculator, Landmark, Award,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import alignIcon from "@/assets/align-icon.png";
@@ -71,6 +71,17 @@ const OPERACIONAL_GROUPS: SubGroup[] = [
     ],
   },
   {
+    id: "consultor", label: "Consultor", icon: Briefcase,
+    items: [
+      { to: "/consultor", label: "Painel", icon: TrendingUpIcon },
+      { to: "/consultor/simulador", label: "Simulador", icon: Calculator },
+      { to: "/consultor/cotas", label: "Cotas", icon: ListChecks },
+      { to: "/consultor/contemplacoes", label: "Contemplações", icon: Award },
+      { to: "/consultor/comissoes", label: "Comissões", icon: Wallet },
+      { to: "/consultor/credito", label: "Crédito", icon: Landmark },
+    ],
+  },
+  {
     id: "suporte", label: "Suporte", icon: LifeBuoy,
     items: [
       { to: "/tickets", label: "Tickets", icon: LifeBuoy },
@@ -114,7 +125,7 @@ const MAIS_GROUPS: SubGroup[] = [
 ];
 
 const COMERCIAL_PATHS = ["/leads", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas"];
-const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/campanhas", "/email-marketing", "/landing-pages", "/automacao", "/tickets", "/base-conhecimento", "/chat"];
+const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/campanhas", "/email-marketing", "/landing-pages", "/automacao", "/tickets", "/base-conhecimento", "/chat", "/consultor"];
 
 
 export function AppShell({ children, title, subtitle, action }: {
