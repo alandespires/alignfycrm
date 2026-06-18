@@ -140,7 +140,7 @@ function CotasPage() {
   );
 }
 
-function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: any }) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" onClick={onClose}>
       <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-5" onClick={e => e.stopPropagation()}>
