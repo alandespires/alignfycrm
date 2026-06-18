@@ -14,7 +14,7 @@ function ContemplacoesPage() {
   const { data: quotas = [] } = useQuotas();
   const qmap = Object.fromEntries(quotas.map(q => [q.id, q]));
 
-  const grouped = events.reduce((acc: Record<string, any[]>, e: any) => {
+  const grouped: Record<string, any[]> = (events as any[]).reduce((acc: Record<string, any[]>, e: any) => {
     const month = new Date(e.data).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
     (acc[month] ||= []).push(e);
     return acc;
