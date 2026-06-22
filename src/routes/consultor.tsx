@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Calculator, ListChecks, Wallet, TrendingUp, Briefcase, Landmark, Award } from "lucide-react";
+import { Calculator, ListChecks, Wallet, TrendingUp, Briefcase, Landmark, Award, History } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 
 export const Route = createFileRoute("/consultor")({
@@ -14,6 +14,7 @@ const SUB = [
   { to: "/consultor/contemplacoes", label: "Contemplações", icon: Award },
   { to: "/consultor/comissoes", label: "Comissões", icon: Wallet },
   { to: "/consultor/credito", label: "Crédito", icon: Landmark },
+  { to: "/consultor/historico", label: "Histórico", icon: History },
 ];
 
 function ConsultorLayout() {
