@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useContemplations } from "@/hooks/use-consortium-quotas";
 import { useQuotas } from "@/hooks/use-consortium-quotas";
+import { ConsultorExportBar } from "@/components/consultor-export-bar";
 import { Award } from "lucide-react";
 
 export const Route = createFileRoute("/consultor/contemplacoes")({
@@ -22,6 +23,24 @@ function ContemplacoesPage() {
 
   return (
     <div className="space-y-5">
+      <ConsultorExportBar
+        title="Contemplações"
+        rows={events as any[]}
+        dateField="data"
+        filenameBase="contemplacoes"
+        columns={[
+          { key: "data", label: "Data", format: v => new Date(v).toLocaleDateString("pt-BR") },
+          { key: "tipo", label: "Tipo", format: v => String(v).replace("_", " ") },
+          { key: "quota_id", label: "Cota", format: (v: string) => qmap[v]?.numero_cota ?? "—" },
+          { key: "valor_lance", label: "Lance (R$)", format: v => v ? BRL(Number(v)) : "" },
+          { key: "observacao", label: "Observação", format: v => v ?? "" },
+        ]}
+        kpisFor={rs => [
+          { label: "Total contemplações", valor: String(rs.length) },
+          { label: "Lances", valor: BRL(rs.reduce((s, r: any) => s + Number(r.valor_lance || 0), 0)) },
+        ]}
+      />
+
       {Object.entries(grouped).map(([month, items]) => (
         <div key={month} className="rounded-2xl border border-border bg-surface-1 p-5">
           <h3 className="mb-3 text-sm font-semibold capitalize">{month}</h3>
