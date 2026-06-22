@@ -883,6 +883,45 @@ export type Database = {
           },
         ]
       }
+      consultor_audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          administrator_id: string | null
+          created_at: string
+          diff: Json
+          entity_id: string
+          entity_type: string
+          id: string
+          quota_id: string | null
+          tenant_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          administrator_id?: string | null
+          created_at?: string
+          diff?: Json
+          entity_id: string
+          entity_type: string
+          id?: string
+          quota_id?: string | null
+          tenant_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          administrator_id?: string | null
+          created_at?: string
+          diff?: Json
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          quota_id?: string | null
+          tenant_id?: string
+        }
+        Relationships: []
+      }
       consultor_commissions: {
         Row: {
           base: number

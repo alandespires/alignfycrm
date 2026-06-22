@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useCommissions, useCreateCommission, useUpdateCommissionStatus, COMMISSION_STATUS_LABEL, type CommissionStatus } from "@/hooks/use-consultor-commissions";
 import { useLeads } from "@/hooks/use-leads";
+import { ConsultorExportBar } from "@/components/consultor-export-bar";
 import { Plus, X, Check, DollarSign } from "lucide-react";
 
 export const Route = createFileRoute("/consultor/comissoes")({
@@ -42,6 +43,28 @@ function ComissoesPage() {
 
   return (
     <div className="space-y-4">
+      <ConsultorExportBar
+        title="Comissões do Consultor"
+        rows={commissions}
+        dateField="created_at"
+        filenameBase="comissoes"
+        columns={[
+          { key: "descricao", label: "Descrição" },
+          { key: "base", label: "Base (R$)", format: v => BRL(Number(v || 0)) },
+          { key: "percentual", label: "%", format: v => `${v}%` },
+          { key: "valor", label: "Valor (R$)", format: v => BRL(Number(v || 0)) },
+          { key: "status", label: "Status", format: v => COMMISSION_STATUS_LABEL[v as CommissionStatus] ?? v },
+          { key: "pagar_em", label: "Pagar em", format: v => v ? new Date(v).toLocaleDateString("pt-BR") : "" },
+          { key: "paga_em", label: "Paga em", format: v => v ? new Date(v).toLocaleDateString("pt-BR") : "" },
+          { key: "created_at", label: "Criada em", format: v => new Date(v).toLocaleDateString("pt-BR") },
+        ]}
+        kpisFor={rs => [
+          { label: "Total", valor: String(rs.length) },
+          { label: "Pagas", valor: BRL(rs.filter(r => r.status === "paga").reduce((s, r) => s + Number(r.valor || 0), 0)) },
+          { label: "Pendentes", valor: BRL(rs.filter(r => r.status === "pendente").reduce((s, r) => s + Number(r.valor || 0), 0)) },
+        ]}
+      />
+
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {(["pendente", "aprovada", "paga", "cancelada"] as CommissionStatus[]).map(s => (
           <div key={s} className="rounded-2xl border border-border bg-surface-1 p-4">

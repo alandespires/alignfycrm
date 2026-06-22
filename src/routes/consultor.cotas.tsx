@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { useQuotas, useCreateQuota, useRegisterContemplation, QUOTA_STATUS_LABEL, type QuotaStatus, type ContemplationType } from "@/hooks/use-consortium-quotas";
 import { useLeads } from "@/hooks/use-leads";
 import { SEGMENT_LABEL, type ConsortiumSegment } from "@/hooks/use-consortium";
+import { ConsultorExportBar } from "@/components/consultor-export-bar";
 import { Plus, Award, X } from "lucide-react";
 
 export const Route = createFileRoute("/consultor/cotas")({
@@ -57,6 +58,28 @@ function CotasPage() {
 
   return (
     <div className="space-y-4">
+      <ConsultorExportBar
+        title="Cotas de Consórcio"
+        rows={quotas}
+        dateField="created_at"
+        filenameBase="cotas-consorcio"
+        columns={[
+          { key: "numero_cota", label: "Cota", format: v => v ?? "—" },
+          { key: "segmento", label: "Segmento", format: v => SEGMENT_LABEL[v as ConsortiumSegment] ?? v },
+          { key: "valor_credito", label: "Crédito (R$)", format: v => BRL(Number(v || 0)) },
+          { key: "parcela_valor", label: "Parcela (R$)", format: v => BRL(Number(v || 0)) },
+          { key: "parcela_atual", label: "Parc. atual" },
+          { key: "parcela_total", label: "Parc. total" },
+          { key: "status", label: "Status", format: v => QUOTA_STATUS_LABEL[v as QuotaStatus] ?? v },
+          { key: "contemplada_em", label: "Contemplada em", format: v => v ? new Date(v).toLocaleDateString("pt-BR") : "" },
+          { key: "created_at", label: "Criada em", format: v => new Date(v).toLocaleDateString("pt-BR") },
+        ]}
+        kpisFor={rs => [
+          { label: "Total cotas", valor: String(rs.length) },
+          { label: "Crédito total", valor: BRL(rs.reduce((s, r) => s + Number(r.valor_credito || 0), 0)) },
+          { label: "Contempladas", valor: String(rs.filter(r => r.status === "contemplada").length) },
+        ]}
+      />
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{quotas.length} cota(s) na carteira</p>
         <button onClick={() => setShowCreate(true)} className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-glow">

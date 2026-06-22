@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useCreditProducts, useCreateCreditSimulation, useCreditSimulations, calcularCreditoPrice, CREDIT_TYPE_LABEL } from "@/hooks/use-credit";
 import { useLeads } from "@/hooks/use-leads";
+import { ConsultorExportBar } from "@/components/consultor-export-bar";
 import { Landmark, Send } from "lucide-react";
 
 export const Route = createFileRoute("/consultor/credito")({
@@ -32,7 +33,27 @@ function CreditoPage() {
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-3">
+    <div className="space-y-5">
+      <ConsultorExportBar
+        title="Simulações de Crédito"
+        rows={history}
+        dateField="created_at"
+        filenameBase="simulacoes-credito"
+        columns={[
+          { key: "created_at", label: "Data", format: v => new Date(v).toLocaleDateString("pt-BR") },
+          { key: "valor_solicitado", label: "Valor (R$)", format: v => BRL(Number(v || 0)) },
+          { key: "prazo_meses", label: "Prazo (m)" },
+          { key: "taxa_mensal", label: "Taxa (%)" },
+          { key: "parcela", label: "Parcela (R$)", format: v => BRL(Number(v || 0)) },
+          { key: "total_pago", label: "Total (R$)", format: v => BRL(Number(v || 0)) },
+          { key: "cet_anual", label: "CET a.a. (%)" },
+        ]}
+        kpisFor={rs => [
+          { label: "Simulações", valor: String(rs.length) },
+          { label: "Volume", valor: BRL(rs.reduce((s, r) => s + Number(r.valor_solicitado || 0), 0)) },
+        ]}
+      />
+      <div className="grid gap-5 lg:grid-cols-3">
       <div className="space-y-4 lg:col-span-2 rounded-2xl border border-border bg-surface-1 p-5">
         <div className="flex items-center gap-2">
           <Landmark className="h-5 w-5 text-primary" />
@@ -80,6 +101,7 @@ function CreditoPage() {
       </div>
 
       <style>{`.i{width:100%;border-radius:10px;border:1px solid hsl(var(--border));background:hsl(var(--background));padding:8px 12px;font-size:14px}`}</style>
+      </div>
     </div>
   );
 }

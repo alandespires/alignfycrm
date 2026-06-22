@@ -54,6 +54,7 @@ import { Route as EscolarComunicacaoRouteImport } from './routes/escolar.comunic
 import { Route as EscolarAvaliacoesRouteImport } from './routes/escolar.avaliacoes'
 import { Route as EscolarAlunosRouteImport } from './routes/escolar.alunos'
 import { Route as ConsultorSimuladorRouteImport } from './routes/consultor.simulador'
+import { Route as ConsultorHistoricoRouteImport } from './routes/consultor.historico'
 import { Route as ConsultorCreditoRouteImport } from './routes/consultor.credito'
 import { Route as ConsultorCotasRouteImport } from './routes/consultor.cotas'
 import { Route as ConsultorContemplacoesRouteImport } from './routes/consultor.contemplacoes'
@@ -290,6 +291,11 @@ const ConsultorSimuladorRoute = ConsultorSimuladorRouteImport.update({
   path: '/simulador',
   getParentRoute: () => ConsultorRoute,
 } as any)
+const ConsultorHistoricoRoute = ConsultorHistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => ConsultorRoute,
+} as any)
 const ConsultorCreditoRoute = ConsultorCreditoRouteImport.update({
   id: '/credito',
   path: '/credito',
@@ -380,6 +386,7 @@ export interface FileRoutesByFullPath {
   '/consultor/contemplacoes': typeof ConsultorContemplacoesRoute
   '/consultor/cotas': typeof ConsultorCotasRoute
   '/consultor/credito': typeof ConsultorCreditoRoute
+  '/consultor/historico': typeof ConsultorHistoricoRoute
   '/consultor/simulador': typeof ConsultorSimuladorRoute
   '/escolar/alunos': typeof EscolarAlunosRoute
   '/escolar/avaliacoes': typeof EscolarAvaliacoesRoute
@@ -434,6 +441,7 @@ export interface FileRoutesByTo {
   '/consultor/contemplacoes': typeof ConsultorContemplacoesRoute
   '/consultor/cotas': typeof ConsultorCotasRoute
   '/consultor/credito': typeof ConsultorCreditoRoute
+  '/consultor/historico': typeof ConsultorHistoricoRoute
   '/consultor/simulador': typeof ConsultorSimuladorRoute
   '/escolar/alunos': typeof EscolarAlunosRoute
   '/escolar/avaliacoes': typeof EscolarAvaliacoesRoute
@@ -491,6 +499,7 @@ export interface FileRoutesById {
   '/consultor/contemplacoes': typeof ConsultorContemplacoesRoute
   '/consultor/cotas': typeof ConsultorCotasRoute
   '/consultor/credito': typeof ConsultorCreditoRoute
+  '/consultor/historico': typeof ConsultorHistoricoRoute
   '/consultor/simulador': typeof ConsultorSimuladorRoute
   '/escolar/alunos': typeof EscolarAlunosRoute
   '/escolar/avaliacoes': typeof EscolarAvaliacoesRoute
@@ -550,6 +559,7 @@ export interface FileRouteTypes {
     | '/consultor/contemplacoes'
     | '/consultor/cotas'
     | '/consultor/credito'
+    | '/consultor/historico'
     | '/consultor/simulador'
     | '/escolar/alunos'
     | '/escolar/avaliacoes'
@@ -604,6 +614,7 @@ export interface FileRouteTypes {
     | '/consultor/contemplacoes'
     | '/consultor/cotas'
     | '/consultor/credito'
+    | '/consultor/historico'
     | '/consultor/simulador'
     | '/escolar/alunos'
     | '/escolar/avaliacoes'
@@ -660,6 +671,7 @@ export interface FileRouteTypes {
     | '/consultor/contemplacoes'
     | '/consultor/cotas'
     | '/consultor/credito'
+    | '/consultor/historico'
     | '/consultor/simulador'
     | '/escolar/alunos'
     | '/escolar/avaliacoes'
@@ -1030,6 +1042,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsultorSimuladorRouteImport
       parentRoute: typeof ConsultorRoute
     }
+    '/consultor/historico': {
+      id: '/consultor/historico'
+      path: '/historico'
+      fullPath: '/consultor/historico'
+      preLoaderRoute: typeof ConsultorHistoricoRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
     '/consultor/credito': {
       id: '/consultor/credito'
       path: '/credito'
@@ -1128,6 +1147,7 @@ interface ConsultorRouteChildren {
   ConsultorContemplacoesRoute: typeof ConsultorContemplacoesRoute
   ConsultorCotasRoute: typeof ConsultorCotasRoute
   ConsultorCreditoRoute: typeof ConsultorCreditoRoute
+  ConsultorHistoricoRoute: typeof ConsultorHistoricoRoute
   ConsultorSimuladorRoute: typeof ConsultorSimuladorRoute
   ConsultorIndexRoute: typeof ConsultorIndexRoute
 }
@@ -1137,6 +1157,7 @@ const ConsultorRouteChildren: ConsultorRouteChildren = {
   ConsultorContemplacoesRoute: ConsultorContemplacoesRoute,
   ConsultorCotasRoute: ConsultorCotasRoute,
   ConsultorCreditoRoute: ConsultorCreditoRoute,
+  ConsultorHistoricoRoute: ConsultorHistoricoRoute,
   ConsultorSimuladorRoute: ConsultorSimuladorRoute,
   ConsultorIndexRoute: ConsultorIndexRoute,
 }
