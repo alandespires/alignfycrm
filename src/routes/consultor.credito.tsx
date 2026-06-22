@@ -101,6 +101,7 @@ function CreditoPage() {
       </div>
 
       <style>{`.i{width:100%;border-radius:10px;border:1px solid hsl(var(--border));background:hsl(var(--background));padding:8px 12px;font-size:14px}`}</style>
+      </div>
     </div>
   );
 }
