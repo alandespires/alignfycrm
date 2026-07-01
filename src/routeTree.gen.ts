@@ -25,6 +25,7 @@ import { Route as InteracoesRouteImport } from './routes/interacoes'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as EscolarRouteImport } from './routes/escolar'
+import { Route as EquipeRouteImport } from './routes/equipe'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EmailMarketingRouteImport } from './routes/email-marketing'
 import { Route as DashboardsRouteImport } from './routes/dashboards'
@@ -144,6 +145,11 @@ const FinanceiroRoute = FinanceiroRouteImport.update({
 const EscolarRoute = EscolarRouteImport.update({
   id: '/escolar',
   path: '/escolar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipeRoute = EquipeRouteImport.update({
+  id: '/equipe',
+  path: '/equipe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmpresasRoute = EmpresasRouteImport.update({
@@ -362,6 +368,7 @@ export interface FileRoutesByFullPath {
   '/dashboards': typeof DashboardsRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/empresas': typeof EmpresasRoute
+  '/equipe': typeof EquipeRoute
   '/escolar': typeof EscolarRouteWithChildren
   '/financeiro': typeof FinanceiroRoute
   '/insights': typeof InsightsRoute
@@ -418,6 +425,7 @@ export interface FileRoutesByTo {
   '/dashboards': typeof DashboardsRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/empresas': typeof EmpresasRoute
+  '/equipe': typeof EquipeRoute
   '/financeiro': typeof FinanceiroRoute
   '/insights': typeof InsightsRoute
   '/interacoes': typeof InteracoesRoute
@@ -475,6 +483,7 @@ export interface FileRoutesById {
   '/dashboards': typeof DashboardsRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/empresas': typeof EmpresasRoute
+  '/equipe': typeof EquipeRoute
   '/escolar': typeof EscolarRouteWithChildren
   '/financeiro': typeof FinanceiroRoute
   '/insights': typeof InsightsRoute
@@ -535,6 +544,7 @@ export interface FileRouteTypes {
     | '/dashboards'
     | '/email-marketing'
     | '/empresas'
+    | '/equipe'
     | '/escolar'
     | '/financeiro'
     | '/insights'
@@ -591,6 +601,7 @@ export interface FileRouteTypes {
     | '/dashboards'
     | '/email-marketing'
     | '/empresas'
+    | '/equipe'
     | '/financeiro'
     | '/insights'
     | '/interacoes'
@@ -647,6 +658,7 @@ export interface FileRouteTypes {
     | '/dashboards'
     | '/email-marketing'
     | '/empresas'
+    | '/equipe'
     | '/escolar'
     | '/financeiro'
     | '/insights'
@@ -706,6 +718,7 @@ export interface RootRouteChildren {
   DashboardsRoute: typeof DashboardsRoute
   EmailMarketingRoute: typeof EmailMarketingRoute
   EmpresasRoute: typeof EmpresasRoute
+  EquipeRoute: typeof EquipeRoute
   EscolarRoute: typeof EscolarRouteWithChildren
   FinanceiroRoute: typeof FinanceiroRoute
   InsightsRoute: typeof InsightsRoute
@@ -837,6 +850,13 @@ declare module '@tanstack/react-router' {
       path: '/escolar'
       fullPath: '/escolar'
       preLoaderRoute: typeof EscolarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/equipe': {
+      id: '/equipe'
+      path: '/equipe'
+      fullPath: '/equipe'
+      preLoaderRoute: typeof EquipeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/empresas': {
@@ -1226,6 +1246,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardsRoute: DashboardsRoute,
   EmailMarketingRoute: EmailMarketingRoute,
   EmpresasRoute: EmpresasRoute,
+  EquipeRoute: EquipeRoute,
   EscolarRoute: EscolarRouteWithChildren,
   FinanceiroRoute: FinanceiroRoute,
   InsightsRoute: InsightsRoute,
