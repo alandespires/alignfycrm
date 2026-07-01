@@ -1327,6 +1327,109 @@ export type Database = {
         }
         Relationships: []
       }
+      departments: {
+        Row: {
+          cor: string | null
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          id: string
+          manager_id: string | null
+          nome: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          cor?: string | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          manager_id?: string | null
+          nome: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          cor?: string | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          manager_id?: string | null
+          nome?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "departments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financial_accounts: {
+        Row: {
+          agencia: string | null
+          ativo: boolean
+          banco: string | null
+          conta: string | null
+          cor: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          saldo_inicial: number
+          tenant_id: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          agencia?: string | null
+          ativo?: boolean
+          banco?: string | null
+          conta?: string | null
+          cor?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          saldo_inicial?: number
+          tenant_id: string
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          agencia?: string | null
+          ativo?: boolean
+          banco?: string | null
+          conta?: string | null
+          cor?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          saldo_inicial?: number
+          tenant_id?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_accounts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       financial_commissions: {
         Row: {
           base_valor: number
@@ -1386,8 +1489,10 @@ export type Database = {
       }
       financial_entries: {
         Row: {
+          account_id: string | null
           categoria: Database["public"]["Enums"]["financial_entry_category"]
           client_id: string | null
+          comprovante_url: string | null
           created_at: string
           created_by: string
           deal_id: string | null
@@ -1409,8 +1514,10 @@ export type Database = {
           vencimento: string | null
         }
         Insert: {
+          account_id?: string | null
           categoria?: Database["public"]["Enums"]["financial_entry_category"]
           client_id?: string | null
+          comprovante_url?: string | null
           created_at?: string
           created_by: string
           deal_id?: string | null
@@ -1432,8 +1539,10 @@ export type Database = {
           vencimento?: string | null
         }
         Update: {
+          account_id?: string | null
           categoria?: Database["public"]["Enums"]["financial_entry_category"]
           client_id?: string | null
+          comprovante_url?: string | null
           created_at?: string
           created_by?: string
           deal_id?: string | null
@@ -1456,6 +1565,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "financial_entries_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "financial_accounts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "financial_entries_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
@@ -1466,7 +1582,9 @@ export type Database = {
       }
       financial_expenses: {
         Row: {
+          account_id: string | null
           categoria: Database["public"]["Enums"]["financial_expense_category"]
+          comprovante_url: string | null
           created_at: string
           created_by: string
           descricao: string
@@ -1485,7 +1603,9 @@ export type Database = {
           vencimento: string | null
         }
         Insert: {
+          account_id?: string | null
           categoria?: Database["public"]["Enums"]["financial_expense_category"]
+          comprovante_url?: string | null
           created_at?: string
           created_by: string
           descricao: string
@@ -1504,7 +1624,9 @@ export type Database = {
           vencimento?: string | null
         }
         Update: {
+          account_id?: string | null
           categoria?: Database["public"]["Enums"]["financial_expense_category"]
+          comprovante_url?: string | null
           created_at?: string
           created_by?: string
           descricao?: string
@@ -1522,7 +1644,15 @@ export type Database = {
           valor?: number
           vencimento?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "financial_expenses_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "financial_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       financial_payments: {
         Row: {
@@ -1625,6 +1755,172 @@ export type Database = {
         }
         Relationships: []
       }
+      goals: {
+        Row: {
+          categoria: string | null
+          created_at: string
+          created_by: string | null
+          data_inicio: string | null
+          department_id: string | null
+          descricao: string | null
+          id: string
+          meta_valor: number | null
+          nome: string
+          owner_id: string | null
+          prazo: string | null
+          prioridade: string | null
+          progresso: number
+          status: string
+          tenant_id: string
+          updated_at: string
+          valor_atual: number | null
+        }
+        Insert: {
+          categoria?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_inicio?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          id?: string
+          meta_valor?: number | null
+          nome: string
+          owner_id?: string | null
+          prazo?: string | null
+          prioridade?: string | null
+          progresso?: number
+          status?: string
+          tenant_id: string
+          updated_at?: string
+          valor_atual?: number | null
+        }
+        Update: {
+          categoria?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_inicio?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          id?: string
+          meta_valor?: number | null
+          nome?: string
+          owner_id?: string | null
+          prazo?: string | null
+          prioridade?: string | null
+          progresso?: number
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          valor_atual?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goals_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goals_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_openings: {
+        Row: {
+          candidatos: number
+          created_at: string
+          created_by: string | null
+          data_abertura: string | null
+          data_fechamento: string | null
+          department_id: string | null
+          descricao: string | null
+          id: string
+          modalidade: string | null
+          regime: string | null
+          requisitos: string | null
+          responsavel_id: string | null
+          salario_max: number | null
+          salario_min: number | null
+          senioridade: string | null
+          status: string
+          tenant_id: string
+          titulo: string
+          updated_at: string
+          vagas: number
+        }
+        Insert: {
+          candidatos?: number
+          created_at?: string
+          created_by?: string | null
+          data_abertura?: string | null
+          data_fechamento?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          id?: string
+          modalidade?: string | null
+          regime?: string | null
+          requisitos?: string | null
+          responsavel_id?: string | null
+          salario_max?: number | null
+          salario_min?: number | null
+          senioridade?: string | null
+          status?: string
+          tenant_id: string
+          titulo: string
+          updated_at?: string
+          vagas?: number
+        }
+        Update: {
+          candidatos?: number
+          created_at?: string
+          created_by?: string | null
+          data_abertura?: string | null
+          data_fechamento?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          id?: string
+          modalidade?: string | null
+          regime?: string | null
+          requisitos?: string | null
+          responsavel_id?: string | null
+          salario_max?: number | null
+          salario_min?: number | null
+          senioridade?: string | null
+          status?: string
+          tenant_id?: string
+          titulo?: string
+          updated_at?: string
+          vagas?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_openings_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_openings_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_openings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kassia_conversations: {
         Row: {
           created_at: string
@@ -1695,47 +1991,156 @@ export type Database = {
       }
       knowledge_articles: {
         Row: {
+          anexos: Json | null
           categoria: string | null
           conteudo: string | null
           created_at: string
           created_by: string
+          department_id: string | null
           id: string
+          prioridade: string | null
           publico: boolean | null
           slug: string
+          status: string | null
           tenant_id: string
           titulo: string
           updated_at: string
+          views_count: number
           visualizacoes: number | null
         }
         Insert: {
+          anexos?: Json | null
           categoria?: string | null
           conteudo?: string | null
           created_at?: string
           created_by: string
+          department_id?: string | null
           id?: string
+          prioridade?: string | null
           publico?: boolean | null
           slug: string
+          status?: string | null
           tenant_id: string
           titulo: string
           updated_at?: string
+          views_count?: number
           visualizacoes?: number | null
         }
         Update: {
+          anexos?: Json | null
           categoria?: string | null
           conteudo?: string | null
           created_at?: string
           created_by?: string
+          department_id?: string | null
           id?: string
+          prioridade?: string | null
           publico?: boolean | null
           slug?: string
+          status?: string | null
           tenant_id?: string
           titulo?: string
           updated_at?: string
+          views_count?: number
           visualizacoes?: number | null
         }
         Relationships: [
           {
+            foreignKeyName: "knowledge_articles_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "knowledge_articles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_favorites: {
+        Row: {
+          article_id: string
+          created_at: string
+          id: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          article_id: string
+          created_at?: string
+          id?: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          id?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_favorites_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_favorites_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_versions: {
+        Row: {
+          article_id: string
+          conteudo: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          tenant_id: string
+          titulo: string | null
+          versao: number
+        }
+        Insert: {
+          article_id: string
+          conteudo?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          tenant_id: string
+          titulo?: string | null
+          versao: number
+        }
+        Update: {
+          article_id?: string
+          conteudo?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          tenant_id?: string
+          titulo?: string | null
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_versions_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_versions_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -1870,6 +2275,91 @@ export type Database = {
           },
         ]
       }
+      marketing_calendar_items: {
+        Row: {
+          campaign_id: string | null
+          conteudo: string | null
+          created_at: string
+          created_by: string | null
+          data_criacao: string | null
+          data_planejada: string | null
+          data_publicacao: string | null
+          formato: string | null
+          id: string
+          observacoes: string | null
+          plataforma: string | null
+          prioridade: string | null
+          responsavel_id: string | null
+          status: string
+          tema: string | null
+          tenant_id: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          conteudo?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_criacao?: string | null
+          data_planejada?: string | null
+          data_publicacao?: string | null
+          formato?: string | null
+          id?: string
+          observacoes?: string | null
+          plataforma?: string | null
+          prioridade?: string | null
+          responsavel_id?: string | null
+          status?: string
+          tema?: string | null
+          tenant_id: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          campaign_id?: string | null
+          conteudo?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_criacao?: string | null
+          data_planejada?: string | null
+          data_publicacao?: string | null
+          formato?: string | null
+          id?: string
+          observacoes?: string | null
+          plataforma?: string | null
+          prioridade?: string | null
+          responsavel_id?: string | null
+          status?: string
+          tema?: string | null
+          tenant_id?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_calendar_items_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketing_calendar_items_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketing_calendar_items_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketing_campaigns: {
         Row: {
           created_at: string
@@ -1879,7 +2369,12 @@ export type Database = {
           inicio: string | null
           metadata: Json | null
           nome: string
+          observacoes: string | null
           orcamento: number | null
+          owner_id: string | null
+          resultado_alcancado: string | null
+          resultado_esperado: string | null
+          roi: number | null
           status: string
           tenant_id: string
           tipo: string
@@ -1893,7 +2388,12 @@ export type Database = {
           inicio?: string | null
           metadata?: Json | null
           nome: string
+          observacoes?: string | null
           orcamento?: number | null
+          owner_id?: string | null
+          resultado_alcancado?: string | null
+          resultado_esperado?: string | null
+          roi?: number | null
           status?: string
           tenant_id: string
           tipo: string
@@ -1907,7 +2407,12 @@ export type Database = {
           inicio?: string | null
           metadata?: Json | null
           nome?: string
+          observacoes?: string | null
           orcamento?: number | null
+          owner_id?: string | null
+          resultado_alcancado?: string | null
+          resultado_esperado?: string | null
+          roi?: number | null
           status?: string
           tenant_id?: string
           tipo?: string
@@ -3142,6 +3647,91 @@ export type Database = {
           },
         ]
       }
+      team_members: {
+        Row: {
+          avatar_url: string | null
+          cargo: string | null
+          created_at: string
+          created_by: string | null
+          data_contratacao: string | null
+          data_desligamento: string | null
+          department_id: string | null
+          email: string | null
+          id: string
+          manager_id: string | null
+          nome: string
+          observacoes: string | null
+          salario: number | null
+          status: string
+          telefone: string | null
+          tenant_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          cargo?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_contratacao?: string | null
+          data_desligamento?: string | null
+          department_id?: string | null
+          email?: string | null
+          id?: string
+          manager_id?: string | null
+          nome: string
+          observacoes?: string | null
+          salario?: number | null
+          status?: string
+          telefone?: string | null
+          tenant_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          cargo?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_contratacao?: string | null
+          data_desligamento?: string | null
+          department_id?: string | null
+          email?: string | null
+          id?: string
+          manager_id?: string | null
+          nome?: string
+          observacoes?: string | null
+          salario?: number | null
+          status?: string
+          telefone?: string | null
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_members_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_members_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_users: {
         Row: {
           created_at: string
@@ -3473,6 +4063,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_article_view: {
+        Args: { _article_id: string }
+        Returns: undefined
+      }
       is_school_student: {
         Args: { _student_id: string; _user_id: string }
         Returns: boolean
@@ -3497,6 +4091,10 @@ export type Database = {
           _tipo: Database["public"]["Enums"]["notification_type"]
           _titulo: string
         }
+        Returns: undefined
+      }
+      recalc_project_progress: {
+        Args: { _project_id: string }
         Returns: undefined
       }
       user_tenant_ids: { Args: { _user_id: string }; Returns: string[] }
