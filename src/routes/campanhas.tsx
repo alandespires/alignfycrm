@@ -133,6 +133,7 @@ function CampaignDialog({ open, onOpenChange, f, setF }: { open: boolean; onOpen
 function CalendarTab({ statusFilter }: { statusFilter: string[] }) {
   const { data: items = [] } = useCalendarItems();
   const del = useDeleteCalendarItem();
+  const save = useSaveCalendarItem();
   const filtered = items.filter(i => statusFilter.includes(i.status));
   const [f, setF] = useState<Partial<CalendarItem>>({});
   const [open, setOpen] = useState(false);
@@ -190,19 +191,10 @@ function CalendarTab({ statusFilter }: { statusFilter: string[] }) {
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button onClick={() => {
-              if (!f.titulo) return;
-              const save = useSaveCalendarItem;
-              // usa hook fora do componente não é ok; substituir por instância abaixo
-            }}>Salvar</Button>
+            <Button onClick={() => { if (!f.titulo) return; save.mutate({ ...f, titulo: f.titulo! }, { onSuccess: () => setOpen(false) }); }}>Salvar</Button>
           </DialogFooter>
-          <SaveCalendarButton f={f} onDone={() => setOpen(false)} />
         </DialogContent>
       </Dialog>
     </Card>
   );
-}
-function SaveCalendarButton({ f, onDone }: { f: Partial<CalendarItem>; onDone: () => void }) {
-  const save = useSaveCalendarItem();
-  return <Button className="hidden" onClick={() => { if (!f.titulo) return; save.mutate({ ...f, titulo: f.titulo! }, { onSuccess: onDone }); }}>_</Button>;
 }
