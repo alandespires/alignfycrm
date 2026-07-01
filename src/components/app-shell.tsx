@@ -127,7 +127,7 @@ const MAIS_GROUPS: SubGroup[] = [
 ];
 
 const COMERCIAL_PATHS = ["/leads", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas"];
-const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/equipe", "/campanhas", "/email-marketing", "/landing-pages", "/automacao", "/tickets", "/base-conhecimento", "/chat", "/consultor"];
+const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/metas", "/equipe", "/campanhas", "/email-marketing", "/landing-pages", "/automacao", "/tickets", "/base-conhecimento", "/chat", "/consultor"];
 
 
 export function AppShell({ children, title, subtitle, action }: {
