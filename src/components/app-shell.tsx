@@ -59,6 +59,7 @@ const OPERACIONAL_GROUPS: SubGroup[] = [
     items: [
       { to: "/projetos", label: "Projetos", icon: Briefcase },
       { to: "/tarefas", label: "Tarefas", icon: ListChecks },
+      { to: "/metas", label: "Metas", icon: ListChecks },
       { to: "/equipe", label: "Equipe", icon: Users },
     ],
   },

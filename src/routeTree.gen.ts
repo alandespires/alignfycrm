@@ -19,6 +19,7 @@ import { Route as PortalAlunoRouteImport } from './routes/portal-aluno'
 import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as OportunidadesRouteImport } from './routes/oportunidades'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as MetasRouteImport } from './routes/metas'
 import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as LandingPagesRouteImport } from './routes/landing-pages'
 import { Route as InteracoesRouteImport } from './routes/interacoes'
@@ -115,6 +116,11 @@ const OportunidadesRoute = OportunidadesRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MetasRoute = MetasRouteImport.update({
+  id: '/metas',
+  path: '/metas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeadsRoute = LeadsRouteImport.update({
@@ -375,6 +381,7 @@ export interface FileRoutesByFullPath {
   '/interacoes': typeof InteracoesRoute
   '/landing-pages': typeof LandingPagesRoute
   '/leads': typeof LeadsRoute
+  '/metas': typeof MetasRoute
   '/onboarding': typeof OnboardingRoute
   '/oportunidades': typeof OportunidadesRoute
   '/pipeline': typeof PipelineRoute
@@ -431,6 +438,7 @@ export interface FileRoutesByTo {
   '/interacoes': typeof InteracoesRoute
   '/landing-pages': typeof LandingPagesRoute
   '/leads': typeof LeadsRoute
+  '/metas': typeof MetasRoute
   '/onboarding': typeof OnboardingRoute
   '/oportunidades': typeof OportunidadesRoute
   '/pipeline': typeof PipelineRoute
@@ -490,6 +498,7 @@ export interface FileRoutesById {
   '/interacoes': typeof InteracoesRoute
   '/landing-pages': typeof LandingPagesRoute
   '/leads': typeof LeadsRoute
+  '/metas': typeof MetasRoute
   '/onboarding': typeof OnboardingRoute
   '/oportunidades': typeof OportunidadesRoute
   '/pipeline': typeof PipelineRoute
@@ -551,6 +560,7 @@ export interface FileRouteTypes {
     | '/interacoes'
     | '/landing-pages'
     | '/leads'
+    | '/metas'
     | '/onboarding'
     | '/oportunidades'
     | '/pipeline'
@@ -607,6 +617,7 @@ export interface FileRouteTypes {
     | '/interacoes'
     | '/landing-pages'
     | '/leads'
+    | '/metas'
     | '/onboarding'
     | '/oportunidades'
     | '/pipeline'
@@ -665,6 +676,7 @@ export interface FileRouteTypes {
     | '/interacoes'
     | '/landing-pages'
     | '/leads'
+    | '/metas'
     | '/onboarding'
     | '/oportunidades'
     | '/pipeline'
@@ -725,6 +737,7 @@ export interface RootRouteChildren {
   InteracoesRoute: typeof InteracoesRoute
   LandingPagesRoute: typeof LandingPagesRoute
   LeadsRoute: typeof LeadsRoute
+  MetasRoute: typeof MetasRoute
   OnboardingRoute: typeof OnboardingRoute
   OportunidadesRoute: typeof OportunidadesRoute
   PipelineRoute: typeof PipelineRoute
@@ -808,6 +821,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metas': {
+      id: '/metas'
+      path: '/metas'
+      fullPath: '/metas'
+      preLoaderRoute: typeof MetasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leads': {
@@ -1253,6 +1273,7 @@ const rootRouteChildren: RootRouteChildren = {
   InteracoesRoute: InteracoesRoute,
   LandingPagesRoute: LandingPagesRoute,
   LeadsRoute: LeadsRoute,
+  MetasRoute: MetasRoute,
   OnboardingRoute: OnboardingRoute,
   OportunidadesRoute: OportunidadesRoute,
   PipelineRoute: PipelineRoute,
