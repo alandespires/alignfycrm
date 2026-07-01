@@ -19,12 +19,14 @@ import { Route as PortalAlunoRouteImport } from './routes/portal-aluno'
 import { Route as PipelineRouteImport } from './routes/pipeline'
 import { Route as OportunidadesRouteImport } from './routes/oportunidades'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as MetasRouteImport } from './routes/metas'
 import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as LandingPagesRouteImport } from './routes/landing-pages'
 import { Route as InteracoesRouteImport } from './routes/interacoes'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as EscolarRouteImport } from './routes/escolar'
+import { Route as EquipeRouteImport } from './routes/equipe'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EmailMarketingRouteImport } from './routes/email-marketing'
 import { Route as DashboardsRouteImport } from './routes/dashboards'
@@ -116,6 +118,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetasRoute = MetasRouteImport.update({
+  id: '/metas',
+  path: '/metas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LeadsRoute = LeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
@@ -144,6 +151,11 @@ const FinanceiroRoute = FinanceiroRouteImport.update({
 const EscolarRoute = EscolarRouteImport.update({
   id: '/escolar',
   path: '/escolar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipeRoute = EquipeRouteImport.update({
+  id: '/equipe',
+  path: '/equipe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmpresasRoute = EmpresasRouteImport.update({
@@ -362,12 +374,14 @@ export interface FileRoutesByFullPath {
   '/dashboards': typeof DashboardsRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/empresas': typeof EmpresasRoute
+  '/equipe': typeof EquipeRoute
   '/escolar': typeof EscolarRouteWithChildren
   '/financeiro': typeof FinanceiroRoute
   '/insights': typeof InsightsRoute
   '/interacoes': typeof InteracoesRoute
   '/landing-pages': typeof LandingPagesRoute
   '/leads': typeof LeadsRoute
+  '/metas': typeof MetasRoute
   '/onboarding': typeof OnboardingRoute
   '/oportunidades': typeof OportunidadesRoute
   '/pipeline': typeof PipelineRoute
@@ -418,11 +432,13 @@ export interface FileRoutesByTo {
   '/dashboards': typeof DashboardsRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/empresas': typeof EmpresasRoute
+  '/equipe': typeof EquipeRoute
   '/financeiro': typeof FinanceiroRoute
   '/insights': typeof InsightsRoute
   '/interacoes': typeof InteracoesRoute
   '/landing-pages': typeof LandingPagesRoute
   '/leads': typeof LeadsRoute
+  '/metas': typeof MetasRoute
   '/onboarding': typeof OnboardingRoute
   '/oportunidades': typeof OportunidadesRoute
   '/pipeline': typeof PipelineRoute
@@ -475,12 +491,14 @@ export interface FileRoutesById {
   '/dashboards': typeof DashboardsRoute
   '/email-marketing': typeof EmailMarketingRoute
   '/empresas': typeof EmpresasRoute
+  '/equipe': typeof EquipeRoute
   '/escolar': typeof EscolarRouteWithChildren
   '/financeiro': typeof FinanceiroRoute
   '/insights': typeof InsightsRoute
   '/interacoes': typeof InteracoesRoute
   '/landing-pages': typeof LandingPagesRoute
   '/leads': typeof LeadsRoute
+  '/metas': typeof MetasRoute
   '/onboarding': typeof OnboardingRoute
   '/oportunidades': typeof OportunidadesRoute
   '/pipeline': typeof PipelineRoute
@@ -535,12 +553,14 @@ export interface FileRouteTypes {
     | '/dashboards'
     | '/email-marketing'
     | '/empresas'
+    | '/equipe'
     | '/escolar'
     | '/financeiro'
     | '/insights'
     | '/interacoes'
     | '/landing-pages'
     | '/leads'
+    | '/metas'
     | '/onboarding'
     | '/oportunidades'
     | '/pipeline'
@@ -591,11 +611,13 @@ export interface FileRouteTypes {
     | '/dashboards'
     | '/email-marketing'
     | '/empresas'
+    | '/equipe'
     | '/financeiro'
     | '/insights'
     | '/interacoes'
     | '/landing-pages'
     | '/leads'
+    | '/metas'
     | '/onboarding'
     | '/oportunidades'
     | '/pipeline'
@@ -647,12 +669,14 @@ export interface FileRouteTypes {
     | '/dashboards'
     | '/email-marketing'
     | '/empresas'
+    | '/equipe'
     | '/escolar'
     | '/financeiro'
     | '/insights'
     | '/interacoes'
     | '/landing-pages'
     | '/leads'
+    | '/metas'
     | '/onboarding'
     | '/oportunidades'
     | '/pipeline'
@@ -706,12 +730,14 @@ export interface RootRouteChildren {
   DashboardsRoute: typeof DashboardsRoute
   EmailMarketingRoute: typeof EmailMarketingRoute
   EmpresasRoute: typeof EmpresasRoute
+  EquipeRoute: typeof EquipeRoute
   EscolarRoute: typeof EscolarRouteWithChildren
   FinanceiroRoute: typeof FinanceiroRoute
   InsightsRoute: typeof InsightsRoute
   InteracoesRoute: typeof InteracoesRoute
   LandingPagesRoute: typeof LandingPagesRoute
   LeadsRoute: typeof LeadsRoute
+  MetasRoute: typeof MetasRoute
   OnboardingRoute: typeof OnboardingRoute
   OportunidadesRoute: typeof OportunidadesRoute
   PipelineRoute: typeof PipelineRoute
@@ -797,6 +823,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/metas': {
+      id: '/metas'
+      path: '/metas'
+      fullPath: '/metas'
+      preLoaderRoute: typeof MetasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/leads': {
       id: '/leads'
       path: '/leads'
@@ -837,6 +870,13 @@ declare module '@tanstack/react-router' {
       path: '/escolar'
       fullPath: '/escolar'
       preLoaderRoute: typeof EscolarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/equipe': {
+      id: '/equipe'
+      path: '/equipe'
+      fullPath: '/equipe'
+      preLoaderRoute: typeof EquipeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/empresas': {
@@ -1226,12 +1266,14 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardsRoute: DashboardsRoute,
   EmailMarketingRoute: EmailMarketingRoute,
   EmpresasRoute: EmpresasRoute,
+  EquipeRoute: EquipeRoute,
   EscolarRoute: EscolarRouteWithChildren,
   FinanceiroRoute: FinanceiroRoute,
   InsightsRoute: InsightsRoute,
   InteracoesRoute: InteracoesRoute,
   LandingPagesRoute: LandingPagesRoute,
   LeadsRoute: LeadsRoute,
+  MetasRoute: MetasRoute,
   OnboardingRoute: OnboardingRoute,
   OportunidadesRoute: OportunidadesRoute,
   PipelineRoute: PipelineRoute,

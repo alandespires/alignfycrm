@@ -1,76 +1,86 @@
-# Módulo Consultor — Consórcios & Crédito
 
-Um módulo dedicado a Consultor de Consórcios / Financeiro, com ferramentas específicas do dia a dia (simulações, cartas, contemplações, comissões) totalmente plugado em Leads, Clientes, Projetos, Tarefas, Financeiro e Launch IA.
+# Auditoria do Align CRM + Plano de Evolução
 
-## 1. Banco de dados (migração)
+Antes de propor código, mapeei o estado atual comparando com o seu checklist. O plano abaixo **preserva 100% do que já existe** e só adiciona/complementa o que falta, reutilizando componentes, hooks, Design System e tabelas atuais.
 
-Novas tabelas no schema `public` (todas com tenant_id, RLS por tenant, GRANTs):
+## 1) Estado atual (auditoria resumida)
 
-- `consortium_administrators` — administradoras (Porto, Embracon, Itaú etc.): nome, cnpj, taxa_adm_padrao, fundo_reserva_padrao, observacoes.
-- `consortium_groups` — grupos: administrator_id, codigo, segmento (`imovel|veiculo|servicos|pesado`), prazo_meses, valor_credito, vagas, status.
-- `consortium_quotas` — cotas/cartas dos clientes: lead_id, client_id, group_id, numero_cota, valor_credito, parcela_atual, parcela_total, parcela_valor, status (`ativa|contemplada|quitada|cancelada|transferida`), contemplada_em, lance_ofertado, lance_tipo.
-- `consortium_simulations` — simulações geradas (PDF-ready): lead_id, administrator, segmento, credito, prazo, parcela_estimada, taxa_adm, fundo_reserva, seguro, payload(jsonb), pdf_url.
-- `consortium_contemplations` — eventos de contemplação: quota_id, tipo (`sorteio|lance_livre|lance_fixo|lance_embutido`), data, valor_lance, observacao.
-- `consultor_commissions` — comissões do consultor: lead_id/quota_id/deal_id, base, percentual, valor, status (`prevista|liberada|paga`), pagar_em, paga_em — gera entrada em `financial_entries` ao liberar.
-- `credit_products` — produtos de crédito (consignado, FGTS, home equity, refin veicular): nome, tipo, taxa_min, taxa_max, prazo_min, prazo_max, banco.
-- `credit_simulations` — simulações de crédito vinculadas a lead/cliente.
+### ✅ JÁ EXISTEM (preservar 100%, não tocar)
 
-Todas seguem o padrão CREATE TABLE → GRANT (authenticated + service_role, sem anon) → ENABLE RLS → POLICIES via `is_tenant_member`/`can_edit_commercial`, com triggers `set_updated_at`.
+- **Financeiro** (`/financeiro`, 1050 linhas) — dashboard, receitas (`financial_entries`), despesas (`financial_expenses`), assinaturas, comissões, pagamentos parciais (`financial_payments`), status automático (`sync_entry_status`, `mark_overdue_financial`), categorias, formas de pagamento, cliente vinculado, filtros por período, gráficos.
+- **Operacional › Projetos** (`/projetos`, 543 linhas) — Kanban, lista, timeline, responsáveis, prioridade, sprint, tarefas vinculadas, templates (`use-project-templates`), auditoria (`project_audit_logs`).
+- **Operacional › Atividades** (`/tarefas`, 371 linhas) — dashboard, quick actions, categorias, prioridades, responsáveis, projetos vinculados, anexos, comentários, tempo, notificação por trigger (`tg_notify_task`).
+- **Dashboard principal** (`/dashboards`) — KPIs, receita, insights IA, pipeline, atividade, widgets configuráveis (`use-dashboard-widgets` já suporta ocultar/reordenar), + seção Consultor.
+- **Consultor / Consórcios**, **Comercial** (leads/pipeline/deals/propostas/clientes/contatos/empresas), **Clínicas**, **Escolar**, **Suporte** (tickets/knowledge_articles), **Automações**, **Insights IA**, **Chat/Kassia**, **Notificações**, **Multi-tenant**, **RLS + roles comerciais**.
+- **Design System** completo (shadcn + tokens semânticos), `app-shell` com bottombar Operacional/Comercial, launch-panel.
 
-Triggers de integração:
-- ao criar `consortium_quota` a partir de um lead `fechado` → cria `project` automaticamente (tipo "Acompanhamento de cota") e `financial_entries` recorrentes para as parcelas.
-- ao marcar `contemplada` → notificação tenant + tarefa "Preparar documentação de crédito".
-- ao mudar `consultor_commissions.status = liberada` → cria `financial_entries` (receita).
+### 🟡 EXISTEM PARCIALMENTE (só complementar)
 
-## 2. Promoção do usuário
+- **Marketing › Campanhas** (`/campanhas`) — hoje é `ModuleStub` (dados fake). Tabelas `marketing_campaigns` e `marketing_emails` **já existem no banco**. Falta: CRUD real ligado às tabelas + calendário editorial.
+- **Metodologia › Base de Conhecimento** (`/base-conhecimento`) — hoje é `ModuleStub`. Tabela `knowledge_articles` **já existe**. Falta: CRUD real, editor rico, busca, favoritos, versionamento.
+- **Financeiro** — falta somente **cadastro de Bancos/Contas** e **upload de comprovante** por entrada (bucket `task-attachments` reutilizável ou novo `finance-receipts`).
+- **Projetos** — barra de progresso: verificar se calcula automaticamente por % de tarefas concluídas; se não, completar.
+- **Tarefas → Projeto** — garantir que ao concluir tarefa recalcula o progresso do projeto (trigger) e propaga para dashboards.
 
-`alandespires@gmail.com` → INSERT em `user_roles` (`super_admin`) **e** em `user_commercial_roles` (`admin`) para todos os tenants em que ele participa. Idempotente via `ON CONFLICT`.
+### ❌ NÃO EXISTEM (implementar do zero, com padrões atuais)
 
-## 3. Hooks
+- **Equipe** (`/equipe`) — colaboradores, departamentos, gestores, vagas, dashboard.
+- **Metas** (dentro de Atividades ou `/metas`) — CRUD de metas com departamento, prazo, status.
+- **Calendário Editorial** de Marketing.
+- **Bancos/Contas financeiras** (`financial_accounts`).
 
-`src/hooks/use-consortium.ts`, `use-consortium-simulations.ts`, `use-consortium-quotas.ts`, `use-consultor-commissions.ts`, `use-credit-products.ts` — todos com React Query + tenant scoping + realtime.
+## 2) Regras aplicadas (do seu prompt)
 
-## 4. UI / Rotas
+- Zero refactor do que existe. Zero substituição. Zero duplicação de entidades.
+- Reutilizar: `clients`, `companies`, `profiles`+`tenant_users` (para colaboradores), `tasks`, `projects`, `financial_entries`, `knowledge_articles`, `marketing_campaigns`.
+- Novos componentes só quando não houver equivalente. Reutilizar `Dialog`, `Sheet`, `Card`, `Tabs`, `DataTable` patterns do app.
+- Mesma tipografia, cores semânticas, ícones lucide, espaçamentos, animações do Align.
+- Novas rotas entram nos dropdowns já existentes do `app-shell` (Operacional / Comercial), sem quebrar navegação.
 
-Rota raiz com sub-abas (TanStack layout):
+## 3) Entregas (em sequência, uma migração cada)
 
-- `/consultor` — Dashboard do consultor: KPIs (cotas ativas, contempladas no mês, comissão prevista vs paga, conversão simulação→venda, ticket médio) + funil simulação→proposta→cota ativa + próximas contemplações.
-- `/consultor/simulador` — Simulador interativo de consórcio: form (segmento, crédito, prazo, administradora) → cálculo de parcela, taxa adm, fundo reserva, seguro, lance embutido, gera PDF via `kassia-pdf` e vincula ao lead.
-- `/consultor/cotas` — Carteira de cotas: tabela rica com filtros por status/administradora/segmento, drawer de detalhes (parcelas, contemplações, anexos, timeline), ações: registrar contemplação, registrar lance, transferir cota.
-- `/consultor/contemplacoes` — Calendário/lista de contemplações + assembleias.
-- `/consultor/comissoes` — Comissões: previstas/liberadas/pagas, com botão "lançar no financeiro".
-- `/consultor/credito` — Simulador de crédito (consignado, FGTS, refin) com catálogo `credit_products`.
+### Fase A — Financeiro (gap pequeno)
+1. Nova tabela `financial_accounts` (bancos/contas) + FK opcional em `financial_entries.account_id` e `financial_expenses.account_id`.
+2. Bucket `finance-receipts` + campo `comprovante_url` em `financial_entries` / `financial_expenses` (se não existir).
+3. UI: aba "Bancos" no `/financeiro` + upload de comprovante no modal de entrada/despesa existente.
 
-## 5. Bottombar
+### Fase B — Equipe (novo módulo)
+1. Tabelas: `departments`, `team_members` (referencia `profiles.id` opcional para usuários do sistema; suporta colaborador externo), `job_openings`.
+2. RLS por tenant + GRANTs.
+3. Rota `/equipe` com abas: **Colaboradores**, **Departamentos**, **Vagas**, **Dashboard**. Reutiliza `Card`, `DataTable`, `Dialog`.
+4. Entra no dropdown Operacional do `app-shell`.
 
-Adicionar grupo "Consultor" no menu **Operacional** existente (junto a Projetos/Tarefas), com badge de contemplações da semana e cotas em atraso. Item só aparece para usuários com role `admin`/`comercial` E flag de feature `consultor` ligada por tenant (via setting simples no localStorage por enquanto, e habilitado por padrão para tenants do super_admin).
+### Fase C — Marketing real
+1. Hooks `use-marketing-campaigns.ts` e `use-marketing-calendar.ts` sobre as tabelas existentes.
+2. Nova tabela `marketing_calendar_items` (título, tema, formato, prioridade, status, data planejada).
+3. `/campanhas` deixa de ser stub → passa a ter: Dashboard (ROI, orçamento, leads), CRUD campanhas, Calendário Editorial, Ideias de Conteúdo.
+4. FK opcional `marketing_campaigns.owner_id` → `profiles`.
 
-## 6. Integração com módulos existentes
+### Fase D — Metodologia real
+1. `/base-conhecimento` deixa de ser stub → CRUD de `knowledge_articles` (que já existe) com: editor rico (reutilizar Textarea + markdown simples, sem nova lib), categorias, departamento, prioridade, status.
+2. Novas tabelas mínimas: `knowledge_favorites` (user_id, article_id), `knowledge_versions` (article_id, conteudo, versao, created_by).
+3. Busca em tempo real (client-side sobre lista), mais-acessados via `views_count` incrementado em `RPC increment_article_view`.
 
-- **Leads**: novo card "Simulações de consórcio" no `lead-detail-drawer` + ação "Gerar simulação" → abre simulador pré-preenchido.
-- **Clientes**: aba "Cotas & Crédito" lista cotas ativas/contempladas.
-- **Projetos**: template novo "Acompanhamento de Consórcio" (12 etapas: KYC, assinatura, 1ª parcela, assembleia, contemplação, uso do crédito etc.).
-- **Financeiro**: parcelas e comissões viram entradas, marcadas com `categoria='consorcio'` para relatórios.
-- **Launch IA**: 3 novas tools no `kassia-chat`:
-  - `simular_consorcio({lead, segmento, credito, prazo})`
-  - `registrar_contemplacao({cota, tipo, valor_lance})`
-  - `liberar_comissao({lead, valor, percentual})`
-  - Sugestões proativas: "Lead X simulou ontem e não recebeu follow-up", "3 cotas contempláveis nesta assembleia".
+### Fase E — Metas + integração Operacional
+1. Nova tabela `goals` (nome, descrição, status, categoria, prioridade, data_inicio, prazo, department_id, owner_id).
+2. Aba **Metas** dentro de `/tarefas` (não cria rota nova para não poluir bottombar).
+3. Trigger `tg_project_progress_from_tasks`: ao mudar status de `tasks`, recalcula `projects.progresso` (% concluídas). Se `projects.progresso` não existir, adiciona coluna.
 
-## 7. Detalhes técnicos
+### Fase F — Dashboard principal (só adição)
+1. Novos widgets opcionais em `use-dashboard-widgets`: **Equipe** (headcount, aniversários, vagas abertas), **Marketing** (ROI mês, campanhas ativas), **Metodologia** (artigos mais lidos), **Metas** (progresso).
+2. Nenhum widget existente removido. Todos default = `false` para não alterar visual atual até o usuário ativar.
 
-- Cálculo de parcela: `parcela = (credito * (1 + taxa_adm + fundo_reserva)) / prazo + seguro_mensal`. Lance embutido: até 25% do crédito reduz parcela.
-- PDF de simulação reusa `src/lib/kassia-pdf.ts` com novo template `simulacao-consorcio`.
-- Realtime nas tabelas `consortium_quotas` e `consultor_commissions`.
-- Server function `gerar-simulacao.functions.ts` para cálculo seguro + persistência.
+## 4) Detalhes técnicos (referência)
 
-## 8. Entregáveis nesta thread
+- **Padrão de hook**: mesmo shape de `use-finance.ts` (react-query + `getActiveTenantId` + toast).
+- **RLS**: `is_tenant_member(tenant_id, auth.uid())` para SELECT; `is_tenant_admin` ou `can_edit_commercial` para writes onde fizer sentido.
+- **GRANTs**: `authenticated` (RLS restringe) + `service_role`. Sem `anon`.
+- **Realtime**: novas tabelas entram no mesmo padrão do `use-realtime`.
+- **Bottombar**: `/equipe` no dropdown Operacional; `/campanhas` e `/base-conhecimento` já estão nos dropdowns atuais (só deixam de ser stub).
+- **Nada é removido do `.env`, `client.ts`, `types.ts`** — types serão regenerados após cada migração.
 
-1. Migração do schema + GRANTs + RLS + triggers.
-2. Promoção do usuário (insert).
-3. Hooks + rotas + componentes principais.
-4. Integração no bottombar (Operacional → Consultor).
-5. Tools novas no `kassia-chat` + ações no `kassia-actions.ts`.
-6. Cards integrados em Leads/Clientes.
+## 5) Execução
 
-Após aprovação rodo migração primeiro (aprovação separada), depois implemento código.
+Vou executar **em ordem A → F**, cada fase é uma migração + arquivos frontend, cada uma testável de forma isolada. Ao final de cada fase, atualizo hooks/rotas e movo para a próxima.
+
+Confirma esta ordem e escopo? Se quiser priorizar/pular alguma fase (ex.: começar por Equipe, ou pular Fase A), me diga antes de eu abrir a primeira migração.
