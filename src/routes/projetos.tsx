@@ -377,6 +377,7 @@ function ProjectDetailDrawer({ project, onClose, onDelete, onUpdate, tasks, entr
   onUpdate: (patch: Partial<ProjectRow>) => void;
   tasks: any[]; entries: any[]; payments: any[];
 }) {
+  const [tab, setTab] = useState<string>("overview");
   const recebido = entries.filter((e) => e.status !== "cancelado").reduce((s, e) => s + computeEntryReceived(e, payments), 0);
   const pendente = entries.filter((e) => e.status !== "cancelado").reduce((s, e) => s + computeEntryBalance(e, payments), 0);
   const { data: logs = [] } = useProjectAuditLogs(project.id);
@@ -392,146 +393,180 @@ function ProjectDetailDrawer({ project, onClose, onDelete, onUpdate, tasks, entr
     onUpdate({ status: s });
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="h-full w-full max-w-xl overflow-y-auto bg-surface-1 shadow-elevated" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-start justify-between gap-3 border-b border-border p-5">
-          <div className="min-w-0">
-            <div className="mb-1.5"><StatusPill tone={PROJECT_STATUS_TONE[project.status] as any}>{PROJECT_STATUS_LABEL[project.status]}</StatusPill></div>
-            <h2 className="truncate text-lg font-semibold">{project.titulo}</h2>
-            {project.descricao && <p className="mt-1 text-xs text-muted-foreground">{project.descricao}</p>}
-          </div>
-          <div className="flex gap-1.5">
-            <button onClick={() => onDelete(project.id)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-destructive/15 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
-            <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
-          </div>
-        </div>
+  const statusTone = project.status === "concluido" ? "success"
+    : project.status === "cancelado" ? "danger"
+    : project.status === "pausado" ? "warn"
+    : project.status === "em_andamento" ? "info"
+    : "neutral";
 
-        <div className="space-y-5 p-5">
-          <div>
-            <div className="mb-2 flex items-center justify-between text-xs">
-              <span className="font-medium uppercase tracking-wider text-muted-foreground">Progresso</span>
-              <span className="tabular-nums font-semibold">{project.progresso}%</span>
+  return (
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Projeto"
+      title={project.titulo}
+      subtitle={project.descricao || undefined}
+      status={{ label: PROJECT_STATUS_LABEL[project.status], tone: statusTone as any }}
+      expandable
+      headerActions={
+        <button
+          onClick={() => onDelete(project.id)}
+          className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface-2 text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive"
+          aria-label="Excluir"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      }
+      tabs={[
+        { id: "overview", label: "Visão geral" },
+        { id: "tasks", label: "Tarefas", count: tasks.length },
+        { id: "finance", label: "Financeiro", count: entries.length },
+        { id: "audit", label: "Histórico", count: logs.length },
+      ]}
+      activeTab={tab}
+      onTabChange={setTab}
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Fechar", onClick: onClose }}
+          primary={{ label: project.status === "concluido" ? "Reabrir" : "Marcar como concluído", onClick: () => handleStatusChange(project.status === "concluido" ? "em_andamento" : "concluido") }}
+        />
+      }
+    >
+      {tab === "overview" && (
+        <div className="space-y-6">
+          <AlignPanelSection title="Progresso">
+            <div className="rounded-2xl border border-border bg-surface-2 p-4">
+              <div className="mb-3 flex items-baseline justify-between">
+                <span className="text-3xl font-black tabular-nums text-primary">{project.progresso}%</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Concluído</span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-3">
+                <div className="h-full rounded-full bg-primary shadow-[0_0_10px_var(--primary)] transition-all" style={{ width: `${project.progresso}%` }} />
+              </div>
+              <input
+                type="range" min={0} max={100} step={5} value={project.progresso}
+                onChange={(e) => onUpdate({ progresso: Number(e.target.value) })}
+                className="mt-3 w-full accent-primary"
+              />
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {STATUS_LIST.map((s) => (
+                  <button key={s} onClick={() => handleStatusChange(s)} className={["rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide transition", project.status === s ? "bg-primary text-primary-foreground" : "border border-border bg-surface-1 text-muted-foreground hover:text-foreground"].join(" ")}>{PROJECT_STATUS_LABEL[s]}</button>
+                ))}
+              </div>
             </div>
-            <input
-              type="range" min={0} max={100} step={5} value={project.progresso}
-              onChange={(e) => onUpdate({ progresso: Number(e.target.value) })}
-              className="w-full accent-primary"
-            />
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {STATUS_LIST.map((s) => (
-                <button key={s} onClick={() => handleStatusChange(s)} className={["rounded-md px-2 py-1 text-[10px] font-medium uppercase tracking-wide transition", project.status === s ? "bg-primary text-primary-foreground" : "border border-border bg-surface-2 text-muted-foreground hover:text-foreground"].join(" ")}>{PROJECT_STATUS_LABEL[s]}</button>
-              ))}
-            </div>
-          </div>
+          </AlignPanelSection>
 
           <div className="grid grid-cols-3 gap-2">
             <Stat icon={DollarSign} label="Valor total" value={brl(Number(project.valor_total))} />
             <Stat icon={CheckCircle2} label="Recebido" value={brl(recebido)} tone="success" />
             <Stat icon={Wallet} label="Pendente" value={brl(pendente)} tone="warn" />
           </div>
-
-          <section>
-            <h3 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground"><ListChecks className="h-3.5 w-3.5" /> Tarefas vinculadas ({tasks.length})</h3>
-            {tasks.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Nenhuma tarefa vinculada.</p>
-            ) : (
-              <ul className="space-y-1.5">
-                {tasks.map((t) => (
-                  <li key={t.id} className="flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm">
-                    <CheckCircle2 className={`h-3.5 w-3.5 ${t.status === "concluida" ? "text-success" : "text-muted-foreground"}`} />
-                    <span className={t.status === "concluida" ? "line-through text-muted-foreground" : ""}>{t.titulo}</span>
-                    {t.prazo && <span className="ml-auto text-[10px] text-muted-foreground">{new Date(t.prazo).toLocaleDateString("pt-BR")}</span>}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          <section>
-            <h3 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground"><Wallet className="h-3.5 w-3.5" /> Entradas financeiras ({entries.length})</h3>
-            {entries.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Nenhuma entrada vinculada.</p>
-            ) : (
-              <ul className="space-y-1.5">
-                {entries.map((e) => (
-                  <li key={e.id} className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm ${e.status === "cancelado" ? "border-destructive/30 bg-destructive/5" : "border-border bg-surface-2"}`}>
-                    <span className="flex items-center gap-2 truncate">
-                      {e.status === "cancelado" && <Ban className="h-3 w-3 shrink-0 text-destructive" />}
-                      <span className={e.status === "cancelado" ? "line-through text-muted-foreground" : ""}>{e.descricao}</span>
-                    </span>
-                    <span className={`tabular-nums font-semibold ${e.status === "cancelado" ? "text-muted-foreground" : "text-success"}`}>{brl(Number(e.valor))}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          <section>
-            <h3 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground"><History className="h-3.5 w-3.5" /> Auditoria ({logs.length})</h3>
-            {logs.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Sem registros de alterações de status ainda.</p>
-            ) : (
-              <ul className="space-y-2">
-                {logs.map((l) => (
-                  <li key={l.id} className="rounded-lg border border-border bg-surface-2 p-3 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold">
-                        {l.action === "project_cancelled" && "Projeto cancelado"}
-                        {l.action === "project_completed" && "Projeto concluído"}
-                        {l.action === "status_changed" && "Status alterado"}
-                        {l.action === "project_deleted" && "Projeto removido"}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">{new Date(l.created_at).toLocaleString("pt-BR")}</span>
-                    </div>
-                    {l.from_status && l.to_status && (
-                      <div className="mt-1 text-[11px] text-muted-foreground">
-                        {PROJECT_STATUS_LABEL[l.from_status as ProjectStatus] ?? l.from_status} → <span className="text-foreground">{PROJECT_STATUS_LABEL[l.to_status as ProjectStatus] ?? l.to_status}</span>
-                      </div>
-                    )}
-                    {(l.affected_entries?.length || 0) > 0 && (
-                      <div className="mt-2">
-                        <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Entradas financeiras afetadas ({l.affected_entries.length})</div>
-                        <ul className="mt-1 space-y-0.5">
-                          {l.affected_entries.map((e: any) => (
-                            <li key={e.id} className="flex justify-between text-[11px]">
-                              <span className="truncate">• {e.descricao}</span>
-                              <span className="ml-2 tabular-nums text-muted-foreground">{brl(Number(e.valor))}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {(l.affected_tasks?.length || 0) > 0 && (
-                      <div className="mt-2">
-                        <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Tarefas afetadas ({l.affected_tasks.length})</div>
-                        <ul className="mt-1 space-y-0.5">
-                          {l.affected_tasks.map((t: any) => (
-                            <li key={t.id} className="text-[11px]">• {t.titulo}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {(l.affected_leads?.length || 0) > 0 && (
-                      <div className="mt-2">
-                        <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Lead sincronizado</div>
-                        <ul className="mt-1 space-y-0.5">
-                          {l.affected_leads.map((ld: any) => (
-                            <li key={ld.id} className="text-[11px]">• {ld.nome}: {ld.from_status} → <span className="text-foreground">{ld.to_status}</span></li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
         </div>
-      </div>
-    </div>
+      )}
+
+      {tab === "tasks" && (
+        <AlignPanelSection title={`Tarefas vinculadas (${tasks.length})`} icon={ListChecks}>
+          {tasks.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-border bg-surface-2 p-6 text-center text-sm text-muted-foreground">Nenhuma tarefa vinculada.</p>
+          ) : (
+            <ul className="space-y-1.5">
+              {tasks.map((t) => (
+                <li key={t.id} className="flex items-center gap-2 rounded-xl border border-border bg-surface-2 px-3 py-2.5 text-sm">
+                  <CheckCircle2 className={`h-4 w-4 ${t.status === "concluida" ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={t.status === "concluida" ? "line-through text-muted-foreground" : ""}>{t.titulo}</span>
+                  {t.prazo && <span className="ml-auto text-[10px] text-muted-foreground">{new Date(t.prazo).toLocaleDateString("pt-BR")}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </AlignPanelSection>
+      )}
+
+      {tab === "finance" && (
+        <AlignPanelSection title={`Entradas financeiras (${entries.length})`} icon={Wallet}>
+          {entries.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-border bg-surface-2 p-6 text-center text-sm text-muted-foreground">Nenhuma entrada vinculada.</p>
+          ) : (
+            <ul className="space-y-1.5">
+              {entries.map((e) => (
+                <li key={e.id} className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-sm ${e.status === "cancelado" ? "border-destructive/30 bg-destructive/5" : "border-border bg-surface-2"}`}>
+                  <span className="flex items-center gap-2 truncate">
+                    {e.status === "cancelado" && <Ban className="h-3.5 w-3.5 shrink-0 text-destructive" />}
+                    <span className={e.status === "cancelado" ? "line-through text-muted-foreground" : ""}>{e.descricao}</span>
+                  </span>
+                  <span className={`tabular-nums font-semibold ${e.status === "cancelado" ? "text-muted-foreground" : "text-primary"}`}>{brl(Number(e.valor))}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </AlignPanelSection>
+      )}
+
+      {tab === "audit" && (
+        <AlignPanelSection title={`Auditoria (${logs.length})`} icon={History}>
+          {logs.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-border bg-surface-2 p-6 text-center text-sm text-muted-foreground">Sem registros de alterações ainda.</p>
+          ) : (
+            <ul className="space-y-2">
+              {logs.map((l) => (
+                <li key={l.id} className="rounded-xl border border-border bg-surface-2 p-3 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">
+                      {l.action === "project_cancelled" && "Projeto cancelado"}
+                      {l.action === "project_completed" && "Projeto concluído"}
+                      {l.action === "status_changed" && "Status alterado"}
+                      {l.action === "project_deleted" && "Projeto removido"}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">{new Date(l.created_at).toLocaleString("pt-BR")}</span>
+                  </div>
+                  {l.from_status && l.to_status && (
+                    <div className="mt-1 text-[11px] text-muted-foreground">
+                      {PROJECT_STATUS_LABEL[l.from_status as ProjectStatus] ?? l.from_status} → <span className="text-foreground">{PROJECT_STATUS_LABEL[l.to_status as ProjectStatus] ?? l.to_status}</span>
+                    </div>
+                  )}
+                  {(l.affected_entries?.length || 0) > 0 && (
+                    <div className="mt-2">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Entradas afetadas ({l.affected_entries.length})</div>
+                      <ul className="mt-1 space-y-0.5">
+                        {l.affected_entries.map((e: any) => (
+                          <li key={e.id} className="flex justify-between text-[11px]">
+                            <span className="truncate">• {e.descricao}</span>
+                            <span className="ml-2 tabular-nums text-muted-foreground">{brl(Number(e.valor))}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {(l.affected_tasks?.length || 0) > 0 && (
+                    <div className="mt-2">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Tarefas afetadas ({l.affected_tasks.length})</div>
+                      <ul className="mt-1 space-y-0.5">
+                        {l.affected_tasks.map((t: any) => (
+                          <li key={t.id} className="text-[11px]">• {t.titulo}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {(l.affected_leads?.length || 0) > 0 && (
+                    <div className="mt-2">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Lead sincronizado</div>
+                      <ul className="mt-1 space-y-0.5">
+                        {l.affected_leads.map((ld: any) => (
+                          <li key={ld.id} className="text-[11px]">• {ld.nome}: {ld.from_status} → <span className="text-foreground">{ld.to_status}</span></li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </AlignPanelSection>
+      )}
+    </AlignPanel>
   );
 }
+
 
 function Stat({ icon: Icon, label, value, tone }: { icon: any; label: string; value: string; tone?: "success" | "warn" }) {
   const color = tone === "success" ? "text-success" : tone === "warn" ? "text-warning" : "text-foreground";
