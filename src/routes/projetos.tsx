@@ -18,6 +18,7 @@ import {
   ListChecks, Wallet, Search, Filter, History, AlertCircle, Ban, Sparkles,
 } from "lucide-react";
 import { ProjectTemplatesGallery } from "@/components/project-templates-gallery";
+import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/align-panel";
 
 export const Route = createFileRoute("/projetos")({
   head: () => ({ meta: [{ title: "Controle de Projetos — Align CRM" }] }),
