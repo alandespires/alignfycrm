@@ -141,19 +141,11 @@ export function AppShell({ children, title, subtitle, action }: {
   const navigate = useNavigate();
 
   const [comercialOpen, setComercialOpen] = useState(false);
-  const [operacionalOpen, setOperacionalOpen] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem("align:operacionalOpen") === "1";
-  });
+  const [operacionalOpen, setOperacionalOpen] = useState(false);
   const [maisOpen, setMaisOpen] = useState(false);
   const [launchOpen, setLaunchOpen] = useState(false);
   const { data: opBadges } = useOperacionalBadges();
   const opBadgeTotal = (opBadges?.tasksOverdue ?? 0) + (opBadges?.projectsAtRisk ?? 0);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem("align:operacionalOpen", operacionalOpen ? "1" : "0");
-  }, [operacionalOpen]);
 
 
   const segmento = (current?.tenant as any)?.segmento;
@@ -190,8 +182,13 @@ export function AppShell({ children, title, subtitle, action }: {
     if (memberships.length === 0 && !isSuperAdmin) navigate({ to: "/onboarding" });
   }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
 
-  // Close transient sheets on route change (Operacional persists per user setting)
-  useEffect(() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
+  // Close all dock sheets on route change
+  useEffect(() => {
+    setComercialOpen(false);
+    setOperacionalOpen(false);
+    setMaisOpen(false);
+    setLaunchOpen(false);
+  }, [pathname]);
 
   // Global keyboard shortcuts
   useEffect(() => {
