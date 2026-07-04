@@ -183,7 +183,13 @@ export function AppShell({ children, title, subtitle, action }: {
   }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
 
   // Close transient sheets on route change (Operacional persists per user setting)
-  useEffect(() => { setComercialOpen(false); setMaisOpen(false); setLaunchOpen(false); }, [pathname]);
+  // Close all dock sheets on route change
+  useEffect(() => {
+    setComercialOpen(false);
+    setOperacionalOpen(false);
+    setMaisOpen(false);
+    setLaunchOpen(false);
+  }, [pathname]);
 
   // Global keyboard shortcuts
   useEffect(() => {
