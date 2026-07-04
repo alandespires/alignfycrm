@@ -182,7 +182,6 @@ export function AppShell({ children, title, subtitle, action }: {
     if (memberships.length === 0 && !isSuperAdmin) navigate({ to: "/onboarding" });
   }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
 
-  // Close transient sheets on route change (Operacional persists per user setting)
   // Close all dock sheets on route change
   useEffect(() => {
     setComercialOpen(false);
