@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { X, Building2, Mail, Phone, Sparkles, Loader2, CheckCircle2, MessageSquare, Calendar, RefreshCw, ArrowRightLeft } from "lucide-react";
+import { Mail, Phone, Sparkles, Loader2, CheckCircle2, MessageSquare, Calendar, RefreshCw, ArrowRightLeft } from "lucide-react";
 import type { ClientRow } from "@/hooks/use-clients";
 import { formatBRL } from "@/lib/mock-data";
+import { AlignPanel, AlignPanelSection } from "@/components/align-panel";
 
 const TIPO_ICON: Record<string, any> = {
   ligacao: Phone, email: Mail, whatsapp: MessageSquare, reuniao: Calendar,
@@ -12,7 +13,6 @@ const TIPO_ICON: Record<string, any> = {
 function fmtDateTime(s: string) {
   return new Date(s).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 }
-
 function fmtDate(s: string) {
   return new Date(s).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
 }
@@ -20,7 +20,6 @@ function fmtDate(s: string) {
 export function ClientDetailDrawer({ client, onClose }: { client: ClientRow | null; onClose: () => void }) {
   const open = !!client;
 
-  // Lead original (se houver)
   const leadQ = useQuery({
     queryKey: ["client-lead", client?.lead_id],
     enabled: !!client?.lead_id,
@@ -31,7 +30,6 @@ export function ClientDetailDrawer({ client, onClose }: { client: ClientRow | nu
     },
   });
 
-  // Activities herdadas: do lead original + do próprio cliente
   const activitiesQ = useQuery({
     queryKey: ["client-activities", client?.id, client?.lead_id],
     enabled: !!client,
@@ -40,25 +38,19 @@ export function ClientDetailDrawer({ client, onClose }: { client: ClientRow | nu
       if (client!.id) filters.push(`client_id.eq.${client!.id}`);
       if (client!.lead_id) filters.push(`lead_id.eq.${client!.lead_id}`);
       const { data, error } = await supabase
-        .from("activities")
-        .select("*")
-        .or(filters.join(","))
-        .order("created_at", { ascending: false })
-        .limit(50);
+        .from("activities").select("*").or(filters.join(","))
+        .order("created_at", { ascending: false }).limit(50);
       if (error) throw error;
       return data ?? [];
     },
   });
 
-  // Deals fechados vinculados
   const dealsQ = useQuery({
     queryKey: ["client-deals", client?.lead_id],
     enabled: !!client?.lead_id,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("deals")
-        .select("*")
-        .eq("lead_id", client!.lead_id!)
+        .from("deals").select("*").eq("lead_id", client!.lead_id!)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -72,57 +64,41 @@ export function ClientDetailDrawer({ client, onClose }: { client: ClientRow | nu
   const deals = dealsQ.data ?? [];
   const dealsFechados = deals.filter((d: any) => d.stage === "fechado");
   const totalConvertido = dealsFechados.reduce((a: number, d: any) => a + Number(d.valor ?? 0), 0);
-
-  // Conversão = activity de movimentacao com action=convert_to_client OU primeira fechado
   const conversao = activities.find((a: any) => a.metadata?.action === "convert_to_client");
 
+  const subtitle = [
+    client.nome !== (client.empresa || client.nome) ? client.nome : null,
+    client.contrato_valor && Number(client.contrato_valor) > 0 ? `${formatBRL(Number(client.contrato_valor))}/mês` : null,
+    client.contrato_inicio ? `desde ${fmtDate(client.contrato_inicio)}` : null,
+  ].filter(Boolean).join(" • ");
+
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" role="dialog">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <aside className="relative flex h-full w-full max-w-xl flex-col overflow-y-auto border-l border-border bg-surface-1 shadow-elevated">
-        {/* Header */}
-        <div className="sticky top-0 z-10 border-b border-border bg-surface-1/95 backdrop-blur">
-          <div className="flex items-start justify-between gap-3 p-5">
-            <div className="flex items-start gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-primary/30 to-surface-3 text-primary">
-                <Building2 className="h-6 w-6" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold leading-tight">{client.empresa || client.nome}</h2>
-                <p className="mt-0.5 text-xs text-muted-foreground">{client.nome}</p>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {client.contrato_valor && Number(client.contrato_valor) > 0 && (
-                    <span className="rounded-md bg-success/15 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-success">
-                      {formatBRL(Number(client.contrato_valor))}/mês
-                    </span>
-                  )}
-                  {client.contrato_inicio && (
-                    <span className="text-[11px] text-muted-foreground">desde {fmtDate(client.contrato_inicio)}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
-          </div>
-          <div className="flex flex-wrap gap-2 border-t border-border px-5 py-3">
+    <AlignPanel
+      open={open}
+      onClose={onClose}
+      eyebrow="Cliente"
+      title={client.empresa || client.nome}
+      subtitle={subtitle}
+      status={{ label: "Ativo", tone: "success" }}
+    >
+      <div className="space-y-6">
+        {/* Contato rápido */}
+        {(client.email || client.whatsapp) && (
+          <div className="flex flex-wrap gap-2">
             {client.email && (
-              <a href={`mailto:${client.email}`} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 text-xs hover:border-primary/40 hover:text-primary">
-                <Mail className="h-3 w-3" /> {client.email}
+              <a href={`mailto:${client.email}`} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-3 text-xs hover:border-primary/40 hover:text-primary">
+                <Mail className="h-3.5 w-3.5" /> {client.email}
               </a>
             )}
             {client.whatsapp && (
-              <a href={`https://wa.me/${client.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 text-xs hover:border-success/40 hover:text-success">
-                <MessageSquare className="h-3 w-3" /> WhatsApp
+              <a href={`https://wa.me/${client.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-3 text-xs hover:border-success/40 hover:text-success">
+                <MessageSquare className="h-3.5 w-3.5" /> WhatsApp
               </a>
             )}
           </div>
-        </div>
+        )}
 
-        {/* Histórico de conversão */}
-        <section className="border-b border-border p-5">
-          <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary">
-            <ArrowRightLeft className="h-3 w-3" /> Histórico de conversão
-          </h3>
+        <AlignPanelSection title="Histórico de conversão" icon={ArrowRightLeft}>
           {leadQ.isLoading ? (
             <div className="grid place-items-center py-6"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
           ) : !lead ? (
@@ -179,13 +155,9 @@ export function ClientDetailDrawer({ client, onClose }: { client: ClientRow | nu
               )}
             </div>
           )}
-        </section>
+        </AlignPanelSection>
 
-        {/* Timeline herdada */}
-        <section className="flex-1 p-5">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Timeline completa <span className="ml-1 text-foreground">{activities.length}</span>
-          </h3>
+        <AlignPanelSection title={`Timeline completa · ${activities.length}`}>
           {activitiesQ.isLoading ? (
             <div className="grid place-items-center py-8"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
           ) : (
@@ -214,9 +186,9 @@ export function ClientDetailDrawer({ client, onClose }: { client: ClientRow | nu
               })}
             </ol>
           )}
-        </section>
-      </aside>
-    </div>
+        </AlignPanelSection>
+      </div>
+    </AlignPanel>
   );
 }
 
@@ -228,7 +200,6 @@ function Stat({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-border bg-surface-2 p-2.5">

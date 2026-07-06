@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   X, Loader2, Trash2, Plus, MessageSquare, Paperclip, Clock, ListChecks,
-  Play, Square, CheckCircle2, Circle, GitBranch, Tag, AlertTriangle, Calendar, Flag,
+  Play, Square, CheckCircle2, Circle, GitBranch, AlertTriangle, Calendar, Flag,
 } from "lucide-react";
 import { useUpdateTask, useDeleteTask, useToggleTask, useCreateTask, useSubtasks, type TaskRow, type ChecklistItem, type TaskPriority, type TaskStatus, TASK_PRIORITY_LABEL } from "@/hooks/use-tasks";
 import { useTaskComments, useCreateTaskComment, useDeleteTaskComment } from "@/hooks/use-task-comments";
@@ -10,9 +10,13 @@ import { useTaskTimeEntries, useStartTimer, useStopTimer, useAddManualTime, useD
 import { useLeads } from "@/hooks/use-leads";
 import { useProjects } from "@/hooks/use-projects";
 import { useAuth } from "@/contexts/auth-context";
-import { StatusPill } from "@/components/app-shell";
+import { AlignPanel, AlignPanelSection } from "@/components/align-panel";
 
 type Tab = "geral" | "checklist" | "comentarios" | "anexos" | "tempo";
+
+const STATUS_TONE: Record<TaskStatus, "neutral" | "info" | "warn" | "success" | "danger"> = {
+  pendente: "neutral", em_andamento: "info", concluida: "success", cancelada: "danger",
+};
 
 export function TaskDetailDrawer({ task, allTasks, onClose }: { task: TaskRow; allTasks: TaskRow[]; onClose: () => void }) {
   const [tab, setTab] = useState<Tab>("geral");
@@ -41,163 +45,144 @@ export function TaskDetailDrawer({ task, allTasks, onClose }: { task: TaskRow; a
 
   function patch(p: Partial<TaskRow>) { update.mutate({ id: task.id, ...p }); }
 
+  const tabs = [
+    { id: "geral", label: "Geral" },
+    { id: "checklist", label: "Checklist & Sub", count: task.checklist.length + subtasks.length },
+    { id: "comentarios", label: "Comentários" },
+    { id: "anexos", label: "Anexos" },
+    { id: "tempo", label: "Tempo" },
+  ];
+
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="h-full w-full max-w-2xl overflow-y-auto bg-surface-1 shadow-elevated" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="sticky top-0 z-10 border-b border-border bg-surface-1/95 backdrop-blur">
-          <div className="flex items-start justify-between gap-3 p-5">
-            <div className="min-w-0 flex-1">
-              <div className="mb-2 flex flex-wrap items-center gap-1.5">
-                <button onClick={() => toggle.mutate({ id: task.id, done: task.status !== "concluida" })}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider hover:border-primary/50">
-                  {task.status === "concluida" ? <CheckCircle2 className="h-3 w-3 text-success" /> : <Circle className="h-3 w-3" />}
-                  {task.status}
-                </button>
-                <StatusPill tone={task.prioridade === "urgente" || task.prioridade === "alta" ? "danger" : task.prioridade === "media" ? "warn" : "neutral"}>
-                  {TASK_PRIORITY_LABEL[task.prioridade]}
-                </StatusPill>
-                {blocked && (
-                  <span className="inline-flex items-center gap-1 rounded-md border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-semibold text-warning">
-                    <AlertTriangle className="h-3 w-3" /> Bloqueada
-                  </span>
-                )}
-              </div>
-              <input
-                value={titulo}
-                onChange={(e) => setTitulo(e.target.value)}
-                onBlur={() => titulo !== task.titulo && patch({ titulo })}
-                className="w-full bg-transparent text-lg font-semibold tracking-tight focus:outline-none"
-              />
-            </div>
-            <div className="flex gap-1.5">
-              <button onClick={() => { if (confirm("Excluir esta tarefa?")) { del.mutate(task.id); onClose(); } }}
-                className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-destructive/15 hover:text-destructive">
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-              <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="px-5 pb-3">
-            <div className="flex items-center gap-2">
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-primary/15">
-                <div className="h-full bg-primary transition-all" style={{ width: `${task.progresso}%` }} />
-              </div>
-              <span className="text-[11px] tabular-nums text-muted-foreground">{task.progresso}%</span>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <nav className="flex gap-1 px-5">
-            {([
-              ["geral", "Geral", null],
-              ["checklist", "Checklist & Subtarefas", task.checklist.length + subtasks.length],
-              ["comentarios", "Comentários", null],
-              ["anexos", "Anexos", null],
-              ["tempo", "Tempo", null],
-            ] as const).map(([k, label, count]) => (
-              <button key={k} onClick={() => setTab(k as Tab)}
-                className={[
-                  "relative -mb-px border-b-2 px-3 py-2 text-xs font-medium transition",
-                  tab === k ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
-                ].join(" ")}>
-                {label}{count !== null && count > 0 && <span className="ml-1.5 rounded bg-surface-3 px-1 text-[10px] tabular-nums">{count}</span>}
-              </button>
-            ))}
-          </nav>
+    <AlignPanel
+      open={true}
+      onClose={onClose}
+      eyebrow={<>
+        <span>{TASK_PRIORITY_LABEL[task.prioridade]}</span>
+        {blocked && (
+          <span className="ml-2 inline-flex items-center gap-1 text-warning">
+            <AlertTriangle className="h-3 w-3" /> Bloqueada
+          </span>
+        )}
+      </>}
+      title={
+        <input
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
+          onBlur={() => titulo !== task.titulo && patch({ titulo })}
+          className="w-full bg-transparent font-display text-[22px] font-bold leading-tight tracking-tight focus:outline-none"
+        />
+      }
+      status={{ label: task.status.replace("_", " "), tone: STATUS_TONE[task.status] }}
+      tabs={tabs}
+      activeTab={tab}
+      onTabChange={(id) => setTab(id as Tab)}
+      headerActions={
+        <button
+          onClick={() => { if (confirm("Excluir esta tarefa?")) { del.mutate(task.id); onClose(); } }}
+          className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface-2 text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive"
+          title="Excluir tarefa"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      }
+      expandable
+    >
+      {/* Progress bar */}
+      <div className="mb-5 flex items-center gap-2">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-primary/15">
+          <div className="h-full bg-primary transition-all" style={{ width: `${task.progresso}%` }} />
         </div>
-
-        <div className="space-y-4 p-5">
-          {tab === "geral" && (
-            <>
-              <Field label="Descrição">
-                <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)}
-                  onBlur={() => descricao !== (task.descricao ?? "") && patch({ descricao: descricao || null as any })}
-                  rows={3} className="w-full rounded-lg border border-border bg-surface-2 p-3 text-sm focus:border-primary/60 focus:outline-none"
-                  placeholder="Adicione uma descrição..." />
-              </Field>
-
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Status">
-                  <select value={task.status} onChange={(e) => patch({ status: e.target.value as TaskStatus })}
-                    className={selectCls}>
-                    <option value="pendente">Pendente</option>
-                    <option value="em_andamento">Em andamento</option>
-                    <option value="concluida">Concluída</option>
-                    <option value="cancelada">Cancelada</option>
-                  </select>
-                </Field>
-                <Field label={<><Flag className="mr-1 inline h-3 w-3" />Prioridade</>}>
-                  <select value={task.prioridade} onChange={(e) => patch({ prioridade: e.target.value as TaskPriority })}
-                    className={selectCls}>
-                    {(["baixa", "media", "alta", "urgente"] as TaskPriority[]).map((p) => <option key={p} value={p}>{TASK_PRIORITY_LABEL[p]}</option>)}
-                  </select>
-                </Field>
-                <Field label={<><Calendar className="mr-1 inline h-3 w-3" />Prazo</>}>
-                  <input type="datetime-local"
-                    value={task.prazo ? task.prazo.slice(0, 16) : ""}
-                    onChange={(e) => patch({ prazo: e.target.value ? new Date(e.target.value).toISOString() : null })}
-                    className={selectCls} />
-                </Field>
-                <Field label="Projeto">
-                  <select value={task.project_id ?? ""} onChange={(e) => patch({ project_id: e.target.value || null })} className={selectCls}>
-                    <option value="">— Sem projeto —</option>
-                    {projects.map((p) => <option key={p.id} value={p.id}>{p.titulo}</option>)}
-                  </select>
-                </Field>
-                <Field label="Lead">
-                  <select value={task.lead_id ?? ""} onChange={(e) => patch({ lead_id: e.target.value || null })} className={selectCls}>
-                    <option value="">— Sem lead —</option>
-                    {leads.map((l) => <option key={l.id} value={l.id}>{l.empresa || l.nome}</option>)}
-                  </select>
-                </Field>
-                <Field label="Horas estimadas">
-                  <input type="number" min={0} step={0.5} value={task.horas_estimadas ?? ""}
-                    onChange={(e) => patch({ horas_estimadas: e.target.value ? Number(e.target.value) : null })}
-                    className={selectCls} placeholder="ex: 2.5" />
-                </Field>
-              </div>
-
-              {(task.horas_estimadas ?? 0) > 0 && (
-                <div>
-                  <div className="mb-1 flex items-center justify-between text-[11px]">
-                    <span className="text-muted-foreground">Horas: {Number(task.horas_realizadas).toFixed(1)}h de {Number(task.horas_estimadas).toFixed(1)}h</span>
-                    <span className="tabular-nums font-semibold">{Math.round((Number(task.horas_realizadas) / Number(task.horas_estimadas!)) * 100)}%</span>
-                  </div>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-primary/15">
-                    <div className="h-full bg-accent" style={{ width: `${Math.min(100, (Number(task.horas_realizadas) / Number(task.horas_estimadas!)) * 100)}%` }} />
-                  </div>
-                </div>
-              )}
-
-              <DependenciesEditor task={task} allTasks={allTasks} onChange={(deps) => patch({ dependencies: deps })} />
-              {(lead || project) && (
-                <div className="rounded-lg border border-border bg-surface-2 p-3 text-xs">
-                  <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Vínculos</div>
-                  {project && <div>📁 {project.titulo}</div>}
-                  {lead && <div>🎯 {lead.empresa || lead.nome}</div>}
-                </div>
-              )}
-            </>
-          )}
-
-          {tab === "checklist" && (
-            <>
-              <ChecklistEditor checklist={task.checklist} onChange={(c) => patch({ checklist: c })} />
-              <SubtasksSection parent={task} subtasks={subtasks} onCreate={(t) => createTask.mutate({ titulo: t, parent_task_id: task.id, project_id: task.project_id, lead_id: task.lead_id })} />
-            </>
-          )}
-
-          {tab === "comentarios" && <CommentsSection taskId={task.id} />}
-          {tab === "anexos" && <AttachmentsSection taskId={task.id} />}
-          {tab === "tempo" && <TimeSection task={task} />}
-        </div>
+        <span className="text-[11px] tabular-nums text-muted-foreground">{task.progresso}%</span>
       </div>
-    </div>
+
+      {tab === "geral" && (
+        <div className="space-y-5">
+          <Field label="Descrição">
+            <textarea value={descricao} onChange={(e) => setDescricao(e.target.value)}
+              onBlur={() => descricao !== (task.descricao ?? "") && patch({ descricao: descricao || null as any })}
+              rows={3} className="w-full rounded-lg border border-border bg-surface-2 p-3 text-sm focus:border-primary/60 focus:outline-none"
+              placeholder="Adicione uma descrição..." />
+          </Field>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Status">
+              <select value={task.status} onChange={(e) => patch({ status: e.target.value as TaskStatus })} className={selectCls}>
+                <option value="pendente">Pendente</option>
+                <option value="em_andamento">Em andamento</option>
+                <option value="concluida">Concluída</option>
+                <option value="cancelada">Cancelada</option>
+              </select>
+            </Field>
+            <Field label={<><Flag className="mr-1 inline h-3 w-3" />Prioridade</>}>
+              <select value={task.prioridade} onChange={(e) => patch({ prioridade: e.target.value as TaskPriority })} className={selectCls}>
+                {(["baixa", "media", "alta", "urgente"] as TaskPriority[]).map((p) => <option key={p} value={p}>{TASK_PRIORITY_LABEL[p]}</option>)}
+              </select>
+            </Field>
+            <Field label={<><Calendar className="mr-1 inline h-3 w-3" />Prazo</>}>
+              <input type="datetime-local"
+                value={task.prazo ? task.prazo.slice(0, 16) : ""}
+                onChange={(e) => patch({ prazo: e.target.value ? new Date(e.target.value).toISOString() : null })}
+                className={selectCls} />
+            </Field>
+            <Field label="Projeto">
+              <select value={task.project_id ?? ""} onChange={(e) => patch({ project_id: e.target.value || null })} className={selectCls}>
+                <option value="">— Sem projeto —</option>
+                {projects.map((p) => <option key={p.id} value={p.id}>{p.titulo}</option>)}
+              </select>
+            </Field>
+            <Field label="Lead">
+              <select value={task.lead_id ?? ""} onChange={(e) => patch({ lead_id: e.target.value || null })} className={selectCls}>
+                <option value="">— Sem lead —</option>
+                {leads.map((l) => <option key={l.id} value={l.id}>{l.empresa || l.nome}</option>)}
+              </select>
+            </Field>
+            <Field label="Horas estimadas">
+              <input type="number" min={0} step={0.5} value={task.horas_estimadas ?? ""}
+                onChange={(e) => patch({ horas_estimadas: e.target.value ? Number(e.target.value) : null })}
+                className={selectCls} placeholder="ex: 2.5" />
+            </Field>
+          </div>
+
+          {(task.horas_estimadas ?? 0) > 0 && (
+            <div>
+              <div className="mb-1 flex items-center justify-between text-[11px]">
+                <span className="text-muted-foreground">Horas: {Number(task.horas_realizadas).toFixed(1)}h de {Number(task.horas_estimadas).toFixed(1)}h</span>
+                <span className="tabular-nums font-semibold">{Math.round((Number(task.horas_realizadas) / Number(task.horas_estimadas!)) * 100)}%</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-primary/15">
+                <div className="h-full bg-accent" style={{ width: `${Math.min(100, (Number(task.horas_realizadas) / Number(task.horas_estimadas!)) * 100)}%` }} />
+              </div>
+            </div>
+          )}
+
+          <DependenciesEditor task={task} allTasks={allTasks} onChange={(deps) => patch({ dependencies: deps })} />
+          {(lead || project) && (
+            <div className="rounded-lg border border-border bg-surface-2 p-3 text-xs">
+              <div className="mb-1 font-semibold uppercase tracking-wider text-muted-foreground">Vínculos</div>
+              {project && <div>📁 {project.titulo}</div>}
+              {lead && <div>🎯 {lead.empresa || lead.nome}</div>}
+            </div>
+          )}
+
+          <button onClick={() => toggle.mutate({ id: task.id, done: task.status !== "concluida" })}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs font-semibold hover:border-primary/50">
+            {task.status === "concluida" ? <><CheckCircle2 className="h-4 w-4 text-success" /> Reabrir</> : <><Circle className="h-4 w-4" /> Marcar como concluída</>}
+          </button>
+        </div>
+      )}
+
+      {tab === "checklist" && (
+        <div className="space-y-6">
+          <ChecklistEditor checklist={task.checklist} onChange={(c) => patch({ checklist: c })} />
+          <SubtasksSection parent={task} subtasks={subtasks} onCreate={(t) => createTask.mutate({ titulo: t, parent_task_id: task.id, project_id: task.project_id, lead_id: task.lead_id })} />
+        </div>
+      )}
+
+      {tab === "comentarios" && <CommentsSection taskId={task.id} />}
+      {tab === "anexos" && <AttachmentsSection taskId={task.id} />}
+      {tab === "tempo" && <TimeSection task={task} />}
+    </AlignPanel>
   );
 }
 
@@ -211,13 +196,7 @@ function ChecklistEditor({ checklist, onChange }: { checklist: ChecklistItem[]; 
   const [novo, setNovo] = useState("");
   const done = checklist.filter((c) => c.feito).length;
   return (
-    <section>
-      <div className="mb-2 flex items-center justify-between">
-        <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          <ListChecks className="h-3.5 w-3.5" /> Checklist
-        </h3>
-        {checklist.length > 0 && <span className="text-[11px] tabular-nums text-muted-foreground">{done}/{checklist.length}</span>}
-      </div>
+    <AlignPanelSection title="Checklist" icon={ListChecks} action={checklist.length > 0 ? <span className="text-[11px] tabular-nums text-muted-foreground">{done}/{checklist.length}</span> : null}>
       <ul className="space-y-1.5">
         {checklist.map((c) => (
           <li key={c.id} className="group flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2">
@@ -240,18 +219,15 @@ function ChecklistEditor({ checklist, onChange }: { checklist: ChecklistItem[]; 
           className="h-9 flex-1 rounded-lg border border-border bg-surface-2 px-3 text-sm focus:border-primary/60 focus:outline-none" />
         <button type="submit" disabled={!novo.trim()} className="h-9 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50"><Plus className="h-3.5 w-3.5" /></button>
       </form>
-    </section>
+    </AlignPanelSection>
   );
 }
 
-function SubtasksSection({ parent, subtasks, onCreate }: { parent: TaskRow; subtasks: TaskRow[]; onCreate: (t: string) => void }) {
+function SubtasksSection({ subtasks, onCreate }: { parent: TaskRow; subtasks: TaskRow[]; onCreate: (t: string) => void }) {
   const toggle = useToggleTask();
   const [novo, setNovo] = useState("");
   return (
-    <section className="mt-5">
-      <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        <GitBranch className="h-3.5 w-3.5" /> Subtarefas
-      </h3>
+    <AlignPanelSection title="Subtarefas" icon={GitBranch}>
       <ul className="space-y-1.5">
         {subtasks.map((s) => (
           <li key={s.id} className="flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2">
@@ -267,7 +243,7 @@ function SubtasksSection({ parent, subtasks, onCreate }: { parent: TaskRow; subt
           className="h-9 flex-1 rounded-lg border border-border bg-surface-2 px-3 text-sm focus:border-primary/60 focus:outline-none" />
         <button type="submit" disabled={!novo.trim()} className="h-9 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50"><Plus className="h-3.5 w-3.5" /></button>
       </form>
-    </section>
+    </AlignPanelSection>
   );
 }
 
@@ -275,10 +251,7 @@ function DependenciesEditor({ task, allTasks, onChange }: { task: TaskRow; allTa
   const options = allTasks.filter((t) => t.id !== task.id && !task.dependencies?.includes(t.id));
   const linked = allTasks.filter((t) => task.dependencies?.includes(t.id));
   return (
-    <section>
-      <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        <GitBranch className="h-3.5 w-3.5" /> Depende de
-      </h3>
+    <AlignPanelSection title="Depende de" icon={GitBranch}>
       {linked.length > 0 ? (
         <ul className="mb-2 space-y-1">
           {linked.map((d) => (
@@ -295,7 +268,7 @@ function DependenciesEditor({ task, allTasks, onChange }: { task: TaskRow; allTa
         <option value="">+ Adicionar dependência</option>
         {options.slice(0, 50).map((t) => <option key={t.id} value={t.id}>{t.titulo}</option>)}
       </select>
-    </section>
+    </AlignPanelSection>
   );
 }
 
@@ -306,10 +279,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
   const del = useDeleteTaskComment();
   const [text, setText] = useState("");
   return (
-    <section>
-      <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        <MessageSquare className="h-3.5 w-3.5" /> Comentários ({comments.length})
-      </h3>
+    <AlignPanelSection title={`Comentários · ${comments.length}`} icon={MessageSquare}>
       {isLoading ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /> : (
         <ul className="space-y-2 mb-3">
           {comments.map((c) => (
@@ -341,7 +311,7 @@ function CommentsSection({ taskId }: { taskId: string }) {
           </button>
         </div>
       </form>
-    </section>
+    </AlignPanelSection>
   );
 }
 
@@ -358,10 +328,7 @@ function AttachmentsSection({ taskId }: { taskId: string }) {
   }
 
   return (
-    <section>
-      <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        <Paperclip className="h-3.5 w-3.5" /> Anexos ({atts.length})
-      </h3>
+    <AlignPanelSection title={`Anexos · ${atts.length}`} icon={Paperclip}>
       <div
         onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
         onDragLeave={() => setDrag(false)}
@@ -385,7 +352,7 @@ function AttachmentsSection({ taskId }: { taskId: string }) {
           </li>
         ))}
       </ul>
-    </section>
+    </AlignPanelSection>
   );
 }
 
@@ -410,11 +377,7 @@ function TimeSection({ task }: { task: TaskRow }) {
 
   const totalMin = entries.reduce((s, e) => s + Number(e.duracao_min ?? 0), 0);
   return (
-    <section>
-      <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        <Clock className="h-3.5 w-3.5" /> Tempo registrado
-      </h3>
-
+    <AlignPanelSection title="Tempo registrado" icon={Clock}>
       <div className="mb-3 flex items-center gap-2 rounded-xl border border-border bg-surface-2 p-3">
         {running ? (
           <>
@@ -469,6 +432,6 @@ function TimeSection({ task }: { task: TaskRow }) {
           </li>
         ))}
       </ul>
-    </section>
+    </AlignPanelSection>
   );
 }
