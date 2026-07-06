@@ -30,7 +30,7 @@ export function PatientDrawer({ patient, onClose, onSave }: {
 
   return (
     <AlignPanel
-      open={!!patient || !patient}
+      open={true}
       onClose={onClose}
       eyebrow="Clínica"
       title={patient ? "Editar paciente" : "Novo paciente"}
