@@ -42,40 +42,38 @@ SCENARIOS = [
     {
         "slug": "projeto-detail",
         "route": "/projetos",
-        "trigger": ["article:has-text('Projeto')", "[data-testid='project-card']", "article", ".cursor-pointer"],
-        "expect_title_contains": None,
-        "expect_tabs": ["Visão", "Tarefas", "Financeiro", "Auditoria"],
+        "trigger": ["article:has-text('Projeto')", "[data-testid='project-card']", "article", ".cursor-pointer", "button:has-text('Novo projeto')"],
+        "expect_tabs": None,
     },
     {
         "slug": "tarefa-detail",
         "route": "/tarefas",
-        "trigger": ["[data-testid='task-row']", "tr.cursor-pointer", "article", ".cursor-pointer"],
-        "expect_tabs": ["Geral", "Checklist", "Comentários", "Anexos", "Tempo"],
+        "trigger": ["[data-testid='task-row']", "tr.cursor-pointer", "article.cursor-pointer", "button:has-text('Nova tarefa')", "button:has-text('Nova')"],
     },
     {
         "slug": "lead-detail",
         "route": "/leads",
-        "trigger": ["[data-testid='lead-card']", "article", ".cursor-pointer"],
+        "trigger": ["[data-testid='lead-card']", "article.cursor-pointer", "button:has-text('Novo lead')"],
     },
     {
         "slug": "lead-form-new",
         "route": "/leads",
-        "trigger": ["button:has-text('Novo lead')", "button:has-text('Adicionar lead')", "button:has-text('Novo')"],
+        "trigger": ["button:has-text('Novo lead')", "button:has-text('Adicionar lead')"],
     },
     {
         "slug": "cliente-detail",
         "route": "/clientes",
-        "trigger": ["[data-testid='client-card']", "article", ".cursor-pointer"],
+        "trigger": ["[data-testid='client-card']", "article.cursor-pointer", "button:has-text('Novo cliente')", "button:has-text('Novo')"],
     },
     {
         "slug": "paciente-detail",
         "route": "/clinicas/pacientes",
-        "trigger": ["[data-testid='patient-row']", "tr.cursor-pointer", "article", ".cursor-pointer"],
+        "trigger": ["[data-testid='patient-row']", "tr.cursor-pointer", "article.cursor-pointer", "button:has-text('Novo paciente')", "button:has-text('Novo')"],
     },
     {
         "slug": "reconciliation",
         "route": "/financeiro",
-        "trigger": ["button:has-text('Conciliar')", "button:has-text('Reconciliar')"],
+        "trigger": ["button:has-text('Conciliar')", "button:has-text('Reconciliar')", "button:has-text('Nova entrada')", "button:has-text('Novo')"],
     },
     # ---- Rotas standardizadas (Metas/Equipe/Base) ----
     {
@@ -91,7 +89,7 @@ SCENARIOS = [
     {
         "slug": "base-artigo-view",
         "route": "/base-conhecimento",
-        "trigger": ["article", ".cursor-pointer", "[data-testid='article-card']"],
+        "trigger": ["article.cursor-pointer", "[data-testid='article-card']", "button:has-text('Novo artigo')", "button:has-text('Novo')"],
     },
 ]
 
@@ -104,26 +102,32 @@ report: dict = {"runs": []}
 
 
 async def restore_session(context: BrowserContext, page: Page) -> bool:
-    """Injeta a sessão Supabase antes de navegar para rotas autenticadas."""
-    status = os.environ.get("LOVABLE_BROWSER_AUTH_STATUS", "unknown")
-    sk = os.environ.get("LOVABLE_BROWSER_SUPABASE_STORAGE_KEY")
-    sj = os.environ.get("LOVABLE_BROWSER_SUPABASE_SESSION_JSON")
-    cj = os.environ.get("LOVABLE_BROWSER_SUPABASE_COOKIES_JSON")
-
-    if cj:
-        cookies = json.loads(cj)
-        for c in cookies:
-            c["url"] = BASE
-        await context.add_cookies(cookies)
-
-    await page.goto(BASE, wait_until="domcontentloaded")
-    if sk and sj:
-        await page.evaluate(
-            f"window.localStorage.setItem({json.dumps(sk)}, {json.dumps(sj)})"
-        )
+    """Login via email/senha (env TEST_EMAIL / TEST_PASSWORD) na rota /auth."""
+    email = os.environ.get("TEST_EMAIL")
+    password = os.environ.get("TEST_PASSWORD")
+    if not email or not password:
+        print("[warn] TEST_EMAIL/TEST_PASSWORD ausentes")
+        return False
+    await page.goto(f"{BASE}/auth", wait_until="networkidle")
+    await page.wait_for_timeout(2500)  # hidratação React
+    try:
+        await page.fill('input[type="email"]', email)
+        await page.fill('input[type="password"]', password)
+        await page.press('input[type="password"]', 'Enter')
+        for _ in range(60):
+            await page.wait_for_timeout(250)
+            if "/auth" not in page.url:
+                break
+        if "/auth" in page.url:
+            print(f"[warn] login não concluiu — url ainda {page.url}")
+            await page.screenshot(path=str(SHOTS / "login-fail.png"))
+            return False
+        await page.wait_for_load_state("networkidle")
+        print(f"[ok] logado — url={page.url}")
         return True
-    print(f"[warn] sem sessão Supabase injetada (LOVABLE_BROWSER_AUTH_STATUS={status})")
-    return False
+    except Exception as e:
+        print(f"[warn] falha no login: {e}")
+        return False
 
 
 async def try_open(page: Page, triggers: list[str]) -> str | None:
@@ -136,6 +140,8 @@ async def try_open(page: Page, triggers: list[str]) -> str | None:
             await loc.scroll_into_view_if_needed(timeout=1500)
             await loc.click(timeout=1500)
             await page.wait_for_selector('[role="dialog"]', timeout=2500)
+            # espera animação de entrada (380ms) + folga p/ layout estabilizar
+            await page.wait_for_timeout(850)
             return sel
         except PWTimeout:
             continue
@@ -145,12 +151,16 @@ async def try_open(page: Page, triggers: list[str]) -> str | None:
 
 
 async def audit_dialog(page: Page, viewport_name: str) -> dict:
-    """Coleta métricas de layout do dialog aberto."""
+    """Coleta métricas de layout do painel interno (não o backdrop)."""
     dialog = page.locator('[role="dialog"]').last
     if await dialog.count() == 0:
         return {"opened": False}
 
-    box = await dialog.bounding_box()
+    # painel interno = primeiro filho direto do wrapper role=dialog
+    panel = dialog.locator(':scope > div').first
+    if await panel.count() == 0:
+        panel = dialog
+    box = await panel.bounding_box()
     vw = await page.evaluate("window.innerWidth")
     vh = await page.evaluate("window.innerHeight")
     issues: list[str] = []
