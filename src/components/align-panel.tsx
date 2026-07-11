@@ -235,12 +235,13 @@ export function AlignPanel({
                         </span>
                       )}
                     </span>
-                    <span
-                      className={cn(
-                        "absolute inset-x-0 -bottom-px h-0.5 rounded-full transition-all",
-                        active ? "bg-primary shadow-[0_0_10px_var(--primary)]" : "bg-transparent"
-                      )}
-                    />
+                    {active && (
+                      <motion.span
+                        layoutId="align-tab-underline"
+                        className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-primary shadow-[0_0_10px_var(--primary)]"
+                        transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                      />
+                    )}
                   </button>
                 );
               })}
