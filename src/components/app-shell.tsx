@@ -486,14 +486,22 @@ function DockItem({ to, label, icon: Icon, active }: { to: string; label: string
         to={to as any}
         aria-label={label}
         className={[
-          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-all duration-300 ease-out",
-          active
-            ? "bg-foreground/[0.08] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-            : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground active:scale-[0.96]",
+          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-colors duration-300 ease-out",
+          active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
         ].join(" ")}
       >
-        <Icon className={["h-[18px] w-[18px] transition-transform duration-300", active ? "text-primary" : ""].join(" ")} strokeWidth={active ? 2.5 : 2.2} />
-        <span className={["hidden text-[12.5px] font-medium tracking-tight md:inline", active ? "" : "opacity-90"].join(" ")}>{label}</span>
+        {active && (
+          <motion.span
+            layoutId="dock-active-pill"
+            aria-hidden
+            className="absolute inset-0 rounded-[20px] bg-foreground/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-primary/25"
+            transition={{ type: "spring", stiffness: 420, damping: 34, mass: 0.7 }}
+          />
+        )}
+        <motion.span whileTap={{ scale: 0.92 }} className="relative flex items-center gap-2">
+          <Icon className={["h-[18px] w-[18px]", active ? "text-primary" : ""].join(" ")} strokeWidth={active ? 2.5 : 2.2} />
+          <span className={["hidden text-[12.5px] font-medium tracking-tight md:inline", active ? "" : "opacity-90"].join(" ")}>{label}</span>
+        </motion.span>
       </Link>
     </li>
   );
@@ -506,26 +514,38 @@ function DockButton({ label, icon: Icon, active, onClick, badge }: { label: stri
         onClick={onClick}
         aria-label={badge ? `${label} (${badge} item${badge === 1 ? "" : "s"} pendente${badge === 1 ? "" : "s"})` : label}
         className={[
-          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-all duration-300 ease-out",
-          active
-            ? "bg-foreground/[0.08] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-            : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground active:scale-[0.96]",
+          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-colors duration-300 ease-out",
+          active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
         ].join(" ")}
       >
-        <Icon className={["h-[18px] w-[18px]", active ? "text-primary" : ""].join(" ")} strokeWidth={active ? 2.5 : 2.2} />
-        <span className={["hidden text-[12.5px] font-medium tracking-tight md:inline"].join(" ")}>{label}</span>
-        {!!badge && badge > 0 && (
-          <span
+        {active && (
+          <motion.span
+            layoutId="dock-active-pill"
             aria-hidden
-            className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-none text-destructive-foreground ring-2 ring-background"
+            className="absolute inset-0 rounded-[20px] bg-foreground/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-primary/25"
+            transition={{ type: "spring", stiffness: 420, damping: 34, mass: 0.7 }}
+          />
+        )}
+        <motion.span whileTap={{ scale: 0.92 }} className="relative flex items-center gap-2">
+          <Icon className={["h-[18px] w-[18px]", active ? "text-primary" : ""].join(" ")} strokeWidth={active ? 2.5 : 2.2} />
+          <span className="hidden text-[12.5px] font-medium tracking-tight md:inline">{label}</span>
+        </motion.span>
+        {!!badge && badge > 0 && (
+          <motion.span
+            aria-hidden
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 500, damping: 22 }}
+            className="absolute -right-0.5 -top-0.5 z-10 grid h-4 min-w-4 place-items-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-none text-destructive-foreground ring-2 ring-background"
           >
             {badge > 99 ? "99+" : badge}
-          </span>
+          </motion.span>
         )}
       </button>
     </li>
   );
 }
+
 
 
 /* -------------------- Sheet (popover for Comercial / Mais) -------------------- */
