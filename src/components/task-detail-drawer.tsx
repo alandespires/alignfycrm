@@ -47,7 +47,7 @@ export function TaskDetailDrawer({ task, allTasks, onClose }: { task: TaskRow; a
 
   const tabs = [
     { id: "geral", label: "Geral" },
-    { id: "checklist", label: "Checklist & Sub", count: task.checklist.length + subtasks.length },
+    { id: "checklist", label: "Checklist & Sub", count: (task.checklist?.length ?? 0) + (subtasks?.length ?? 0) },
     { id: "comentarios", label: "Comentários" },
     { id: "anexos", label: "Anexos" },
     { id: "tempo", label: "Tempo" },
