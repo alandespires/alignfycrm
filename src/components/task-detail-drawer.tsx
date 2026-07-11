@@ -258,7 +258,7 @@ function DependenciesEditor({ task, allTasks, onChange }: { task: TaskRow; allTa
             <li key={d.id} className="flex items-center gap-2 rounded-md border border-border bg-surface-2 px-2.5 py-1.5 text-xs">
               {d.status === "concluida" ? <CheckCircle2 className="h-3 w-3 text-success" /> : <Circle className="h-3 w-3 text-warning" />}
               <span className="flex-1 truncate">{d.titulo}</span>
-              <button onClick={() => onChange(task.dependencies.filter((x) => x !== d.id))} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button>
+              <button onClick={() => onChange((task.dependencies ?? []).filter((x) => x !== d.id))} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button>
             </li>
           ))}
         </ul>
