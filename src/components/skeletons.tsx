@@ -1,20 +1,44 @@
+import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { staggerContainer, staggerItem } from "@/lib/motion";
+
+/** Motion-wrapped grid/list with stagger for skeleton children */
+function Stagger({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <motion.div
+      variants={staggerContainer}
+      initial="initial"
+      animate="animate"
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function Item({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <motion.div variants={staggerItem} className={className}>
+      {children}
+    </motion.div>
+  );
+}
 
 /** KPI cards row (4 columns) */
 export function KpiSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <Stagger className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-2xl border border-border bg-surface-2 p-5 shadow-card">
+        <Item key={i} className="rounded-2xl border border-border bg-surface-2 p-5 shadow-card">
           <div className="flex items-start justify-between">
             <Skeleton className="h-9 w-9 rounded-lg" />
             <Skeleton className="h-7 w-7 rounded-md" />
           </div>
           <Skeleton className="mt-5 h-3 w-24" />
           <Skeleton className="mt-2 h-7 w-32" />
-        </div>
+        </Item>
       ))}
-    </div>
+    </Stagger>
   );
 }
 
@@ -30,7 +54,7 @@ export function ChartSkeleton({ className = "" }: { className?: string }) {
         <Skeleton className="h-3 w-24" />
       </div>
       <div className="h-72 p-6">
-        <Skeleton className="h-full w-full rounded-lg" />
+        <Skeleton variant="shine" className="h-full w-full rounded-lg" />
       </div>
     </div>
   );
@@ -66,26 +90,31 @@ export function TableRowsSkeleton({ rows = 6, cols = 5 }: { rows?: number; cols?
 /** List items (e.g., activities, insights) */
 export function ListSkeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <ul className="divide-y divide-border">
+    <motion.ul
+      variants={staggerContainer}
+      initial="initial"
+      animate="animate"
+      className="divide-y divide-border"
+    >
       {Array.from({ length: rows }).map((_, i) => (
-        <li key={i} className="flex gap-3 px-6 py-3.5">
+        <motion.li variants={staggerItem} key={i} className="flex gap-3 px-6 py-3.5">
           <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
           <div className="flex-1 space-y-1.5">
             <Skeleton className="h-3 w-3/4" />
             <Skeleton className="h-2.5 w-1/3" />
           </div>
-        </li>
+        </motion.li>
       ))}
-    </ul>
+    </motion.ul>
   );
 }
 
 /** Card grid (clients, automations) */
 export function CardGridSkeleton({ count = 6, cols = "md:grid-cols-2 xl:grid-cols-3" }: { count?: number; cols?: string }) {
   return (
-    <div className={`grid gap-4 ${cols}`}>
+    <Stagger className={`grid gap-4 ${cols}`}>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-2xl border border-border bg-surface-2 p-5 shadow-card">
+        <Item key={i} className="rounded-2xl border border-border bg-surface-2 p-5 shadow-card">
           <div className="flex items-start justify-between">
             <Skeleton className="h-11 w-11 rounded-xl" />
             <Skeleton className="h-8 w-8 rounded-md" />
@@ -102,9 +131,9 @@ export function CardGridSkeleton({ count = 6, cols = "md:grid-cols-2 xl:grid-col
               <Skeleton className="h-3 w-20" />
             </div>
           </div>
-        </div>
+        </Item>
       ))}
-    </div>
+    </Stagger>
   );
 }
 
@@ -112,9 +141,9 @@ export function CardGridSkeleton({ count = 6, cols = "md:grid-cols-2 xl:grid-col
 export function KanbanSkeleton({ columns = 5 }: { columns?: number }) {
   return (
     <div className="-mx-5 overflow-x-auto px-5 pb-4 md:-mx-8 md:px-8">
-      <div className="flex gap-4">
+      <Stagger className="flex gap-4">
         {Array.from({ length: columns }).map((_, c) => (
-          <div key={c} className="flex w-72 shrink-0 flex-col rounded-2xl border border-border bg-surface-1/60">
+          <Item key={c} className="flex w-72 shrink-0 flex-col rounded-2xl border border-border bg-surface-1/60">
             <div className="flex items-center justify-between border-b border-border p-3">
               <div className="flex items-center gap-2">
                 <Skeleton className="h-2 w-2 rounded-full" />
@@ -141,9 +170,9 @@ export function KanbanSkeleton({ columns = 5 }: { columns?: number }) {
                 </div>
               ))}
             </div>
-          </div>
+          </Item>
         ))}
-      </div>
+      </Stagger>
     </div>
   );
 }
@@ -151,9 +180,9 @@ export function KanbanSkeleton({ columns = 5 }: { columns?: number }) {
 /** Insights / feature cards (3-up) */
 export function FeatureCardsSkeleton({ count = 6 }: { count?: number }) {
   return (
-    <div className="grid gap-5 xl:grid-cols-3">
+    <Stagger className="grid gap-5 xl:grid-cols-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-2xl border border-border bg-surface-2 p-5 shadow-card">
+        <Item key={i} className="rounded-2xl border border-border bg-surface-2 p-5 shadow-card">
           <div className="mb-3 flex items-center justify-between">
             <Skeleton className="h-9 w-9 rounded-lg" />
             <Skeleton className="h-5 w-20 rounded-full" />
@@ -165,18 +194,18 @@ export function FeatureCardsSkeleton({ count = 6 }: { count?: number }) {
             <Skeleton className="h-3 w-24" />
             <Skeleton className="h-7 w-28 rounded-md" />
           </div>
-        </div>
+        </Item>
       ))}
-    </div>
+    </Stagger>
   );
 }
 
 /** Automation row skeleton */
 export function AutomationListSkeleton({ count = 3 }: { count?: number }) {
   return (
-    <div className="space-y-3">
+    <Stagger className="space-y-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="flex items-center gap-4 rounded-2xl border border-border bg-surface-2 p-5 shadow-card">
+        <Item key={i} className="flex items-center gap-4 rounded-2xl border border-border bg-surface-2 p-5 shadow-card">
           <Skeleton className="h-11 w-11 rounded-xl" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-3 w-1/3" />
@@ -193,18 +222,18 @@ export function AutomationListSkeleton({ count = 3 }: { count?: number }) {
             <Skeleton className="h-3 w-10" />
           </div>
           <Skeleton className="h-5 w-16 rounded-full" />
-        </div>
+        </Item>
       ))}
-    </div>
+    </Stagger>
   );
 }
 
 /** Task list skeleton (two columns) */
 export function TaskGroupsSkeleton() {
   return (
-    <div className="grid gap-5 lg:grid-cols-2">
+    <Stagger className="grid gap-5 lg:grid-cols-2">
       {Array.from({ length: 2 }).map((_, g) => (
-        <div key={g} className="overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-card">
+        <Item key={g} className="overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-card">
           <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
             <div className="flex items-center gap-2">
               <Skeleton className="h-4 w-4 rounded" />
@@ -224,8 +253,8 @@ export function TaskGroupsSkeleton() {
               </li>
             ))}
           </ul>
-        </div>
+        </Item>
       ))}
-    </div>
+    </Stagger>
   );
 }
