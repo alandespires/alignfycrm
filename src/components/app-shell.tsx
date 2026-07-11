@@ -1,4 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   LayoutDashboard, Users, Kanban, Building2, ListChecks, Zap, Sparkles,
   BarChart3, Settings, Search, Plus, LogOut, Loader2, Sun, Moon, Shield, Wallet,
@@ -349,7 +350,18 @@ export function AppShell({ children, title, subtitle, action }: {
           </div>
           {action && <div className="w-full sm:w-auto">{action}</div>}
         </div>
-        <div key={pathname} className="min-w-0 overflow-x-hidden anim-fade-up">{children}</div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+            className="min-w-0 overflow-x-hidden"
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* ===== Liquid-glass floating dock ===== */}

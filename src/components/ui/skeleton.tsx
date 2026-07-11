@@ -1,18 +1,14 @@
+import { motion, type HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 /**
- * Premium Skeleton — minimal, silent, with a soft shimmer sweep.
- * Uses the global `ks-shimmer` keyframe defined in src/styles.css.
- * Variants:
- *  - "default": subtle surface block with shimmer
- *  - "shine":   accent-tinted shimmer for hero placeholders
- *  - "pulse":   classic gentle pulse (no shimmer) for tiny chips
- *  - "text":    text-line block with auto rounding
- *  - "circle":  forced 1:1 rounded-full
+ * Premium Skeleton — soft entry (fade+scale) plus continuous shimmer sweep.
+ * Shimmer runs via CSS keyframe `ks-sweep` (styles.css) for perf,
+ * entry uses Framer Motion so items compose with stagger containers.
  */
 type Variant = "default" | "shine" | "pulse" | "text" | "circle";
 
-export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SkeletonProps extends HTMLMotionProps<"div"> {
   variant?: Variant;
 }
 
@@ -33,7 +29,15 @@ function Skeleton({ className, variant = "default", ...props }: SkeletonProps) {
     circle: `aspect-square rounded-full ${sweep}`,
   };
 
-  return <div className={cn(base, variants[variant], className)} {...props} />;
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+      className={cn(base, variants[variant], className)}
+      {...props}
+    />
+  );
 }
 
 export { Skeleton };
