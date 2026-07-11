@@ -262,8 +262,10 @@ export function AlignPanel({
             {footer}
           </footer>
         )}
-      </div>
-    </div>,
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
     document.body
   );
 }
