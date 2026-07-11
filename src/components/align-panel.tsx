@@ -1,7 +1,9 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { X, Maximize2, Minimize2 } from "lucide-react";
+import { AnimatePresence, motion, LayoutGroup } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { DUR, EASE_OUT } from "@/lib/motion";
 
 /**
  * AlignPanel — global side-drawer / bottom-sheet used across the app.
@@ -76,57 +78,69 @@ export function AlignPanel({
   expandable = false,
 }: AlignPanelProps) {
   const [expanded, setExpanded] = React.useState(false);
-  const [mounted, setMounted] = React.useState(false);
+  const [isDesktop, setIsDesktop] = React.useState(() =>
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 768px)").matches : true
+  );
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = () => setIsDesktop(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   React.useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
-    // lock body scroll
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    // enter animation
-    const t = requestAnimationFrame(() => setMounted(true));
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
-      cancelAnimationFrame(t);
-      setMounted(false);
     };
   }, [open, onClose]);
 
-  if (!open) return null;
   if (typeof document === "undefined") return null;
 
   const toneClass = TONE_STYLES[status?.tone ?? "success"];
 
+  const panelInitial = isDesktop ? { x: "100%" } : { y: "100%" };
+  const panelAnimate = isDesktop ? { x: 0 } : { y: 0 };
+  const panelExit = isDesktop ? { x: "100%" } : { y: "100%" };
+
   return createPortal(
-    <div
-      className={cn(
-        "fixed inset-0 z-[60] flex items-end md:items-stretch md:justify-end",
-        "bg-black/55 backdrop-blur-md transition-opacity duration-300",
-        mounted ? "opacity-100" : "opacity-0"
-      )}
-      onClick={onClose}
-      aria-modal
-      role="dialog"
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className={cn(
-          // shape
-          "relative flex w-full flex-col overflow-hidden bg-surface-1 text-foreground",
-          "border border-border/60 shadow-[0_-20px_60px_-12px_rgba(0,0,0,0.6),0_20px_60px_-12px_rgba(0,0,0,0.4)]",
-          // mobile bottom sheet
-          "max-h-[92vh] rounded-t-[28px] border-b-0",
-          // desktop side drawer
-          "md:h-full md:max-h-none md:rounded-l-[24px] md:rounded-tr-none md:border-r-0",
-          expanded ? "md:max-w-none md:w-full" : widthClass,
-          // motion
-          "transition-transform duration-[380ms] ease-[cubic-bezier(0.32,0.72,0,1)]",
-          mounted ? "translate-y-0 md:translate-x-0" : "translate-y-full md:translate-y-0 md:translate-x-full"
-        )}
-      >
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          key="align-panel-root"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: DUR.base, ease: EASE_OUT }}
+          className={cn(
+            "fixed inset-0 z-[60] flex items-end md:items-stretch md:justify-end",
+            "bg-black/55 backdrop-blur-md"
+          )}
+          onClick={onClose}
+          aria-modal
+          role="dialog"
+        >
+          <motion.div
+            onClick={(e) => e.stopPropagation()}
+            initial={panelInitial}
+            animate={panelAnimate}
+            exit={panelExit}
+            transition={{ duration: DUR.panel, ease: EASE_OUT }}
+            className={cn(
+              "relative flex w-full flex-col overflow-hidden bg-surface-1 text-foreground",
+              "border border-border/60 shadow-[0_-20px_60px_-12px_rgba(0,0,0,0.6),0_20px_60px_-12px_rgba(0,0,0,0.4)]",
+              "max-h-[92vh] rounded-t-[28px] border-b-0",
+              "md:h-full md:max-h-none md:rounded-l-[24px] md:rounded-tr-none md:border-r-0",
+              expanded ? "md:max-w-none md:w-full" : widthClass
+            )}
+          >
         {/* subtle top glow */}
         <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-primary/[0.04] to-transparent" />
 
