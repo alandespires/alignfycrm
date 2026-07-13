@@ -411,6 +411,7 @@ export function AppShell({ children, title, subtitle, action }: {
       )}
 
       <LaunchPanel open={launchOpen} onClose={() => setLaunchOpen(false)} />
+      <ProductTour />
     </div>
   );
 }
