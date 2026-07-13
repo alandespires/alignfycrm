@@ -42,6 +42,13 @@ function AutomacaoPage() {
   const del = useDeleteAutomation();
 
   const [open, setOpen] = useState(false);
+  const [prefill, setPrefill] = useState<TemplateInput | null>(null);
+
+  function useTemplate(t: TemplateInput) {
+    setPrefill(t);
+    setOpen(true);
+  }
+
 
   return (
     <AppShell
