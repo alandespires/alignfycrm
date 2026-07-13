@@ -196,25 +196,31 @@ export type Database = {
         Row: {
           automation_id: string
           created_at: string
+          erro: string | null
           id: string
           lead_id: string | null
           resultado: Json | null
+          status: string
           tenant_id: string
         }
         Insert: {
           automation_id: string
           created_at?: string
+          erro?: string | null
           id?: string
           lead_id?: string | null
           resultado?: Json | null
+          status?: string
           tenant_id: string
         }
         Update: {
           automation_id?: string
           created_at?: string
+          erro?: string | null
           id?: string
           lead_id?: string | null
           resultado?: Json | null
+          status?: string
           tenant_id?: string
         }
         Relationships: [
@@ -2654,6 +2660,53 @@ export type Database = {
           whatsapp?: string | null
         }
         Relationships: []
+      }
+      pipeline_stage_automations: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          created_by: string
+          id: string
+          nome: string
+          notificar: boolean
+          stage: string
+          tarefas: Json
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          created_by: string
+          id?: string
+          nome: string
+          notificar?: boolean
+          stage: string
+          tarefas?: Json
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          created_by?: string
+          id?: string
+          nome?: string
+          notificar?: boolean
+          stage?: string
+          tarefas?: Json
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_stage_automations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       plans: {
         Row: {
