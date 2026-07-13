@@ -231,7 +231,7 @@ function AutomacaoPage() {
         </div>
       )}
 
-      {open && <AutomationForm onClose={() => setOpen(false)} onSubmit={async (input) => { await create.mutateAsync(input); setOpen(false); }} pending={create.isPending} />}
+      {open && <AutomationForm prefill={prefill} onClose={() => { setOpen(false); setPrefill(null); }} onSubmit={async (input) => { await create.mutateAsync(input); setOpen(false); setPrefill(null); }} pending={create.isPending} />}
     </AppShell>
   );
 }
