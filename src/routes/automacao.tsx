@@ -4,10 +4,10 @@ import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import { RealtimeBadge } from "@/components/realtime-badge";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import {
-  useAutomations, useCreateAutomation, useToggleAutomation, useDeleteAutomation,
+  useAutomations, useCreateAutomation, useToggleAutomation, useDeleteAutomation, useAutomationRuns,
   type AutomationAction, type AutomationTrigger,
 } from "@/hooks/use-automations";
-import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSquare, Inbox, Bolt, Sparkles } from "lucide-react";
+import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSquare, Inbox, Bolt, Sparkles, CheckCircle2, AlertTriangle, History } from "lucide-react";
 import { AutomationListSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/automacao")({
