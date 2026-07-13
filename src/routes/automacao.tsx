@@ -138,16 +138,43 @@ function AutomacaoPage() {
         </div>
       }
     >
+      {/* Template gallery */}
+      <div className="mb-5">
+        <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <Sparkles className="h-3 w-3 text-primary" /> Templates prontos
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {TEMPLATES.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => useTemplate(t.input)}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-surface-2 p-4 text-left shadow-card transition hover:border-primary/40 hover:-translate-y-0.5"
+            >
+              <div className="flex items-center gap-2">
+                <div className={`grid h-8 w-8 place-items-center rounded-lg bg-primary/10 ${t.tone}`}>
+                  <Zap className="h-4 w-4" />
+                </div>
+                <div className="text-sm font-semibold">{t.label}</div>
+              </div>
+              <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">{t.blurb}</p>
+              <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
+                Usar template <ArrowRight className="h-3 w-3" />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {isLoading ? (
         <AutomationListSkeleton count={3} />
       ) : rules.length === 0 ? (
-        <div className="grid place-items-center rounded-2xl border border-dashed border-border bg-surface-1/40 py-20 text-center">
+        <div className="grid place-items-center rounded-2xl border border-dashed border-border bg-surface-1/40 py-16 text-center">
           <Inbox className="mb-3 h-10 w-10 text-muted-foreground" />
-          <h3 className="text-lg font-semibold">Nenhuma automação ainda</h3>
+          <h3 className="text-lg font-semibold">Nenhuma automação criada</h3>
           <p className="mb-5 mt-1 max-w-sm text-sm text-muted-foreground">
-            Crie um fluxo para reagir automaticamente a eventos como mudança de status ou score IA.
+            Use um template acima ou crie um fluxo do zero.
           </p>
-          <PrimaryButton icon={Plus} onClick={() => setOpen(true)}>Criar primeira automação</PrimaryButton>
+          <PrimaryButton icon={Plus} onClick={() => { setPrefill(null); setOpen(true); }}>Criar do zero</PrimaryButton>
         </div>
       ) : (
         <div className="space-y-3">
