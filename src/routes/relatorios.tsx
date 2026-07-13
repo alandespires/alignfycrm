@@ -92,6 +92,27 @@ function RelatoriosPage() {
     [leadList],
   );
 
+  // Origem dos melhores leads (ranking por receita fechada + score)
+  const bestOrigins = useMemo(() => {
+    const map = new Map<string, { origem: string; total: number; fechados: number; receita: number; scoreMedio: number; scoreSum: number; scoreCount: number }>();
+    for (const l of leadList) {
+      const key = (l.origem || "Desconhecida").trim() || "Desconhecida";
+      const cur = map.get(key) ?? { origem: key, total: 0, fechados: 0, receita: 0, scoreMedio: 0, scoreSum: 0, scoreCount: 0 };
+      cur.total += 1;
+      if (l.status === "fechado") {
+        cur.fechados += 1;
+        cur.receita += Number(l.valor_estimado ?? 0);
+      }
+      if (typeof l.ai_score === "number") { cur.scoreSum += l.ai_score; cur.scoreCount += 1; }
+      map.set(key, cur);
+    }
+    return Array.from(map.values())
+      .map((v) => ({ ...v, scoreMedio: v.scoreCount > 0 ? Math.round(v.scoreSum / v.scoreCount) : 0, conversao: v.total > 0 ? Math.round((v.fechados / v.total) * 100) : 0 }))
+      .sort((a, b) => b.receita - a.receita || b.scoreMedio - a.scoreMedio)
+      .slice(0, 6);
+  }, [leadList]);
+
+
   // Métricas
   const fechados = leadList.filter((l) => l.status === "fechado").length;
   const perdidos = leadList.filter((l) => l.status === "perdido").length;
