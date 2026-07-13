@@ -7,7 +7,7 @@ import {
   useAutomations, useCreateAutomation, useToggleAutomation, useDeleteAutomation,
   type AutomationAction, type AutomationTrigger,
 } from "@/hooks/use-automations";
-import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSquare, Inbox, Bolt } from "lucide-react";
+import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSquare, Inbox, Bolt, Sparkles } from "lucide-react";
 import { AutomationListSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/automacao")({
