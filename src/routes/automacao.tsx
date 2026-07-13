@@ -30,6 +30,83 @@ const STATUS_OPTIONS = [
 
 const ACTION_ICON: Record<string, any> = { criar_tarefa: ListChecks, registrar_atividade: MessageSquare };
 
+type TemplateInput = {
+  nome: string;
+  descricao: string;
+  trigger_tipo: AutomationTrigger;
+  trigger_valor: string;
+  acoes: AutomationAction[];
+};
+
+const TEMPLATES: { id: string; label: string; blurb: string; tone: string; input: TemplateInput }[] = [
+  {
+    id: "followup-24h",
+    label: "Follow-up em 24h",
+    blurb: "Toda proposta enviada gera lembrete de contato no dia seguinte.",
+    tone: "text-primary",
+    input: {
+      nome: "Follow-up de proposta em 24h",
+      descricao: "Cria tarefa de follow-up quando o lead vai para Proposta",
+      trigger_tipo: "status_mudou",
+      trigger_valor: "proposta",
+      acoes: [
+        { tipo: "criar_tarefa", titulo: "Ligar para confirmar proposta", prioridade: "alta", prazo_dias: 1 },
+        { tipo: "registrar_atividade", tipo_atividade: "nota", descricao: "Proposta enviada — aguardar retorno" },
+      ],
+    },
+  },
+  {
+    id: "cadencia-5-toques",
+    label: "Cadência 5 toques",
+    blurb: "Sequência de 5 contatos escalonados assim que o lead entra no CRM.",
+    tone: "text-success",
+    input: {
+      nome: "Cadência de prospecção 5 toques",
+      descricao: "Ligação → WhatsApp → Email → WhatsApp → Ligação final",
+      trigger_tipo: "lead_criado",
+      trigger_valor: "",
+      acoes: [
+        { tipo: "criar_tarefa", titulo: "Toque 1 · Ligação de descoberta", prioridade: "alta", prazo_dias: 0 },
+        { tipo: "criar_tarefa", titulo: "Toque 2 · WhatsApp de reforço", prioridade: "media", prazo_dias: 2 },
+        { tipo: "criar_tarefa", titulo: "Toque 3 · Email com case", prioridade: "media", prazo_dias: 4 },
+        { tipo: "criar_tarefa", titulo: "Toque 4 · WhatsApp com oferta", prioridade: "media", prazo_dias: 7 },
+        { tipo: "criar_tarefa", titulo: "Toque 5 · Ligação final", prioridade: "alta", prazo_dias: 10 },
+      ],
+    },
+  },
+  {
+    id: "lead-quente",
+    label: "Lead quente detectado",
+    blurb: "Quando a IA identifica score ≥ 80, prioriza ação imediata.",
+    tone: "text-warning",
+    input: {
+      nome: "Ação imediata para lead quente",
+      descricao: "Dispara tarefa urgente sempre que o score IA sobe para 80+",
+      trigger_tipo: "score_alto",
+      trigger_valor: "80",
+      acoes: [
+        { tipo: "criar_tarefa", titulo: "🔥 Contato imediato — lead quente", prioridade: "urgente", prazo_dias: 0 },
+      ],
+    },
+  },
+  {
+    id: "reativacao",
+    label: "Reativação de lead frio",
+    blurb: "Quando o score cai, agenda ação de recuperação em 3 dias.",
+    tone: "text-info",
+    input: {
+      nome: "Reativação de lead que esfriou",
+      descricao: "Quando o score IA cai bastante, cria plano de recuperação",
+      trigger_tipo: "score_baixou",
+      trigger_valor: "",
+      acoes: [
+        { tipo: "criar_tarefa", titulo: "Reengajar com conteúdo relevante", prioridade: "media", prazo_dias: 3 },
+        { tipo: "registrar_atividade", tipo_atividade: "email", descricao: "Enviar email de reativação" },
+      ],
+    },
+  },
+];
+
 function AutomacaoPage() {
   useRealtimeSync([
     { table: "automations", queryKeys: [["automations"]] },
