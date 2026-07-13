@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import {
   BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -72,14 +72,36 @@ function KpiTile({ label, value, icon: Icon, hint }: { label: string; value: str
   );
 }
 
+type PeriodKey = "7" | "30" | "90" | "all";
+const PERIODS: { id: PeriodKey; label: string }[] = [
+  { id: "7", label: "7 dias" },
+  { id: "30", label: "30 dias" },
+  { id: "90", label: "90 dias" },
+  { id: "all", label: "Tudo" },
+];
+
 function RelatoriosPage() {
+  const [period, setPeriod] = useState<PeriodKey>("30");
   const leads = useLeads();
   const deals = useDeals();
   const revenue = useRevenueSeries();
   const ranking = useSellersRanking();
 
-  const leadList = leads.data ?? [];
-  const dealList = deals.data ?? [];
+  const cutoff = useMemo(() => {
+    if (period === "all") return null;
+    const d = new Date();
+    d.setDate(d.getDate() - parseInt(period, 10));
+    return d.getTime();
+  }, [period]);
+
+  const inPeriod = (iso?: string | null) => {
+    if (!cutoff) return true;
+    if (!iso) return false;
+    return new Date(iso).getTime() >= cutoff;
+  };
+
+  const leadList = (leads.data ?? []).filter((l) => inPeriod(l.created_at));
+  const dealList = (deals.data ?? []).filter((d: any) => inPeriod(d.created_at ?? d.fechado_em));
 
   // Funil
   const funnel = useMemo(
@@ -129,7 +151,26 @@ function RelatoriosPage() {
   const isLoading = leads.isLoading || deals.isLoading;
 
   return (
-    <AppShell title="Relatórios" subtitle="Performance comercial em tempo real">
+    <AppShell
+      title="Relatórios"
+      subtitle="Performance comercial em tempo real"
+      action={
+        <div className="flex flex-wrap items-center gap-1 rounded-lg border border-border bg-surface-2 p-1">
+          {PERIODS.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setPeriod(p.id)}
+              className={[
+                "rounded-md px-2.5 py-1 text-[11px] font-semibold transition",
+                period === p.id ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground",
+              ].join(" ")}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      }
+    >
       {isLoading ? (
         <KpiSkeleton count={4} />
       ) : (

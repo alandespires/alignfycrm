@@ -4,10 +4,10 @@ import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import { RealtimeBadge } from "@/components/realtime-badge";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import {
-  useAutomations, useCreateAutomation, useToggleAutomation, useDeleteAutomation,
+  useAutomations, useCreateAutomation, useToggleAutomation, useDeleteAutomation, useAutomationRuns,
   type AutomationAction, type AutomationTrigger,
 } from "@/hooks/use-automations";
-import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSquare, Inbox, Bolt, Sparkles } from "lucide-react";
+import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSquare, Inbox, Bolt, Sparkles, CheckCircle2, AlertTriangle, History } from "lucide-react";
 import { AutomationListSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/automacao")({
@@ -232,6 +232,8 @@ function AutomacaoPage() {
       )}
 
       {open && <AutomationForm prefill={prefill} onClose={() => { setOpen(false); setPrefill(null); }} onSubmit={async (input) => { await create.mutateAsync(input); setOpen(false); setPrefill(null); }} pending={create.isPending} />}
+
+      <AutomationHistory />
     </AppShell>
   );
 }
@@ -431,3 +433,69 @@ function FlowConnector() {
     </div>
   );
 }
+
+function AutomationHistory() {
+  const { data: runs = [], isLoading } = useAutomationRuns();
+  const { data: rules = [] } = useAutomations();
+  const nameOf = (id: string) => rules.find((r) => r.id === id)?.nome ?? "Automação removida";
+
+  const total = runs.length;
+  const erros = runs.filter((r) => r.status === "erro").length;
+  const proxima = rules.filter((r) => r.ativo).length;
+
+  return (
+    <div className="mt-8 rounded-2xl border border-border bg-surface-2 p-5 shadow-card">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/15 text-primary"><History className="h-4 w-4" /></div>
+          <div>
+            <h3 className="text-base font-semibold">Histórico de execuções</h3>
+            <p className="text-xs text-muted-foreground">Auditoria de disparos, erros e próximas ações</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 text-[11px]">
+          <span><b className="text-foreground tabular-nums">{total}</b> execuções</span>
+          <span className={erros > 0 ? "text-destructive" : "text-muted-foreground"}><b className="tabular-nums">{erros}</b> erros</span>
+          <span className="text-success"><b className="tabular-nums">{proxima}</b> ativas</span>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="grid place-items-center py-8"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
+      ) : runs.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
+          Nenhuma execução ainda. Assim que uma automação disparar, ela aparecerá aqui.
+        </div>
+      ) : (
+        <ul className="divide-y divide-border">
+          {runs.slice(0, 20).map((r) => {
+            const isErro = r.status === "erro";
+            const acoesCount = Array.isArray(r.resultado?.acoes) ? r.resultado.acoes.length : 0;
+            const trigger = r.resultado?.trigger ?? "—";
+            return (
+              <li key={r.id} className="flex items-start gap-3 py-3">
+                <div className={`mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-md ${isErro ? "bg-destructive/15 text-destructive" : "bg-success/15 text-success"}`}>
+                  {isErro ? <AlertTriangle className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="truncate text-sm font-semibold">{nameOf(r.automation_id)}</span>
+                    <span className="rounded-md bg-surface-3 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">{trigger}</span>
+                    {acoesCount > 0 && <span className="text-[11px] text-muted-foreground">{acoesCount} {acoesCount === 1 ? "ação" : "ações"}</span>}
+                  </div>
+                  {isErro && r.erro && (
+                    <p className="mt-0.5 line-clamp-2 text-[11px] text-destructive/90">{r.erro}</p>
+                  )}
+                </div>
+                <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
+                  {new Date(r.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
