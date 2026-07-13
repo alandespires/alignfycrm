@@ -151,7 +151,26 @@ function RelatoriosPage() {
   const isLoading = leads.isLoading || deals.isLoading;
 
   return (
-    <AppShell title="Relatórios" subtitle="Performance comercial em tempo real">
+    <AppShell
+      title="Relatórios"
+      subtitle="Performance comercial em tempo real"
+      action={
+        <div className="flex flex-wrap items-center gap-1 rounded-lg border border-border bg-surface-2 p-1">
+          {PERIODS.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setPeriod(p.id)}
+              className={[
+                "rounded-md px-2.5 py-1 text-[11px] font-semibold transition",
+                period === p.id ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground",
+              ].join(" ")}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      }
+    >
       {isLoading ? (
         <KpiSkeleton count={4} />
       ) : (
