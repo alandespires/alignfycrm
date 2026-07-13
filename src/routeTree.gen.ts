@@ -24,6 +24,7 @@ import { Route as LeadsRouteImport } from './routes/leads'
 import { Route as LandingPagesRouteImport } from './routes/landing-pages'
 import { Route as InteracoesRouteImport } from './routes/interacoes'
 import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as FollowUpRouteImport } from './routes/follow-up'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as EscolarRouteImport } from './routes/escolar'
 import { Route as EquipeRouteImport } from './routes/equipe'
@@ -141,6 +142,11 @@ const InteracoesRoute = InteracoesRouteImport.update({
 const InsightsRoute = InsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FollowUpRoute = FollowUpRouteImport.update({
+  id: '/follow-up',
+  path: '/follow-up',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinanceiroRoute = FinanceiroRouteImport.update({
@@ -377,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/equipe': typeof EquipeRoute
   '/escolar': typeof EscolarRouteWithChildren
   '/financeiro': typeof FinanceiroRoute
+  '/follow-up': typeof FollowUpRoute
   '/insights': typeof InsightsRoute
   '/interacoes': typeof InteracoesRoute
   '/landing-pages': typeof LandingPagesRoute
@@ -434,6 +441,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof EmpresasRoute
   '/equipe': typeof EquipeRoute
   '/financeiro': typeof FinanceiroRoute
+  '/follow-up': typeof FollowUpRoute
   '/insights': typeof InsightsRoute
   '/interacoes': typeof InteracoesRoute
   '/landing-pages': typeof LandingPagesRoute
@@ -494,6 +502,7 @@ export interface FileRoutesById {
   '/equipe': typeof EquipeRoute
   '/escolar': typeof EscolarRouteWithChildren
   '/financeiro': typeof FinanceiroRoute
+  '/follow-up': typeof FollowUpRoute
   '/insights': typeof InsightsRoute
   '/interacoes': typeof InteracoesRoute
   '/landing-pages': typeof LandingPagesRoute
@@ -556,6 +565,7 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/escolar'
     | '/financeiro'
+    | '/follow-up'
     | '/insights'
     | '/interacoes'
     | '/landing-pages'
@@ -613,6 +623,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/equipe'
     | '/financeiro'
+    | '/follow-up'
     | '/insights'
     | '/interacoes'
     | '/landing-pages'
@@ -672,6 +683,7 @@ export interface FileRouteTypes {
     | '/equipe'
     | '/escolar'
     | '/financeiro'
+    | '/follow-up'
     | '/insights'
     | '/interacoes'
     | '/landing-pages'
@@ -733,6 +745,7 @@ export interface RootRouteChildren {
   EquipeRoute: typeof EquipeRoute
   EscolarRoute: typeof EscolarRouteWithChildren
   FinanceiroRoute: typeof FinanceiroRoute
+  FollowUpRoute: typeof FollowUpRoute
   InsightsRoute: typeof InsightsRoute
   InteracoesRoute: typeof InteracoesRoute
   LandingPagesRoute: typeof LandingPagesRoute
@@ -856,6 +869,13 @@ declare module '@tanstack/react-router' {
       path: '/insights'
       fullPath: '/insights'
       preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/follow-up': {
+      id: '/follow-up'
+      path: '/follow-up'
+      fullPath: '/follow-up'
+      preLoaderRoute: typeof FollowUpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/financeiro': {
@@ -1269,6 +1289,7 @@ const rootRouteChildren: RootRouteChildren = {
   EquipeRoute: EquipeRoute,
   EscolarRoute: EscolarRouteWithChildren,
   FinanceiroRoute: FinanceiroRoute,
+  FollowUpRoute: FollowUpRoute,
   InsightsRoute: InsightsRoute,
   InteracoesRoute: InteracoesRoute,
   LandingPagesRoute: LandingPagesRoute,
