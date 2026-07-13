@@ -84,19 +84,34 @@ export function useDeleteAutomation() {
   });
 }
 
-export function useAutomationRuns(automationId: string | null) {
+export type AutomationRun = {
+  id: string;
+  tenant_id: string;
+  automation_id: string;
+  lead_id: string | null;
+  resultado: any;
+  status: "sucesso" | "erro";
+  erro: string | null;
+  created_at: string;
+};
+
+export function useAutomationRuns(automationId?: string | null) {
+  const tenantId = getActiveTenantId();
   return useQuery({
-    queryKey: ["automation_runs", automationId],
-    enabled: !!automationId,
-    queryFn: async () => {
-      const { data, error } = await supabase
+    queryKey: ["automation_runs", tenantId, automationId ?? "all"],
+    enabled: !!tenantId,
+    queryFn: async (): Promise<AutomationRun[]> => {
+      let q = supabase
         .from("automation_runs")
         .select("*")
-        .eq("automation_id", automationId!)
+        .eq("tenant_id", tenantId!)
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(50);
+      if (automationId) q = q.eq("automation_id", automationId);
+      const { data, error } = await q;
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as any;
     },
   });
 }
+
