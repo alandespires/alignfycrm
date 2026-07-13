@@ -18,6 +18,7 @@ import { useOperacionalBadges } from "@/hooks/use-operacional-badges";
 import { NotificationsPopover } from "@/components/notifications-popover";
 import { LaunchPanel } from "@/components/launch-panel";
 import { LaunchIcon } from "@/components/launch-icon";
+import { ProductTour } from "@/components/product-tour";
 
 
 /* ============================================================
