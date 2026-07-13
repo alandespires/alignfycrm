@@ -263,6 +263,45 @@ function RelatoriosPage() {
             )}
           </div>
         </div>
+
+        {/* Origem dos melhores leads */}
+        <div className="rounded-2xl border border-border bg-surface-2 p-5 shadow-card lg:col-span-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-semibold">Origem dos melhores leads</h3>
+              <p className="text-xs text-muted-foreground">Onde nascem os leads que mais convertem em receita</p>
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Top 6</span>
+          </div>
+          <div className="mt-4">
+            {bestOrigins.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
+                Cadastre a origem dos leads para começar a ver este ranking.
+              </div>
+            ) : (
+              <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                {bestOrigins.map((o, i) => (
+                  <li key={o.origem} className="rounded-lg border border-border bg-surface-1 p-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`grid h-7 w-7 place-items-center rounded-md text-[11px] font-bold ${i === 0 ? "bg-warning/20 text-warning" : i === 1 ? "bg-primary/15 text-primary" : "bg-surface-3 text-muted-foreground"}`}>{i + 1}</div>
+                      <div className="min-w-0 flex-1 truncate text-sm font-semibold">{o.origem}</div>
+                      <div className="text-xs font-semibold tabular-nums text-success">{formatBRL(o.receita)}</div>
+                    </div>
+                    <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground">
+                      <span><b className="text-foreground">{o.total}</b> leads</span>
+                      <span><b className="text-foreground">{o.fechados}</b> fechados</span>
+                      <span><b className="text-foreground">{o.conversao}%</b> conv.</span>
+                      {o.scoreMedio > 0 && <span>score IA <b className="text-foreground">{o.scoreMedio}</b></span>}
+                    </div>
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-3">
+                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-success" style={{ width: `${Math.min(100, o.conversao)}%` }} />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
       </div>
     </AppShell>
   );
