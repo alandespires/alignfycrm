@@ -237,17 +237,18 @@ function AutomacaoPage() {
 }
 
 function AutomationForm({
-  onClose, onSubmit, pending,
+  onClose, onSubmit, pending, prefill,
 }: {
   onClose: () => void;
   onSubmit: (input: { nome: string; descricao: string | null; ativo: boolean; trigger_tipo: AutomationTrigger; trigger_valor: string | null; acoes: AutomationAction[] }) => Promise<void>;
   pending: boolean;
+  prefill?: TemplateInput | null;
 }) {
-  const [nome, setNome] = useState("");
-  const [descricao, setDescricao] = useState("");
-  const [trigger, setTrigger] = useState<AutomationTrigger>("status_mudou");
-  const [triggerValor, setTriggerValor] = useState("proposta");
-  const [acoes, setAcoes] = useState<AutomationAction[]>([
+  const [nome, setNome] = useState(prefill?.nome ?? "");
+  const [descricao, setDescricao] = useState(prefill?.descricao ?? "");
+  const [trigger, setTrigger] = useState<AutomationTrigger>(prefill?.trigger_tipo ?? "status_mudou");
+  const [triggerValor, setTriggerValor] = useState(prefill?.trigger_valor ?? "proposta");
+  const [acoes, setAcoes] = useState<AutomationAction[]>(prefill?.acoes ?? [
     { tipo: "criar_tarefa", titulo: "Fazer follow-up", prioridade: "alta", prazo_dias: 1 },
   ]);
 
