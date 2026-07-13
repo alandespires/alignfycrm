@@ -72,14 +72,36 @@ function KpiTile({ label, value, icon: Icon, hint }: { label: string; value: str
   );
 }
 
+type PeriodKey = "7" | "30" | "90" | "all";
+const PERIODS: { id: PeriodKey; label: string }[] = [
+  { id: "7", label: "7 dias" },
+  { id: "30", label: "30 dias" },
+  { id: "90", label: "90 dias" },
+  { id: "all", label: "Tudo" },
+];
+
 function RelatoriosPage() {
+  const [period, setPeriod] = useState<PeriodKey>("30");
   const leads = useLeads();
   const deals = useDeals();
   const revenue = useRevenueSeries();
   const ranking = useSellersRanking();
 
-  const leadList = leads.data ?? [];
-  const dealList = deals.data ?? [];
+  const cutoff = useMemo(() => {
+    if (period === "all") return null;
+    const d = new Date();
+    d.setDate(d.getDate() - parseInt(period, 10));
+    return d.getTime();
+  }, [period]);
+
+  const inPeriod = (iso?: string | null) => {
+    if (!cutoff) return true;
+    if (!iso) return false;
+    return new Date(iso).getTime() >= cutoff;
+  };
+
+  const leadList = (leads.data ?? []).filter((l) => inPeriod(l.created_at));
+  const dealList = (deals.data ?? []).filter((d: any) => inPeriod(d.created_at ?? d.fechado_em));
 
   // Funil
   const funnel = useMemo(
