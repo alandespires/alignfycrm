@@ -7,7 +7,7 @@ import {
   useAutomations, useCreateAutomation, useToggleAutomation, useDeleteAutomation,
   type AutomationAction, type AutomationTrigger,
 } from "@/hooks/use-automations";
-import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSquare, Inbox, Bolt } from "lucide-react";
+import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSquare, Inbox, Bolt, Sparkles } from "lucide-react";
 import { AutomationListSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/automacao")({
@@ -30,6 +30,83 @@ const STATUS_OPTIONS = [
 
 const ACTION_ICON: Record<string, any> = { criar_tarefa: ListChecks, registrar_atividade: MessageSquare };
 
+type TemplateInput = {
+  nome: string;
+  descricao: string;
+  trigger_tipo: AutomationTrigger;
+  trigger_valor: string;
+  acoes: AutomationAction[];
+};
+
+const TEMPLATES: { id: string; label: string; blurb: string; tone: string; input: TemplateInput }[] = [
+  {
+    id: "followup-24h",
+    label: "Follow-up em 24h",
+    blurb: "Toda proposta enviada gera lembrete de contato no dia seguinte.",
+    tone: "text-primary",
+    input: {
+      nome: "Follow-up de proposta em 24h",
+      descricao: "Cria tarefa de follow-up quando o lead vai para Proposta",
+      trigger_tipo: "status_mudou",
+      trigger_valor: "proposta",
+      acoes: [
+        { tipo: "criar_tarefa", titulo: "Ligar para confirmar proposta", prioridade: "alta", prazo_dias: 1 },
+        { tipo: "registrar_atividade", tipo_atividade: "nota", descricao: "Proposta enviada — aguardar retorno" },
+      ],
+    },
+  },
+  {
+    id: "cadencia-5-toques",
+    label: "Cadência 5 toques",
+    blurb: "Sequência de 5 contatos escalonados assim que o lead entra no CRM.",
+    tone: "text-success",
+    input: {
+      nome: "Cadência de prospecção 5 toques",
+      descricao: "Ligação → WhatsApp → Email → WhatsApp → Ligação final",
+      trigger_tipo: "lead_criado",
+      trigger_valor: "",
+      acoes: [
+        { tipo: "criar_tarefa", titulo: "Toque 1 · Ligação de descoberta", prioridade: "alta", prazo_dias: 0 },
+        { tipo: "criar_tarefa", titulo: "Toque 2 · WhatsApp de reforço", prioridade: "media", prazo_dias: 2 },
+        { tipo: "criar_tarefa", titulo: "Toque 3 · Email com case", prioridade: "media", prazo_dias: 4 },
+        { tipo: "criar_tarefa", titulo: "Toque 4 · WhatsApp com oferta", prioridade: "media", prazo_dias: 7 },
+        { tipo: "criar_tarefa", titulo: "Toque 5 · Ligação final", prioridade: "alta", prazo_dias: 10 },
+      ],
+    },
+  },
+  {
+    id: "lead-quente",
+    label: "Lead quente detectado",
+    blurb: "Quando a IA identifica score ≥ 80, prioriza ação imediata.",
+    tone: "text-warning",
+    input: {
+      nome: "Ação imediata para lead quente",
+      descricao: "Dispara tarefa urgente sempre que o score IA sobe para 80+",
+      trigger_tipo: "score_alto",
+      trigger_valor: "80",
+      acoes: [
+        { tipo: "criar_tarefa", titulo: "🔥 Contato imediato — lead quente", prioridade: "urgente", prazo_dias: 0 },
+      ],
+    },
+  },
+  {
+    id: "reativacao",
+    label: "Reativação de lead frio",
+    blurb: "Quando o score cai, agenda ação de recuperação em 3 dias.",
+    tone: "text-info",
+    input: {
+      nome: "Reativação de lead que esfriou",
+      descricao: "Quando o score IA cai bastante, cria plano de recuperação",
+      trigger_tipo: "score_baixou",
+      trigger_valor: "",
+      acoes: [
+        { tipo: "criar_tarefa", titulo: "Reengajar com conteúdo relevante", prioridade: "media", prazo_dias: 3 },
+        { tipo: "registrar_atividade", tipo_atividade: "email", descricao: "Enviar email de reativação" },
+      ],
+    },
+  },
+];
+
 function AutomacaoPage() {
   useRealtimeSync([
     { table: "automations", queryKeys: [["automations"]] },
@@ -42,6 +119,13 @@ function AutomacaoPage() {
   const del = useDeleteAutomation();
 
   const [open, setOpen] = useState(false);
+  const [prefill, setPrefill] = useState<TemplateInput | null>(null);
+
+  function useTemplate(t: TemplateInput) {
+    setPrefill(t);
+    setOpen(true);
+  }
+
 
   return (
     <AppShell
@@ -54,16 +138,43 @@ function AutomacaoPage() {
         </div>
       }
     >
+      {/* Template gallery */}
+      <div className="mb-5">
+        <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <Sparkles className="h-3 w-3 text-primary" /> Templates prontos
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {TEMPLATES.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => useTemplate(t.input)}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-surface-2 p-4 text-left shadow-card transition hover:border-primary/40 hover:-translate-y-0.5"
+            >
+              <div className="flex items-center gap-2">
+                <div className={`grid h-8 w-8 place-items-center rounded-lg bg-primary/10 ${t.tone}`}>
+                  <Zap className="h-4 w-4" />
+                </div>
+                <div className="text-sm font-semibold">{t.label}</div>
+              </div>
+              <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">{t.blurb}</p>
+              <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
+                Usar template <ArrowRight className="h-3 w-3" />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {isLoading ? (
         <AutomationListSkeleton count={3} />
       ) : rules.length === 0 ? (
-        <div className="grid place-items-center rounded-2xl border border-dashed border-border bg-surface-1/40 py-20 text-center">
+        <div className="grid place-items-center rounded-2xl border border-dashed border-border bg-surface-1/40 py-16 text-center">
           <Inbox className="mb-3 h-10 w-10 text-muted-foreground" />
-          <h3 className="text-lg font-semibold">Nenhuma automação ainda</h3>
+          <h3 className="text-lg font-semibold">Nenhuma automação criada</h3>
           <p className="mb-5 mt-1 max-w-sm text-sm text-muted-foreground">
-            Crie um fluxo para reagir automaticamente a eventos como mudança de status ou score IA.
+            Use um template acima ou crie um fluxo do zero.
           </p>
-          <PrimaryButton icon={Plus} onClick={() => setOpen(true)}>Criar primeira automação</PrimaryButton>
+          <PrimaryButton icon={Plus} onClick={() => { setPrefill(null); setOpen(true); }}>Criar do zero</PrimaryButton>
         </div>
       ) : (
         <div className="space-y-3">
@@ -120,23 +231,24 @@ function AutomacaoPage() {
         </div>
       )}
 
-      {open && <AutomationForm onClose={() => setOpen(false)} onSubmit={async (input) => { await create.mutateAsync(input); setOpen(false); }} pending={create.isPending} />}
+      {open && <AutomationForm prefill={prefill} onClose={() => { setOpen(false); setPrefill(null); }} onSubmit={async (input) => { await create.mutateAsync(input); setOpen(false); setPrefill(null); }} pending={create.isPending} />}
     </AppShell>
   );
 }
 
 function AutomationForm({
-  onClose, onSubmit, pending,
+  onClose, onSubmit, pending, prefill,
 }: {
   onClose: () => void;
   onSubmit: (input: { nome: string; descricao: string | null; ativo: boolean; trigger_tipo: AutomationTrigger; trigger_valor: string | null; acoes: AutomationAction[] }) => Promise<void>;
   pending: boolean;
+  prefill?: TemplateInput | null;
 }) {
-  const [nome, setNome] = useState("");
-  const [descricao, setDescricao] = useState("");
-  const [trigger, setTrigger] = useState<AutomationTrigger>("status_mudou");
-  const [triggerValor, setTriggerValor] = useState("proposta");
-  const [acoes, setAcoes] = useState<AutomationAction[]>([
+  const [nome, setNome] = useState(prefill?.nome ?? "");
+  const [descricao, setDescricao] = useState(prefill?.descricao ?? "");
+  const [trigger, setTrigger] = useState<AutomationTrigger>(prefill?.trigger_tipo ?? "status_mudou");
+  const [triggerValor, setTriggerValor] = useState(prefill?.trigger_valor ?? "proposta");
+  const [acoes, setAcoes] = useState<AutomationAction[]>(prefill?.acoes ?? [
     { tipo: "criar_tarefa", titulo: "Fazer follow-up", prioridade: "alta", prazo_dias: 1 },
   ]);
 

@@ -92,6 +92,27 @@ function RelatoriosPage() {
     [leadList],
   );
 
+  // Origem dos melhores leads (ranking por receita fechada + score)
+  const bestOrigins = useMemo(() => {
+    const map = new Map<string, { origem: string; total: number; fechados: number; receita: number; scoreMedio: number; scoreSum: number; scoreCount: number }>();
+    for (const l of leadList) {
+      const key = (l.origem || "Desconhecida").trim() || "Desconhecida";
+      const cur = map.get(key) ?? { origem: key, total: 0, fechados: 0, receita: 0, scoreMedio: 0, scoreSum: 0, scoreCount: 0 };
+      cur.total += 1;
+      if (l.status === "fechado") {
+        cur.fechados += 1;
+        cur.receita += Number(l.valor_estimado ?? 0);
+      }
+      if (typeof l.ai_score === "number") { cur.scoreSum += l.ai_score; cur.scoreCount += 1; }
+      map.set(key, cur);
+    }
+    return Array.from(map.values())
+      .map((v) => ({ ...v, scoreMedio: v.scoreCount > 0 ? Math.round(v.scoreSum / v.scoreCount) : 0, conversao: v.total > 0 ? Math.round((v.fechados / v.total) * 100) : 0 }))
+      .sort((a, b) => b.receita - a.receita || b.scoreMedio - a.scoreMedio)
+      .slice(0, 6);
+  }, [leadList]);
+
+
   // Métricas
   const fechados = leadList.filter((l) => l.status === "fechado").length;
   const perdidos = leadList.filter((l) => l.status === "perdido").length;
@@ -236,6 +257,45 @@ function RelatoriosPage() {
                       <div className="text-[11px] text-muted-foreground">{r.fechados} {r.fechados === 1 ? "fechamento" : "fechamentos"}</div>
                     </div>
                     <div className="text-sm font-semibold tabular-nums text-success">{formatBRL(r.valor)}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* Origem dos melhores leads */}
+        <div className="rounded-2xl border border-border bg-surface-2 p-5 shadow-card lg:col-span-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-semibold">Origem dos melhores leads</h3>
+              <p className="text-xs text-muted-foreground">Onde nascem os leads que mais convertem em receita</p>
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Top 6</span>
+          </div>
+          <div className="mt-4">
+            {bestOrigins.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
+                Cadastre a origem dos leads para começar a ver este ranking.
+              </div>
+            ) : (
+              <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                {bestOrigins.map((o, i) => (
+                  <li key={o.origem} className="rounded-lg border border-border bg-surface-1 p-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`grid h-7 w-7 place-items-center rounded-md text-[11px] font-bold ${i === 0 ? "bg-warning/20 text-warning" : i === 1 ? "bg-primary/15 text-primary" : "bg-surface-3 text-muted-foreground"}`}>{i + 1}</div>
+                      <div className="min-w-0 flex-1 truncate text-sm font-semibold">{o.origem}</div>
+                      <div className="text-xs font-semibold tabular-nums text-success">{formatBRL(o.receita)}</div>
+                    </div>
+                    <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground">
+                      <span><b className="text-foreground">{o.total}</b> leads</span>
+                      <span><b className="text-foreground">{o.fechados}</b> fechados</span>
+                      <span><b className="text-foreground">{o.conversao}%</b> conv.</span>
+                      {o.scoreMedio > 0 && <span>score IA <b className="text-foreground">{o.scoreMedio}</b></span>}
+                    </div>
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-3">
+                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-success" style={{ width: `${Math.min(100, o.conversao)}%` }} />
+                    </div>
                   </li>
                 ))}
               </ul>
