@@ -153,12 +153,9 @@ export function useRunProspectingSearch() {
           oportunidade: s.oportunidade,
           status: excluir || abaixoScore ? "ignorado" : "novo",
           favorito: false,
-          duplicado_lead_id: dup.leadId ?? null,
-          duplicado_motivo: dup.motivo ?? null,
-          duplicado_nivel: dup.level,
           source: r.source ?? "mock",
           source_ref: r.source_ref ?? null,
-          raw: (r.raw ?? {}) as any,
+          raw: { ...(r.raw ?? {}), dedup: dup } as any,
           is_demo: true,
         };
       });
