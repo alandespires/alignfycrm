@@ -247,9 +247,14 @@ export function useImportResults() {
       );
 
       // Log
+      const searchIds = Array.from(new Set((results ?? []).map((r: any) => r.search_id)));
       await (supabase as any).from(T.imports).insert({
-        tenant_id, user_id: u.user.id, quantidade: inserted?.length ?? 0,
-        origem: origem ?? "Prospecção B2B",
+        tenant_id, user_id: u.user.id,
+        search_id: searchIds[0] ?? null,
+        total: leadsToInsert.length,
+        criados: inserted?.length ?? 0,
+        atualizados: 0, ignorados: 0, falhos: 0,
+        detalhes: { origem: origem ?? "Prospecção B2B" },
       });
 
       return { imported: inserted?.length ?? 0 };
