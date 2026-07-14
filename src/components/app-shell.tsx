@@ -37,6 +37,7 @@ const COMERCIAL_GROUPS: SubGroup[] = [
     id: "vendas", label: "Vendas", icon: ShoppingBag,
     items: [
       { to: "/leads", label: "Leads", icon: Users },
+      { to: "/prospeccao", label: "Prospecção B2B", icon: Target },
       { to: "/pipeline", label: "Pipeline", icon: Kanban },
       { to: "/oportunidades", label: "Oportunidades", icon: Target },
       { to: "/propostas", label: "Propostas", icon: FileText },
@@ -128,7 +129,7 @@ const MAIS_GROUPS: SubGroup[] = [
   },
 ];
 
-const COMERCIAL_PATHS = ["/leads", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas"];
+const COMERCIAL_PATHS = ["/leads", "/prospeccao", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas"];
 const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/metas", "/equipe", "/campanhas", "/email-marketing", "/landing-pages", "/automacao", "/tickets", "/base-conhecimento", "/chat", "/consultor"];
 
 

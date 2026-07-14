@@ -2976,6 +2976,568 @@ export type Database = {
           },
         ]
       }
+      prospecting_import_logs: {
+        Row: {
+          atualizados: number
+          created_at: string
+          criados: number
+          detalhes: Json
+          falhos: number
+          id: string
+          ignorados: number
+          search_id: string | null
+          tenant_id: string
+          total: number
+          user_id: string
+        }
+        Insert: {
+          atualizados?: number
+          created_at?: string
+          criados?: number
+          detalhes?: Json
+          falhos?: number
+          id?: string
+          ignorados?: number
+          search_id?: string | null
+          tenant_id: string
+          total?: number
+          user_id: string
+        }
+        Update: {
+          atualizados?: number
+          created_at?: string
+          criados?: number
+          detalhes?: Json
+          falhos?: number
+          id?: string
+          ignorados?: number
+          search_id?: string | null
+          tenant_id?: string
+          total?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_import_logs_search_id_fkey"
+            columns: ["search_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_searches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_import_logs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospecting_list_items: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          id: string
+          list_id: string
+          result_id: string
+          tenant_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          list_id: string
+          result_id: string
+          tenant_id: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          id?: string
+          list_id?: string
+          result_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_list_items_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_list_items_result_id_fkey"
+            columns: ["result_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_list_items_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospecting_lists: {
+        Row: {
+          created_at: string
+          created_by: string
+          descricao: string | null
+          id: string
+          nome: string
+          responsavel: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          descricao?: string | null
+          id?: string
+          nome: string
+          responsavel?: string | null
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          responsavel?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_lists_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospecting_profiles: {
+        Row: {
+          cidade: string | null
+          created_at: string
+          created_by: string
+          descricao: string | null
+          etapa_padrao: string | null
+          exclusoes: Json
+          filtros: Json
+          funil_padrao: string | null
+          id: string
+          nicho: string | null
+          nome: string
+          quantidade_padrao: number
+          responsavel_padrao: string | null
+          score_minimo: number
+          tags_padrao: string[] | null
+          tenant_id: string
+          uf: string | null
+          ultima_execucao: string | null
+          updated_at: string
+        }
+        Insert: {
+          cidade?: string | null
+          created_at?: string
+          created_by: string
+          descricao?: string | null
+          etapa_padrao?: string | null
+          exclusoes?: Json
+          filtros?: Json
+          funil_padrao?: string | null
+          id?: string
+          nicho?: string | null
+          nome: string
+          quantidade_padrao?: number
+          responsavel_padrao?: string | null
+          score_minimo?: number
+          tags_padrao?: string[] | null
+          tenant_id: string
+          uf?: string | null
+          ultima_execucao?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cidade?: string | null
+          created_at?: string
+          created_by?: string
+          descricao?: string | null
+          etapa_padrao?: string | null
+          exclusoes?: Json
+          filtros?: Json
+          funil_padrao?: string | null
+          id?: string
+          nicho?: string | null
+          nome?: string
+          quantidade_padrao?: number
+          responsavel_padrao?: string | null
+          score_minimo?: number
+          tags_padrao?: string[] | null
+          tenant_id?: string
+          uf?: string | null
+          ultima_execucao?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospecting_results: {
+        Row: {
+          bairro: string | null
+          cidade: string | null
+          cnpj: string | null
+          confiabilidade: string
+          created_at: string
+          descricao: string | null
+          email: string | null
+          endereco: string | null
+          facebook: string | null
+          favorito: boolean
+          horario_funcionamento: string | null
+          id: string
+          imported_at: string | null
+          imported_by: string | null
+          imported_lead_id: string | null
+          instagram: string | null
+          is_demo: boolean
+          last_validated_at: string | null
+          latitude: number | null
+          linkedin: string | null
+          longitude: number | null
+          motivos_atencao: Json
+          motivos_positivos: Json
+          nome: string
+          nome_fantasia: string | null
+          observacoes: string | null
+          oportunidade: string | null
+          rating: number | null
+          raw: Json
+          razao_social: string | null
+          reviews_count: number | null
+          score: number
+          search_id: string
+          segmento: string | null
+          site: string | null
+          site_domain: string | null
+          source: string | null
+          source_ref: string | null
+          status: string
+          telefone: string | null
+          telefone_norm: string | null
+          tenant_id: string
+          tier: string
+          uf: string | null
+          updated_at: string
+          whatsapp: string | null
+          whatsapp_norm: string | null
+        }
+        Insert: {
+          bairro?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          confiabilidade?: string
+          created_at?: string
+          descricao?: string | null
+          email?: string | null
+          endereco?: string | null
+          facebook?: string | null
+          favorito?: boolean
+          horario_funcionamento?: string | null
+          id?: string
+          imported_at?: string | null
+          imported_by?: string | null
+          imported_lead_id?: string | null
+          instagram?: string | null
+          is_demo?: boolean
+          last_validated_at?: string | null
+          latitude?: number | null
+          linkedin?: string | null
+          longitude?: number | null
+          motivos_atencao?: Json
+          motivos_positivos?: Json
+          nome: string
+          nome_fantasia?: string | null
+          observacoes?: string | null
+          oportunidade?: string | null
+          rating?: number | null
+          raw?: Json
+          razao_social?: string | null
+          reviews_count?: number | null
+          score?: number
+          search_id: string
+          segmento?: string | null
+          site?: string | null
+          site_domain?: string | null
+          source?: string | null
+          source_ref?: string | null
+          status?: string
+          telefone?: string | null
+          telefone_norm?: string | null
+          tenant_id: string
+          tier?: string
+          uf?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+          whatsapp_norm?: string | null
+        }
+        Update: {
+          bairro?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          confiabilidade?: string
+          created_at?: string
+          descricao?: string | null
+          email?: string | null
+          endereco?: string | null
+          facebook?: string | null
+          favorito?: boolean
+          horario_funcionamento?: string | null
+          id?: string
+          imported_at?: string | null
+          imported_by?: string | null
+          imported_lead_id?: string | null
+          instagram?: string | null
+          is_demo?: boolean
+          last_validated_at?: string | null
+          latitude?: number | null
+          linkedin?: string | null
+          longitude?: number | null
+          motivos_atencao?: Json
+          motivos_positivos?: Json
+          nome?: string
+          nome_fantasia?: string | null
+          observacoes?: string | null
+          oportunidade?: string | null
+          rating?: number | null
+          raw?: Json
+          razao_social?: string | null
+          reviews_count?: number | null
+          score?: number
+          search_id?: string
+          segmento?: string | null
+          site?: string | null
+          site_domain?: string | null
+          source?: string | null
+          source_ref?: string | null
+          status?: string
+          telefone?: string | null
+          telefone_norm?: string | null
+          tenant_id?: string
+          tier?: string
+          uf?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+          whatsapp_norm?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_results_imported_lead_id_fkey"
+            columns: ["imported_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_results_search_id_fkey"
+            columns: ["search_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_searches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_results_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospecting_score_rules: {
+        Row: {
+          created_at: string
+          id: string
+          pesos: Json
+          quantidade_max: number
+          retencao_dias: number
+          score_minimo: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pesos?: Json
+          quantidade_max?: number
+          retencao_dias?: number
+          score_minimo?: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pesos?: Json
+          quantidade_max?: number
+          retencao_dias?: number
+          score_minimo?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_score_rules_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospecting_searches: {
+        Row: {
+          created_at: string
+          created_by: string
+          custo_estimado: number
+          descartados: number
+          encontrados: number
+          erro: string | null
+          etapa_atual: string | null
+          filtros: Json
+          id: string
+          importados: number
+          is_demo: boolean
+          nome: string | null
+          profile_id: string | null
+          provedor: string
+          qualificados: number
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          custo_estimado?: number
+          descartados?: number
+          encontrados?: number
+          erro?: string | null
+          etapa_atual?: string | null
+          filtros?: Json
+          id?: string
+          importados?: number
+          is_demo?: boolean
+          nome?: string | null
+          profile_id?: string | null
+          provedor?: string
+          qualificados?: number
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          custo_estimado?: number
+          descartados?: number
+          encontrados?: number
+          erro?: string | null
+          etapa_atual?: string | null
+          filtros?: Json
+          id?: string
+          importados?: number
+          is_demo?: boolean
+          nome?: string | null
+          profile_id?: string | null
+          provedor?: string
+          qualificados?: number
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_searches_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_searches_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospecting_sources: {
+        Row: {
+          ativo: boolean
+          configurado: boolean
+          created_at: string
+          id: string
+          limite_mensal: number
+          provider: string
+          tenant_id: string
+          ultimo_reset: string
+          updated_at: string
+          usado_mes: number
+        }
+        Insert: {
+          ativo?: boolean
+          configurado?: boolean
+          created_at?: string
+          id?: string
+          limite_mensal?: number
+          provider: string
+          tenant_id: string
+          ultimo_reset?: string
+          updated_at?: string
+          usado_mes?: number
+        }
+        Update: {
+          ativo?: boolean
+          configurado?: boolean
+          created_at?: string
+          id?: string
+          limite_mensal?: number
+          provider?: string
+          tenant_id?: string
+          ultimo_reset?: string
+          updated_at?: string
+          usado_mes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_sources_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       school_announcements: {
         Row: {
           class_id: string | null

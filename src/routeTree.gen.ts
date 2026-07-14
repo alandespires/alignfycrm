@@ -13,6 +13,7 @@ import { Route as TicketsRouteImport } from './routes/tickets'
 import { Route as TarefasRouteImport } from './routes/tarefas'
 import { Route as SuperAdminRouteImport } from './routes/super-admin'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
+import { Route as ProspeccaoRouteImport } from './routes/prospeccao'
 import { Route as PropostasRouteImport } from './routes/propostas'
 import { Route as ProjetosRouteImport } from './routes/projetos'
 import { Route as PortalAlunoRouteImport } from './routes/portal-aluno'
@@ -87,6 +88,11 @@ const SuperAdminRoute = SuperAdminRouteImport.update({
 const RelatoriosRoute = RelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProspeccaoRoute = ProspeccaoRouteImport.update({
+  id: '/prospeccao',
+  path: '/prospeccao',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PropostasRoute = PropostasRouteImport.update({
@@ -395,6 +401,7 @@ export interface FileRoutesByFullPath {
   '/portal-aluno': typeof PortalAlunoRoute
   '/projetos': typeof ProjetosRoute
   '/propostas': typeof PropostasRoute
+  '/prospeccao': typeof ProspeccaoRoute
   '/relatorios': typeof RelatoriosRoute
   '/super-admin': typeof SuperAdminRoute
   '/tarefas': typeof TarefasRoute
@@ -453,6 +460,7 @@ export interface FileRoutesByTo {
   '/portal-aluno': typeof PortalAlunoRoute
   '/projetos': typeof ProjetosRoute
   '/propostas': typeof PropostasRoute
+  '/prospeccao': typeof ProspeccaoRoute
   '/relatorios': typeof RelatoriosRoute
   '/super-admin': typeof SuperAdminRoute
   '/tarefas': typeof TarefasRoute
@@ -514,6 +522,7 @@ export interface FileRoutesById {
   '/portal-aluno': typeof PortalAlunoRoute
   '/projetos': typeof ProjetosRoute
   '/propostas': typeof PropostasRoute
+  '/prospeccao': typeof ProspeccaoRoute
   '/relatorios': typeof RelatoriosRoute
   '/super-admin': typeof SuperAdminRoute
   '/tarefas': typeof TarefasRoute
@@ -577,6 +586,7 @@ export interface FileRouteTypes {
     | '/portal-aluno'
     | '/projetos'
     | '/propostas'
+    | '/prospeccao'
     | '/relatorios'
     | '/super-admin'
     | '/tarefas'
@@ -635,6 +645,7 @@ export interface FileRouteTypes {
     | '/portal-aluno'
     | '/projetos'
     | '/propostas'
+    | '/prospeccao'
     | '/relatorios'
     | '/super-admin'
     | '/tarefas'
@@ -695,6 +706,7 @@ export interface FileRouteTypes {
     | '/portal-aluno'
     | '/projetos'
     | '/propostas'
+    | '/prospeccao'
     | '/relatorios'
     | '/super-admin'
     | '/tarefas'
@@ -757,6 +769,7 @@ export interface RootRouteChildren {
   PortalAlunoRoute: typeof PortalAlunoRoute
   ProjetosRoute: typeof ProjetosRoute
   PropostasRoute: typeof PropostasRoute
+  ProspeccaoRoute: typeof ProspeccaoRoute
   RelatoriosRoute: typeof RelatoriosRoute
   SuperAdminRoute: typeof SuperAdminRoute
   TarefasRoute: typeof TarefasRoute
@@ -792,6 +805,13 @@ declare module '@tanstack/react-router' {
       path: '/relatorios'
       fullPath: '/relatorios'
       preLoaderRoute: typeof RelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prospeccao': {
+      id: '/prospeccao'
+      path: '/prospeccao'
+      fullPath: '/prospeccao'
+      preLoaderRoute: typeof ProspeccaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/propostas': {
@@ -1301,6 +1321,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortalAlunoRoute: PortalAlunoRoute,
   ProjetosRoute: ProjetosRoute,
   PropostasRoute: PropostasRoute,
+  ProspeccaoRoute: ProspeccaoRoute,
   RelatoriosRoute: RelatoriosRoute,
   SuperAdminRoute: SuperAdminRoute,
   TarefasRoute: TarefasRoute,
@@ -1310,12 +1331,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
