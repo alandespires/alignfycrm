@@ -37,6 +37,7 @@ const COMERCIAL_GROUPS: SubGroup[] = [
     id: "vendas", label: "Vendas", icon: ShoppingBag,
     items: [
       { to: "/leads", label: "Leads", icon: Users },
+      { to: "/prospeccao", label: "Prospecção B2B", icon: Target },
       { to: "/pipeline", label: "Pipeline", icon: Kanban },
       { to: "/oportunidades", label: "Oportunidades", icon: Target },
       { to: "/propostas", label: "Propostas", icon: FileText },
