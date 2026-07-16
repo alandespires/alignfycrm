@@ -2,16 +2,26 @@ import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/al
 import type { ProspectingResultRow } from "@/lib/prospecting/types";
 import { ScorePill } from "./score-pill";
 import { CheckCircle2, AlertTriangle, Mail, Phone, Globe, Instagram, Linkedin, MapPin, Sparkles } from "lucide-react";
-import { useImportResults, useToggleFavorite, useUpdateResultStatus } from "@/hooks/use-prospecting";
+import { useToggleFavorite, useUpdateResultStatus } from "@/hooks/use-prospecting";
+import { useMyCommercialRole } from "@/hooks/use-commercial-role";
+import { canImportProspectingResult } from "@/lib/prospecting/demo";
 
-export function ProspectingResultDrawer({ result, onClose }: { result: ProspectingResultRow | null; onClose: () => void }) {
-  const importMut = useImportResults();
+export function ProspectingResultDrawer({
+  result,
+  onClose,
+  onImport,
+}: {
+  result: ProspectingResultRow | null;
+  onClose: () => void;
+  onImport: (result: ProspectingResultRow) => void;
+}) {
   const favMut = useToggleFavorite();
   const statusMut = useUpdateResultStatus();
+  const { canEdit } = useMyCommercialRole();
 
   if (!result) return null;
 
-  const canImport = result.status !== "importado";
+  const canImport = canEdit && canImportProspectingResult(result);
 
   return (
     <AlignPanel
@@ -25,9 +35,15 @@ export function ProspectingResultDrawer({ result, onClose }: { result: Prospecti
         <AlignPanelFooter
           secondary={{ label: result.favorito ? "Remover favorito" : "Favoritar", onClick: () => favMut.mutate({ id: result.id, favorito: !result.favorito }) }}
           primary={{
-            label: canImport ? "Importar como lead" : "Já importado",
-            onClick: () => importMut.mutate({ resultIds: [result.id] }, { onSuccess: () => onClose() }),
-            loading: importMut.isPending,
+            label: canImport
+              ? "Importar como lead"
+              : result.status === "importado"
+                ? "Já importado"
+                : result.is_demo
+                  ? "Importação demo bloqueada"
+                  : "Sem permissão para importar",
+            onClick: () => onImport(result),
+            loading: false,
             disabled: !canImport,
           }}
         />

@@ -1,12 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  FunctionsFetchError,
+  FunctionsHttpError,
+  FunctionsRelayError,
+} from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getActiveTenantId, requireTenantId } from "@/contexts/tenant-context";
 import { toast } from "sonner";
-import { mockSearch } from "@/lib/prospecting/mock-provider";
-import { scoreLead } from "@/lib/prospecting/score";
-import { detectDuplicate, type ExistingLead } from "@/lib/prospecting/dedup";
-import { normalizePhone, normalizeEmail, extractDomain } from "@/lib/prospecting/normalize";
-import type { ProspectingFilters, ProspectingResultRow, ProspectingSearch } from "@/lib/prospecting/types";
+import type {
+  ProspectingFilters,
+  ProspectingResultRow,
+  ProspectingSearch,
+} from "@/lib/prospecting/types";
 
 const T = {
   searches: "prospecting_searches",
@@ -16,18 +21,86 @@ const T = {
   imports: "prospecting_import_logs",
 } as const;
 
+function getEdgeFunctionError(error: unknown, action: "buscar" | "importar") {
+  if (error instanceof FunctionsFetchError) {
+    return new Error(
+      `Não foi possível acessar o serviço de prospecção para ${action}. Verifique se a Edge Function foi publicada no Supabase e tente novamente.`,
+    );
+  }
+
+  if (error instanceof FunctionsRelayError) {
+    return new Error("O Supabase não conseguiu encaminhar a solicitação de prospecção.");
+  }
+
+  if (error instanceof FunctionsHttpError) {
+    const status = error.context instanceof Response ? error.context.status : undefined;
+    if (status === 401) return new Error("Sua sessão expirou. Entre novamente para continuar.");
+    if (status === 403) return new Error("Você não tem permissão para executar esta ação.");
+    if (status === 404) return new Error("O serviço de prospecção ainda não foi publicado.");
+    if (status === 429) return new Error("O limite mensal do provedor de prospecção foi atingido.");
+    if (status === 502)
+      return new Error("O Google Places está temporariamente indisponível. Tente novamente.");
+    if (status === 503)
+      return new Error("O Google Places ainda não está configurado para esta empresa.");
+    return new Error(`O serviço de prospecção não conseguiu ${action} agora.`);
+  }
+
+  return error instanceof Error ? error : new Error("Erro inesperado no serviço de prospecção.");
+}
+
 /** Última busca por tenant. */
 export function useProspectingSearches(limit = 20) {
   const tenantId = getActiveTenantId();
   return useQuery({
     queryKey: ["prospecting-searches", tenantId, limit],
     enabled: !!tenantId,
+    refetchInterval: (query) =>
+      (query.state.data as ProspectingSearch[] | undefined)?.some((search) =>
+        ["pendente", "buscando", "validando", "deduplicando", "analisando", "calculando"].includes(
+          search.status,
+        ),
+      )
+        ? 1500
+        : false,
     queryFn: async (): Promise<ProspectingSearch[]> => {
       const { data, error } = await (supabase as any)
-        .from(T.searches).select("*").eq("tenant_id", tenantId!)
-        .order("created_at", { ascending: false }).limit(limit);
+        .from(T.searches)
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .order("created_at", { ascending: false })
+        .limit(limit);
       if (error) throw error;
       return (data ?? []) as ProspectingSearch[];
+    },
+  });
+}
+
+export function useProspectingKpis(days = 30) {
+  const tenantId = getActiveTenantId();
+  return useQuery({
+    queryKey: ["prospecting-kpis", tenantId, days],
+    enabled: !!tenantId,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).rpc("get_prospecting_kpis", {
+        _tenant_id: tenantId,
+        _days: days,
+      });
+      if (error) throw error;
+      return (data?.[0] ?? {
+        encontrados: 0,
+        qualificados: 0,
+        importados: 0,
+        descartados: 0,
+        pesquisas: 0,
+        taxa_qualificacao: 0,
+      }) as {
+        encontrados: number;
+        qualificados: number;
+        importados: number;
+        descartados: number;
+        pesquisas: number;
+        taxa_qualificacao: number;
+      };
     },
   });
 }
@@ -39,7 +112,10 @@ export function useProspectingResults(searchId: string | null) {
     enabled: !!tenantId && !!searchId,
     queryFn: async (): Promise<ProspectingResultRow[]> => {
       const { data, error } = await (supabase as any)
-        .from(T.results).select("*").eq("tenant_id", tenantId!).eq("search_id", searchId!)
+        .from(T.results)
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .eq("search_id", searchId!)
         .order("score", { ascending: false });
       if (error) throw error;
       return (data ?? []) as ProspectingResultRow[];
@@ -54,7 +130,10 @@ export function useProspectingProfiles() {
     enabled: !!tenantId,
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from(T.profiles).select("*").eq("tenant_id", tenantId!).order("created_at", { ascending: false });
+        .from(T.profiles)
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
@@ -68,116 +147,49 @@ export function useProspectingLists() {
     enabled: !!tenantId,
     queryFn: async () => {
       const { data, error } = await (supabase as any)
-        .from(T.lists).select("*").eq("tenant_id", tenantId!).order("created_at", { ascending: false });
+        .from(T.lists)
+        .select("*")
+        .eq("tenant_id", tenantId!)
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
 }
 
-/**
- * Executa uma busca client-side com o provedor mock, calcula score,
- * detecta duplicatas e persiste em prospecting_searches/prospecting_results.
- */
+/** Executa a busca segura no backend e devolve o id persistido. */
 export function useRunProspectingSearch() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { nome?: string; filtros: ProspectingFilters; profileId?: string }) => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) throw new Error("Não autenticado");
+    mutationFn: async (input: {
+      nome?: string;
+      filtros: ProspectingFilters;
+      profileId?: string;
+      searchId?: string;
+    }) => {
       const tenant_id = requireTenantId();
-
-      // 1. Cria a busca
-      const { data: search, error: e1 } = await (supabase as any)
-        .from(T.searches)
-        .insert({
-          tenant_id, created_by: u.user.id,
-          profile_id: input.profileId ?? null,
-          nome: input.nome ?? null,
-          filtros: input.filtros as any,
-          provedor: "mock",
-          status: "buscando",
-          etapa_atual: "Buscando fontes",
-          is_demo: true,
-        })
-        .select().single();
-      if (e1) throw e1;
-
-      // 2. Busca no provedor (mock)
-      await new Promise((r) => setTimeout(r, 400));
-      const raw = mockSearch(input.filtros);
-
-      // 3. Carrega leads existentes para dedup
-      const { data: existing } = await supabase
-        .from("leads").select("id, nome, email, whatsapp, empresa").eq("tenant_id", tenant_id);
-      const existingList: ExistingLead[] = (existing ?? []) as any;
-
-      // 4. Scoring + dedup + montagem dos registros
-      const rows = raw.map((r) => {
-        const s = scoreLead(r, input.filtros);
-        const dup = detectDuplicate(r, existingList);
-        const excluir = input.filtros.excluir_cadastrados && dup.level === "confirmada";
-        const scoreMin = input.filtros.score_min ?? 0;
-        const abaixoScore = s.score < scoreMin;
-        return {
+      const { data, error } = await supabase.functions.invoke("prospecting-search", {
+        body: {
           tenant_id,
-          search_id: search.id,
-          nome: r.nome,
-          razao_social: r.razao_social ?? null,
-          nome_fantasia: r.nome_fantasia ?? null,
-          cnpj: r.cnpj ?? null,
-          segmento: r.segmento ?? null,
-          descricao: r.descricao ?? null,
-          endereco: r.endereco ?? null,
-          bairro: r.bairro ?? null,
-          cidade: r.cidade ?? null,
-          uf: r.uf ?? null,
-          telefone: r.telefone ?? null,
-          telefone_norm: normalizePhone(r.telefone),
-          whatsapp: r.whatsapp ?? null,
-          whatsapp_norm: normalizePhone(r.whatsapp),
-          email: normalizeEmail(r.email),
-          site: r.site ?? null,
-          site_domain: extractDomain(r.site),
-          instagram: r.instagram ?? null,
-          facebook: r.facebook ?? null,
-          linkedin: r.linkedin ?? null,
-          horario_funcionamento: r.horario_funcionamento ?? null,
-          rating: r.rating ?? null,
-          reviews_count: r.reviews_count ?? null,
-          score: s.score,
-          tier: s.tier,
-          confiabilidade: s.confiabilidade,
-          motivos_positivos: s.motivos_positivos,
-          motivos_atencao: s.motivos_atencao,
-          oportunidade: s.oportunidade,
-          status: excluir || abaixoScore ? "ignorado" : "novo",
-          favorito: false,
-          source: r.source ?? "mock",
-          source_ref: r.source_ref ?? null,
-          raw: { ...(r.raw ?? {}), dedup: dup } as any,
-          is_demo: true,
-        };
+          nome: input.nome,
+          filtros: input.filtros,
+          profile_id: input.profileId,
+          search_id: input.searchId,
+        },
       });
-
-      // 5. Insere resultados
-      if (rows.length) {
-        const { error: e2 } = await (supabase as any).from(T.results).insert(rows);
-        if (e2) throw e2;
-      }
-
-      // 6. Atualiza busca
-      const qualificados = rows.filter((r) => r.status === "novo").length;
-      const descartados = rows.length - qualificados;
-      await (supabase as any).from(T.searches).update({
-        status: "pronto", etapa_atual: null,
-        encontrados: rows.length, qualificados, descartados,
-      }).eq("id", search.id);
-
-      return { searchId: search.id as string, encontrados: rows.length, qualificados };
+      if (error) throw getEdgeFunctionError(error, "buscar");
+      if (data?.error) throw new Error(data.error);
+      return data as {
+        searchId: string;
+        encontrados: number;
+        qualificados: number;
+        is_demo: boolean;
+      };
     },
     onSuccess: (r) => {
       qc.invalidateQueries({ queryKey: ["prospecting-searches"] });
+      qc.invalidateQueries({ queryKey: ["prospecting-kpis"] });
+      qc.invalidateQueries({ queryKey: ["prospecting-results"] });
       toast.success(`Busca concluída: ${r.qualificados} qualificados de ${r.encontrados}`);
     },
     onError: (e: any) => toast.error(e.message ?? "Erro na busca"),
@@ -206,64 +218,56 @@ export function useUpdateResultStatus() {
   });
 }
 
-/** Importa resultados selecionados como leads. */
+export type ProspectingImportOptions = {
+  duplicate_strategy?: "ignore" | "update";
+  owner_id?: string;
+  tags?: string[];
+  observation?: string;
+  score_min?: number;
+  require_contact?: boolean;
+  initial_stage?: "novo" | "contato_inicial" | "qualificacao" | "proposta" | "negociacao";
+};
+
+/** Importa resultados pela Edge Function transacional e idempotente. */
 export function useImportResults() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ resultIds, origem }: { resultIds: string[]; origem?: string }) => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) throw new Error("Não autenticado");
+    mutationFn: async ({
+      resultIds,
+      options,
+      requestKey,
+    }: {
+      resultIds: string[];
+      options?: ProspectingImportOptions;
+      requestKey?: string;
+    }) => {
       const tenant_id = requireTenantId();
-
-      const { data: results, error: e0 } = await (supabase as any)
-        .from(T.results).select("*").in("id", resultIds);
-      if (e0) throw e0;
-
-      const leadsToInsert = (results ?? []).map((r: any) => ({
-        tenant_id, created_by: u.user!.id, owner_id: u.user!.id,
-        nome: r.nome, empresa: r.razao_social ?? r.nome_fantasia ?? r.nome,
-        email: r.email, whatsapp: r.whatsapp ?? r.telefone,
-        origem: origem ?? "Prospecção B2B",
-        interesse: r.segmento,
-        observacoes: [r.oportunidade, r.descricao].filter(Boolean).join("\n\n"),
-        status: "novo" as const,
-        tags: [r.tier, "prospeccao"],
-      }));
-
-      if (!leadsToInsert.length) return { imported: 0 };
-
-      const { data: inserted, error: e1 } = await supabase
-        .from("leads").insert(leadsToInsert as any).select("id");
-      if (e1) throw e1;
-
-      // Marca resultados como importados
-      const importedAt = new Date().toISOString();
-      await Promise.all(
-        (results ?? []).map((r: any, i: number) =>
-          (supabase as any).from(T.results).update({
-            status: "importado", imported_lead_id: (inserted ?? [])[i]?.id ?? null, imported_at: importedAt,
-          }).eq("id", r.id),
-        ),
-      );
-
-      // Log
-      const searchIds = Array.from(new Set((results ?? []).map((r: any) => r.search_id)));
-      await (supabase as any).from(T.imports).insert({
-        tenant_id, user_id: u.user.id,
-        search_id: searchIds[0] ?? null,
-        total: leadsToInsert.length,
-        criados: inserted?.length ?? 0,
-        atualizados: 0, ignorados: 0, falhos: 0,
-        detalhes: { origem: origem ?? "Prospecção B2B" },
+      const { data, error } = await supabase.functions.invoke("prospecting-import", {
+        body: {
+          tenant_id,
+          result_ids: Array.from(new Set(resultIds)),
+          options,
+          request_key: requestKey ?? crypto.randomUUID(),
+        },
       });
-
-      return { imported: inserted?.length ?? 0 };
+      if (error) throw getEdgeFunctionError(error, "importar");
+      if (data?.error) throw new Error(data.error);
+      return data as {
+        total: number;
+        criados: number;
+        atualizados: number;
+        ignorados: number;
+        falhos: number;
+      };
     },
     onSuccess: (r) => {
       qc.invalidateQueries({ queryKey: ["prospecting-results"] });
       qc.invalidateQueries({ queryKey: ["prospecting-searches"] });
       qc.invalidateQueries({ queryKey: ["leads"] });
-      toast.success(`${r.imported} leads importados`);
+      qc.invalidateQueries({ queryKey: ["prospecting-kpis"] });
+      toast.success(
+        `${r.criados} criados, ${r.atualizados} atualizados e ${r.ignorados} ignorados`,
+      );
     },
     onError: (e: any) => toast.error(e.message ?? "Erro ao importar"),
   });
@@ -272,12 +276,19 @@ export function useImportResults() {
 export function useSaveProfile() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { nome: string; filtros: ProspectingFilters; descricao?: string }) => {
+    mutationFn: async (input: {
+      nome: string;
+      filtros: ProspectingFilters;
+      descricao?: string;
+    }) => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Não autenticado");
       const tenant_id = requireTenantId();
       const { error } = await (supabase as any).from(T.profiles).insert({
-        tenant_id, created_by: u.user.id, nome: input.nome, filtros: input.filtros as any,
+        tenant_id,
+        created_by: u.user.id,
+        nome: input.nome,
+        filtros: input.filtros as any,
         descricao: input.descricao ?? null,
       });
       if (error) throw error;
@@ -287,5 +298,152 @@ export function useSaveProfile() {
       toast.success("Perfil salvo");
     },
     onError: (e: any) => toast.error(e.message ?? "Erro ao salvar perfil"),
+  });
+}
+
+export function useDeleteProspectingSearch() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const tenantId = requireTenantId();
+      const { error } = await (supabase as any)
+        .from(T.searches)
+        .delete()
+        .eq("tenant_id", tenantId)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["prospecting-searches"] });
+      qc.invalidateQueries({ queryKey: ["prospecting-kpis"] });
+      toast.success("Pesquisa excluída");
+    },
+    onError: (error: any) => toast.error(error.message ?? "Erro ao excluir pesquisa"),
+  });
+}
+
+export function useDeleteProspectingProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const tenantId = requireTenantId();
+      const { error } = await (supabase as any)
+        .from(T.profiles)
+        .delete()
+        .eq("tenant_id", tenantId)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["prospecting-profiles"] }),
+  });
+}
+
+export function useCreateProspectingList() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { nome: string; descricao?: string }) => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error("Não autenticado");
+      const tenantId = requireTenantId();
+      const { data, error } = await (supabase as any)
+        .from(T.lists)
+        .insert({
+          tenant_id: tenantId,
+          created_by: auth.user.id,
+          nome: input.nome,
+          descricao: input.descricao ?? null,
+        })
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["prospecting-lists"] });
+      toast.success("Lista criada");
+    },
+  });
+}
+
+export function useAddResultsToList() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ listId, resultIds }: { listId: string; resultIds: string[] }) => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error("Não autenticado");
+      const tenantId = requireTenantId();
+      const rows = Array.from(new Set(resultIds)).map((resultId) => ({
+        tenant_id: tenantId,
+        list_id: listId,
+        result_id: resultId,
+        added_by: auth.user!.id,
+      }));
+      const { error } = await (supabase as any)
+        .from("prospecting_list_items")
+        .upsert(rows, { onConflict: "list_id,result_id", ignoreDuplicates: true });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["prospecting-lists"] });
+      toast.success("Resultados adicionados à lista");
+    },
+  });
+}
+
+export function useProspectingSettings() {
+  const tenantId = getActiveTenantId();
+  return useQuery({
+    queryKey: ["prospecting-settings", tenantId],
+    enabled: !!tenantId,
+    queryFn: async () => {
+      const [sources, rules] = await Promise.all([
+        (supabase as any).from("prospecting_sources").select("*").eq("tenant_id", tenantId),
+        (supabase as any)
+          .from("prospecting_score_rules")
+          .select("*")
+          .eq("tenant_id", tenantId)
+          .maybeSingle(),
+      ]);
+      if (sources.error) throw sources.error;
+      if (rules.error) throw rules.error;
+      return { sources: sources.data ?? [], rules: rules.data ?? null };
+    },
+  });
+}
+
+export function useSaveProspectingSettings() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      source: {
+        provider: string;
+        ativo: boolean;
+        configurado: boolean;
+        limite_mensal: number;
+      };
+      rules: {
+        score_minimo: number;
+        quantidade_max: number;
+        retencao_dias: number;
+        pesos?: Record<string, number>;
+      };
+    }) => {
+      const tenantId = requireTenantId();
+      const [source, rules] = await Promise.all([
+        (supabase as any)
+          .from("prospecting_sources")
+          .upsert({ tenant_id: tenantId, ...input.source }, { onConflict: "tenant_id,provider" }),
+        (supabase as any)
+          .from("prospecting_score_rules")
+          .upsert({ tenant_id: tenantId, ...input.rules }, { onConflict: "tenant_id" }),
+      ]);
+      if (source.error) throw source.error;
+      if (rules.error) throw rules.error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["prospecting-settings"] });
+      toast.success("Configurações salvas");
+    },
+    onError: (error: any) => toast.error(error.message ?? "Sem permissão para salvar"),
   });
 }

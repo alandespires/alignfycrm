@@ -3,6 +3,7 @@ import type { ProspectingResultRow } from "@/lib/prospecting/types";
 import { ScorePill } from "./score-pill";
 import { Star, Mail, Phone, Globe, Instagram, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
 import { staggerContainer, staggerItem } from "@/lib/motion";
+import { canImportProspectingResult } from "@/lib/prospecting/demo";
 
 export function ProspectingResultsTable({
   results, selected, onToggleSelect, onSelectAll, onOpen, onToggleFav,
@@ -24,7 +25,10 @@ export function ProspectingResultsTable({
     );
   }
 
-  const allSelected = selected.size === results.length;
+  const importableResults = results.filter(canImportProspectingResult);
+  const allSelected =
+    importableResults.length > 0 &&
+    importableResults.every((result) => selected.has(result.id));
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-card">
@@ -59,7 +63,12 @@ export function ProspectingResultsTable({
                       type="checkbox"
                       checked={selected.has(r.id)}
                       onChange={() => onToggleSelect(r.id)}
-                      disabled={r.status === "importado"}
+                      disabled={!canImportProspectingResult(r)}
+                      title={
+                        r.is_demo && !canImportProspectingResult(r)
+                          ? "Importação de dados demo bloqueada"
+                          : undefined
+                      }
                       className="h-3.5 w-3.5 rounded border-border accent-primary"
                     />
                   </td>

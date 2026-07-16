@@ -25,6 +25,7 @@ export type ProspectingFilters = {
   score_min?: number;
   excluir_cadastrados?: boolean;
   excluir_invalidos?: boolean;
+  excluir_pesquisas_anteriores?: boolean;
   // intenção
   sem_site?: boolean;
   sem_whatsapp?: boolean;
@@ -97,6 +98,19 @@ export type ProspectingResultRow = {
   observacoes: string | null;
   imported_lead_id: string | null;
   imported_at: string | null;
+  imported_by?: string | null;
+  dedup_level?: "confirmada" | "possivel" | "novo";
+  dedup_confidence?: number;
+  matched_lead_id?: string | null;
+  validation_status?: "nao_validado" | "formato_valido" | "verificado" | "duvidoso" | "invalido";
+  score_rule_version?: number;
+  score_breakdown?: Array<{
+    criterion: string;
+    points: number;
+    maxPoints: number;
+    status: string;
+    evidence?: string | number | boolean;
+  }>;
   source: string | null;
   is_demo: boolean;
   created_at: string;
@@ -110,7 +124,16 @@ export type ProspectingSearch = {
   nome: string | null;
   filtros: ProspectingFilters;
   provedor: string;
-  status: "pendente" | "buscando" | "validando" | "deduplicando" | "analisando" | "calculando" | "pronto" | "erro";
+  status:
+    | "pendente"
+    | "buscando"
+    | "validando"
+    | "deduplicando"
+    | "analisando"
+    | "calculando"
+    | "pronto"
+    | "parcial"
+    | "erro";
   etapa_atual: string | null;
   erro: string | null;
   encontrados: number;
