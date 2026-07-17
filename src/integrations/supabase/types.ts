@@ -2204,6 +2204,54 @@ export type Database = {
           },
         ]
       }
+      lead_identifiers: {
+        Row: {
+          confidence: number
+          created_at: string
+          id: string
+          kind: string
+          lead_id: string
+          source: string
+          tenant_id: string
+          value: string
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          kind: string
+          lead_id: string
+          source?: string
+          tenant_id: string
+          value: string
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          id?: string
+          kind?: string
+          lead_id?: string
+          source?: string
+          tenant_id?: string
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_identifiers_lead_tenant_fkey"
+            columns: ["lead_id", "tenant_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id", "tenant_id"]
+          },
+          {
+            foreignKeyName: "lead_identifiers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           ai_resumo: string | null
@@ -2219,6 +2267,11 @@ export type Database = {
           observacoes: string | null
           origem: string | null
           owner_id: string | null
+          prospecting_reasons: Json
+          prospecting_result_id: string | null
+          prospecting_score: number | null
+          prospecting_search_id: string | null
+          prospecting_source: string | null
           status: Database["public"]["Enums"]["lead_status"]
           tags: string[] | null
           tenant_id: string
@@ -2241,6 +2294,11 @@ export type Database = {
           observacoes?: string | null
           origem?: string | null
           owner_id?: string | null
+          prospecting_reasons?: Json
+          prospecting_result_id?: string | null
+          prospecting_score?: number | null
+          prospecting_search_id?: string | null
+          prospecting_source?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
           tags?: string[] | null
           tenant_id: string
@@ -2263,6 +2321,11 @@ export type Database = {
           observacoes?: string | null
           origem?: string | null
           owner_id?: string | null
+          prospecting_reasons?: Json
+          prospecting_result_id?: string | null
+          prospecting_score?: number | null
+          prospecting_search_id?: string | null
+          prospecting_source?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
           tags?: string[] | null
           tenant_id?: string
@@ -2272,6 +2335,34 @@ export type Database = {
           whatsapp?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "leads_prospecting_result_fkey"
+            columns: ["prospecting_result_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_results"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_prospecting_result_tenant_fkey"
+            columns: ["prospecting_result_id", "tenant_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_results"
+            referencedColumns: ["id", "tenant_id"]
+          },
+          {
+            foreignKeyName: "leads_prospecting_search_fkey"
+            columns: ["prospecting_search_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_searches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_prospecting_search_tenant_fkey"
+            columns: ["prospecting_search_id", "tenant_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_searches"
+            referencedColumns: ["id", "tenant_id"]
+          },
           {
             foreignKeyName: "leads_tenant_id_fkey"
             columns: ["tenant_id"]
@@ -2979,12 +3070,14 @@ export type Database = {
       prospecting_import_logs: {
         Row: {
           atualizados: number
+          completed_at: string | null
           created_at: string
           criados: number
           detalhes: Json
           falhos: number
           id: string
           ignorados: number
+          request_key: string | null
           search_id: string | null
           tenant_id: string
           total: number
@@ -2992,12 +3085,14 @@ export type Database = {
         }
         Insert: {
           atualizados?: number
+          completed_at?: string | null
           created_at?: string
           criados?: number
           detalhes?: Json
           falhos?: number
           id?: string
           ignorados?: number
+          request_key?: string | null
           search_id?: string | null
           tenant_id: string
           total?: number
@@ -3005,12 +3100,14 @@ export type Database = {
         }
         Update: {
           atualizados?: number
+          completed_at?: string | null
           created_at?: string
           criados?: number
           detalhes?: Json
           falhos?: number
           id?: string
           ignorados?: number
+          request_key?: string | null
           search_id?: string | null
           tenant_id?: string
           total?: number
@@ -3067,11 +3164,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "prospecting_list_items_list_tenant_fkey"
+            columns: ["list_id", "tenant_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_lists"
+            referencedColumns: ["id", "tenant_id"]
+          },
+          {
             foreignKeyName: "prospecting_list_items_result_id_fkey"
             columns: ["result_id"]
             isOneToOne: false
             referencedRelation: "prospecting_results"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_list_items_result_tenant_fkey"
+            columns: ["result_id", "tenant_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_results"
+            referencedColumns: ["id", "tenant_id"]
           },
           {
             foreignKeyName: "prospecting_list_items_tenant_id_fkey"
@@ -3119,6 +3230,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "prospecting_lists_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospecting_permission_overrides: {
+        Row: {
+          allowed: boolean
+          created_at: string
+          id: string
+          permission: string
+          tenant_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allowed: boolean
+          created_at?: string
+          id?: string
+          permission: string
+          tenant_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          permission?: string
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_permission_overrides_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -3207,6 +3356,8 @@ export type Database = {
           cnpj: string | null
           confiabilidade: string
           created_at: string
+          dedup_confidence: number
+          dedup_level: string
           descricao: string | null
           email: string | null
           endereco: string | null
@@ -3223,6 +3374,7 @@ export type Database = {
           latitude: number | null
           linkedin: string | null
           longitude: number | null
+          matched_lead_id: string | null
           motivos_atencao: Json
           motivos_positivos: Json
           nome: string
@@ -3234,6 +3386,8 @@ export type Database = {
           razao_social: string | null
           reviews_count: number | null
           score: number
+          score_breakdown: Json
+          score_rule_version: number
           search_id: string
           segmento: string | null
           site: string | null
@@ -3247,6 +3401,7 @@ export type Database = {
           tier: string
           uf: string | null
           updated_at: string
+          validation_status: string
           whatsapp: string | null
           whatsapp_norm: string | null
         }
@@ -3256,6 +3411,8 @@ export type Database = {
           cnpj?: string | null
           confiabilidade?: string
           created_at?: string
+          dedup_confidence?: number
+          dedup_level?: string
           descricao?: string | null
           email?: string | null
           endereco?: string | null
@@ -3272,6 +3429,7 @@ export type Database = {
           latitude?: number | null
           linkedin?: string | null
           longitude?: number | null
+          matched_lead_id?: string | null
           motivos_atencao?: Json
           motivos_positivos?: Json
           nome: string
@@ -3283,6 +3441,8 @@ export type Database = {
           razao_social?: string | null
           reviews_count?: number | null
           score?: number
+          score_breakdown?: Json
+          score_rule_version?: number
           search_id: string
           segmento?: string | null
           site?: string | null
@@ -3296,6 +3456,7 @@ export type Database = {
           tier?: string
           uf?: string | null
           updated_at?: string
+          validation_status?: string
           whatsapp?: string | null
           whatsapp_norm?: string | null
         }
@@ -3305,6 +3466,8 @@ export type Database = {
           cnpj?: string | null
           confiabilidade?: string
           created_at?: string
+          dedup_confidence?: number
+          dedup_level?: string
           descricao?: string | null
           email?: string | null
           endereco?: string | null
@@ -3321,6 +3484,7 @@ export type Database = {
           latitude?: number | null
           linkedin?: string | null
           longitude?: number | null
+          matched_lead_id?: string | null
           motivos_atencao?: Json
           motivos_positivos?: Json
           nome?: string
@@ -3332,6 +3496,8 @@ export type Database = {
           razao_social?: string | null
           reviews_count?: number | null
           score?: number
+          score_breakdown?: Json
+          score_rule_version?: number
           search_id?: string
           segmento?: string | null
           site?: string | null
@@ -3345,6 +3511,7 @@ export type Database = {
           tier?: string
           uf?: string | null
           updated_at?: string
+          validation_status?: string
           whatsapp?: string | null
           whatsapp_norm?: string | null
         }
@@ -3357,11 +3524,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "prospecting_results_imported_lead_tenant_fkey"
+            columns: ["imported_lead_id", "tenant_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id", "tenant_id"]
+          },
+          {
+            foreignKeyName: "prospecting_results_matched_lead_fkey"
+            columns: ["matched_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_results_matched_lead_tenant_fkey"
+            columns: ["matched_lead_id", "tenant_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id", "tenant_id"]
+          },
+          {
             foreignKeyName: "prospecting_results_search_id_fkey"
             columns: ["search_id"]
             isOneToOne: false
             referencedRelation: "prospecting_searches"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prospecting_results_search_tenant_fkey"
+            columns: ["search_id", "tenant_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_searches"
+            referencedColumns: ["id", "tenant_id"]
           },
           {
             foreignKeyName: "prospecting_results_tenant_id_fkey"
@@ -3483,6 +3678,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "prospecting_searches_profile_tenant_fkey"
+            columns: ["profile_id", "tenant_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_profiles"
+            referencedColumns: ["id", "tenant_id"]
+          },
+          {
             foreignKeyName: "prospecting_searches_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -3531,6 +3733,63 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "prospecting_sources_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospecting_validation_logs: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          evidence: Json
+          id: string
+          provider: string
+          reason: string | null
+          result_id: string
+          status: string
+          tenant_id: string
+          validated_by: string | null
+          validation_type: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          evidence?: Json
+          id?: string
+          provider: string
+          reason?: string | null
+          result_id: string
+          status: string
+          tenant_id: string
+          validated_by?: string | null
+          validation_type: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          evidence?: Json
+          id?: string
+          provider?: string
+          reason?: string | null
+          result_id?: string
+          status?: string
+          tenant_id?: string
+          validated_by?: string | null
+          validation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospecting_validation_logs_result_tenant_fkey"
+            columns: ["result_id", "tenant_id"]
+            isOneToOne: false
+            referencedRelation: "prospecting_results"
+            referencedColumns: ["id", "tenant_id"]
+          },
+          {
+            foreignKeyName: "prospecting_validation_logs_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -4663,6 +4922,17 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_prospecting_kpis: {
+        Args: { _days?: number; _tenant_id: string }
+        Returns: {
+          descartados: number
+          encontrados: number
+          importados: number
+          pesquisas: number
+          qualificados: number
+          taxa_qualificacao: number
+        }[]
+      }
       has_commercial_role: {
         Args: {
           _role: Database["public"]["Enums"]["commercial_role"]
@@ -4671,12 +4941,27 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_prospecting_permission: {
+        Args: { _permission: string; _tenant_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      import_prospecting_results_internal: {
+        Args: {
+          _allow_demo?: boolean
+          _options?: Json
+          _request_key?: string
+          _result_ids: string[]
+          _tenant_id: string
+          _user_id: string
+        }
+        Returns: Json
       }
       increment_article_view: {
         Args: { _article_id: string }
