@@ -2,9 +2,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { getActiveTenantId, requireTenantId } from "@/contexts/tenant-context";
 import { toast } from "sonner";
+import { createUniqueSlug } from "@/lib/slug";
 
 export type Article = {
   id: string; tenant_id: string; titulo: string; conteudo: string | null;
+  slug: string;
   categoria: string | null; department_id: string | null;
   prioridade: string | null; status: string | null;
   views_count: number; anexos: any;
@@ -49,7 +51,12 @@ export function useSaveArticle() {
         const { error } = await supabase.from("knowledge_articles" as any).update(input as any).eq("id", input.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("knowledge_articles" as any).insert({ ...(input as any), tenant_id, created_by: u.user?.id });
+        const { error } = await supabase.from("knowledge_articles" as any).insert({
+          ...(input as any),
+          slug: createUniqueSlug(input.titulo),
+          tenant_id,
+          created_by: u.user?.id,
+        });
         if (error) throw error;
       }
     },
