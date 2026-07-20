@@ -18,6 +18,7 @@ export function LeadFormDialog({ defaultStatus = "novo", trigger }: { defaultSta
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [origem, setOrigem] = useState("Site");
+  const [nicho, setNicho] = useState("");
   const [valor, setValor] = useState("");
   const [status, setStatus] = useState<LeadStatus>(defaultStatus);
   const [obs, setObs] = useState("");
@@ -25,7 +26,7 @@ export function LeadFormDialog({ defaultStatus = "novo", trigger }: { defaultSta
 
   function reset() {
     setNome(""); setEmpresa(""); setEmail(""); setWhatsapp("");
-    setOrigem("Site"); setValor(""); setStatus(defaultStatus); setObs("");
+    setOrigem("Site"); setNicho(""); setValor(""); setStatus(defaultStatus); setObs("");
   }
 
   async function onSubmit(e?: FormEvent) {
@@ -34,6 +35,7 @@ export function LeadFormDialog({ defaultStatus = "novo", trigger }: { defaultSta
     await create.mutateAsync({
       nome, empresa: empresa || undefined, email: email || undefined,
       whatsapp: whatsapp || undefined, origem: origem || undefined,
+      nicho: nicho.trim() || undefined,
       observacoes: obs || undefined, status,
       valor_estimado: valor ? Number(valor) : undefined,
     });
