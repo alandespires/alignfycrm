@@ -63,6 +63,7 @@ export function useCreateLead() {
       whatsapp?: string;
       origem?: string;
       interesse?: string;
+      nicho?: string;
       observacoes?: string;
       valor_estimado?: number;
       status?: LeadStatus;
