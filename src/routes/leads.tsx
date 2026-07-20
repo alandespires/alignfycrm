@@ -232,6 +232,15 @@ function LeadsPage() {
                         </div>
                       </td>
                       <td className="px-5 py-3.5">
+                        {l.nicho || l.interesse ? (
+                          <span className="inline-flex items-center rounded-full border border-border bg-surface-1 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                            {l.nicho ?? l.interesse}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5">
                         <StatusPill tone={statusTone(l.status) as any}>
                           {STATUS_LABEL[l.status]}
                         </StatusPill>
