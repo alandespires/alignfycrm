@@ -86,6 +86,9 @@ function LeadsPage() {
   const del = useDeleteLead();
   const score = useScoreLead();
   const [selected, setSelected] = useState<LeadRow | null>(null);
+  const [filters, setFilters] = useState<LeadFilters>(EMPTY_FILTERS);
+  const filteredLeads = useMemo(() => applyLeadFilters(leads, filters), [leads, filters]);
+  const activeFilterCount = countActiveFilters(filters);
   const novosSemana = leads.filter(
     (l) => Date.now() - new Date(l.created_at).getTime() < 7 * 864e5,
   ).length;
@@ -100,9 +103,7 @@ function LeadsPage() {
       action={
         <div className="flex gap-2">
           <LeadImportDialog leads={leads} />
-          <button className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground">
-            <Filter className="h-3.5 w-3.5" /> Filtros
-          </button>
+          <LeadFiltersDialog leads={leads} value={filters} onChange={setFilters} />
           <LeadFormDialog />
         </div>
       }
