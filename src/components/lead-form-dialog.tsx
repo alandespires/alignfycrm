@@ -18,6 +18,7 @@ export function LeadFormDialog({ defaultStatus = "novo", trigger }: { defaultSta
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [origem, setOrigem] = useState("Site");
+  const [nicho, setNicho] = useState("");
   const [valor, setValor] = useState("");
   const [status, setStatus] = useState<LeadStatus>(defaultStatus);
   const [obs, setObs] = useState("");
@@ -25,7 +26,7 @@ export function LeadFormDialog({ defaultStatus = "novo", trigger }: { defaultSta
 
   function reset() {
     setNome(""); setEmpresa(""); setEmail(""); setWhatsapp("");
-    setOrigem("Site"); setValor(""); setStatus(defaultStatus); setObs("");
+    setOrigem("Site"); setNicho(""); setValor(""); setStatus(defaultStatus); setObs("");
   }
 
   async function onSubmit(e?: FormEvent) {
@@ -34,6 +35,7 @@ export function LeadFormDialog({ defaultStatus = "novo", trigger }: { defaultSta
     await create.mutateAsync({
       nome, empresa: empresa || undefined, email: email || undefined,
       whatsapp: whatsapp || undefined, origem: origem || undefined,
+      nicho: nicho.trim() || undefined,
       observacoes: obs || undefined, status,
       valor_estimado: valor ? Number(valor) : undefined,
     });
@@ -84,6 +86,15 @@ export function LeadFormDialog({ defaultStatus = "novo", trigger }: { defaultSta
               </Field>
               <Field label="Valor estimado (R$)">
                 <input type="number" min="0" step="100" value={valor} onChange={(e) => setValor(e.target.value)} className={inputCls} />
+              </Field>
+              <Field label="Nicho" full>
+                <input value={nicho} onChange={(e) => setNicho(e.target.value)} className={inputCls} placeholder="Ex.: Saúde, Educação, SaaS..." list="nicho-suggestions" />
+                <datalist id="nicho-suggestions">
+                  <option value="Saúde" /><option value="Educação" /><option value="Tecnologia" />
+                  <option value="SaaS" /><option value="Varejo" /><option value="Serviços" />
+                  <option value="Indústria" /><option value="Financeiro" /><option value="Imobiliário" />
+                  <option value="Alimentação" /><option value="Consultoria" /><option value="Agronegócio" />
+                </datalist>
               </Field>
               <Field label="Etapa" full>
                 <select value={status} onChange={(e) => setStatus(e.target.value as LeadStatus)} className={inputCls}>

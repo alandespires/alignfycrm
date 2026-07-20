@@ -1,13 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AppShell, StatusPill } from "@/components/app-shell";
 import { LeadFormDialog } from "@/components/lead-form-dialog";
 import { LeadDetailDrawer } from "@/components/lead-detail-drawer";
 import { LeadImportDialog } from "@/components/lead-import-dialog";
+import {
+  LeadFiltersDialog,
+  applyLeadFilters,
+  countActiveFilters,
+  EMPTY_FILTERS,
+  type LeadFilters,
+} from "@/components/lead-filters-dialog";
 import { useLeads, useDeleteLead, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
 import { useScoreLead } from "@/hooks/use-score-lead";
 import { useRealtimeSync } from "@/hooks/use-realtime";
-import { Filter, Trash2, Mail, Phone, Loader2, Inbox, Sparkles } from "lucide-react";
+import { Trash2, Mail, Phone, Loader2, Inbox, Sparkles, X } from "lucide-react";
 import { TableRowsSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/leads")({
@@ -79,6 +86,9 @@ function LeadsPage() {
   const del = useDeleteLead();
   const score = useScoreLead();
   const [selected, setSelected] = useState<LeadRow | null>(null);
+  const [filters, setFilters] = useState<LeadFilters>(EMPTY_FILTERS);
+  const filteredLeads = useMemo(() => applyLeadFilters(leads, filters), [leads, filters]);
+  const activeFilterCount = countActiveFilters(filters);
   const novosSemana = leads.filter(
     (l) => Date.now() - new Date(l.created_at).getTime() < 7 * 864e5,
   ).length;
@@ -93,9 +103,7 @@ function LeadsPage() {
       action={
         <div className="flex gap-2">
           <LeadImportDialog leads={leads} />
-          <button className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground">
-            <Filter className="h-3.5 w-3.5" /> Filtros
-          </button>
+          <LeadFiltersDialog leads={leads} value={filters} onChange={setFilters} />
           <LeadFormDialog />
         </div>
       }
@@ -129,6 +137,36 @@ function LeadsPage() {
           <LeadFormDialog />
         </div>
       ) : (
+        <div className="space-y-3">
+          {activeFilterCount > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm">
+              <span className="text-foreground/90">
+                <span className="font-semibold text-primary">{filteredLeads.length}</span>
+                <span className="text-muted-foreground"> de {leads.length} leads · {activeFilterCount} filtro{activeFilterCount === 1 ? "" : "s"} ativo{activeFilterCount === 1 ? "" : "s"}</span>
+              </span>
+              <button
+                onClick={() => setFilters(EMPTY_FILTERS)}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-3 w-3" /> Limpar
+              </button>
+            </div>
+          )}
+          {filteredLeads.length === 0 ? (
+            <div className="grid place-items-center rounded-2xl border border-dashed border-border bg-surface-1/40 py-16 text-center">
+              <Inbox className="mb-3 h-10 w-10 text-muted-foreground" />
+              <h3 className="text-lg font-semibold">Nenhum lead corresponde aos filtros</h3>
+              <p className="mb-4 mt-1 max-w-sm text-sm text-muted-foreground">
+                Ajuste ou limpe os filtros para ver mais resultados.
+              </p>
+              <button
+                onClick={() => setFilters(EMPTY_FILTERS)}
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5" /> Limpar filtros
+              </button>
+            </div>
+          ) : (
         <div className="overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-card">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -137,6 +175,7 @@ function LeadsPage() {
                   <th className="px-5 py-3 font-medium">Lead</th>
                   <th className="px-5 py-3 font-medium">Empresa</th>
                   <th className="px-5 py-3 font-medium">Contato</th>
+                  <th className="px-5 py-3 font-medium">Nicho</th>
                   <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Score IA</th>
                   <th className="px-5 py-3 font-medium">Próxima ação (IA)</th>
@@ -145,7 +184,7 @@ function LeadsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {leads.map((l) => {
+                {filteredLeads.map((l) => {
                   const isScoring = score.isPending && score.variables === l.id;
                   return (
                     <tr
@@ -191,6 +230,15 @@ function LeadsPage() {
                           )}
                           {!l.email && !l.whatsapp && <span className="text-xs">—</span>}
                         </div>
+                      </td>
+                      <td className="px-5 py-3.5">
+                        {l.nicho || l.interesse ? (
+                          <span className="inline-flex items-center rounded-full border border-border bg-surface-1 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                            {l.nicho ?? l.interesse}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </td>
                       <td className="px-5 py-3.5">
                         <StatusPill tone={statusTone(l.status) as any}>
@@ -246,6 +294,8 @@ function LeadsPage() {
               </tbody>
             </table>
           </div>
+        </div>
+          )}
         </div>
       )}
 

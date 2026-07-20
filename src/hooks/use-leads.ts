@@ -21,6 +21,7 @@ export type LeadRow = {
   whatsapp: string | null;
   origem: string | null;
   interesse: string | null;
+  nicho: string | null;
   observacoes: string | null;
   tags: string[] | null;
   status: LeadStatus;
@@ -62,6 +63,7 @@ export function useCreateLead() {
       whatsapp?: string;
       origem?: string;
       interesse?: string;
+      nicho?: string;
       observacoes?: string;
       valor_estimado?: number;
       status?: LeadStatus;
