@@ -1,13 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AppShell, StatusPill } from "@/components/app-shell";
 import { LeadFormDialog } from "@/components/lead-form-dialog";
 import { LeadDetailDrawer } from "@/components/lead-detail-drawer";
 import { LeadImportDialog } from "@/components/lead-import-dialog";
+import {
+  LeadFiltersDialog,
+  applyLeadFilters,
+  countActiveFilters,
+  EMPTY_FILTERS,
+  type LeadFilters,
+} from "@/components/lead-filters-dialog";
 import { useLeads, useDeleteLead, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
 import { useScoreLead } from "@/hooks/use-score-lead";
 import { useRealtimeSync } from "@/hooks/use-realtime";
-import { Filter, Trash2, Mail, Phone, Loader2, Inbox, Sparkles } from "lucide-react";
+import { Trash2, Mail, Phone, Loader2, Inbox, Sparkles, X } from "lucide-react";
 import { TableRowsSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/leads")({
