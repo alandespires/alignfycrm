@@ -21,6 +21,7 @@ export type LeadRow = {
   whatsapp: string | null;
   origem: string | null;
   interesse: string | null;
+  nicho: string | null;
   observacoes: string | null;
   tags: string[] | null;
   status: LeadStatus;
