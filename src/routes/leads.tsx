@@ -295,6 +295,8 @@ function LeadsPage() {
             </table>
           </div>
         </div>
+          )}
+        </div>
       )}
 
       <LeadDetailDrawer lead={selectedLive} onClose={() => setSelected(null)} />
