@@ -2263,6 +2263,7 @@ export type Database = {
           empresa: string | null
           id: string
           interesse: string | null
+          nicho: string | null
           nome: string
           observacoes: string | null
           origem: string | null
@@ -2290,6 +2291,7 @@ export type Database = {
           empresa?: string | null
           id?: string
           interesse?: string | null
+          nicho?: string | null
           nome: string
           observacoes?: string | null
           origem?: string | null
@@ -2317,6 +2319,7 @@ export type Database = {
           empresa?: string | null
           id?: string
           interesse?: string | null
+          nicho?: string | null
           nome?: string
           observacoes?: string | null
           origem?: string | null
