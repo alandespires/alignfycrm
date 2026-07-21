@@ -500,7 +500,7 @@ export function useTeacherAlerts() {
       try {
         const raw = typeof window !== "undefined" ? localStorage.getItem("ks-escolar-settings") : null;
         if (raw) cfg = { ...cfg, ...JSON.parse(raw) };
-      } catch {}
+      } catch { /* mantém os limites padrão */ }
       const limite = cfg.faltaPctLimite / 100;
       // Faltas por aluno (últimas 500)
       const { data: att } = await supabase.from("school_attendance")

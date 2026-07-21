@@ -108,7 +108,7 @@ const TEMPLATES: { id: string; label: string; blurb: string; tone: string; input
 ];
 
 function AutomacaoPage() {
-  useRealtimeSync([
+  const realtimeStatus = useRealtimeSync([
     { table: "automations", queryKeys: [["automations"]] },
     { table: "automation_runs", queryKeys: [["automation_runs"]] },
   ]);
@@ -121,7 +121,7 @@ function AutomacaoPage() {
   const [open, setOpen] = useState(false);
   const [prefill, setPrefill] = useState<TemplateInput | null>(null);
 
-  function useTemplate(t: TemplateInput) {
+  function applyTemplate(t: TemplateInput) {
     setPrefill(t);
     setOpen(true);
   }
@@ -133,7 +133,7 @@ function AutomacaoPage() {
       subtitle="Workflows SE → ENTÃO que reagem em tempo real a eventos do CRM"
       action={
         <div className="flex items-center gap-2">
-          <RealtimeBadge />
+          <RealtimeBadge status={realtimeStatus} />
           <PrimaryButton icon={Plus} onClick={() => setOpen(true)}>Novo fluxo</PrimaryButton>
         </div>
       }
@@ -147,7 +147,7 @@ function AutomacaoPage() {
           {TEMPLATES.map((t) => (
             <button
               key={t.id}
-              onClick={() => useTemplate(t.input)}
+              onClick={() => applyTemplate(t.input)}
               className="group relative overflow-hidden rounded-2xl border border-border bg-surface-2 p-4 text-left shadow-card transition hover:border-primary/40 hover:-translate-y-0.5"
             >
               <div className="flex items-center gap-2">

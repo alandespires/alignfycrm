@@ -7,6 +7,7 @@ import { ClientDetailDrawer } from "@/components/client-detail-drawer";
 import { useClients, useCreateClient, useDeleteClient, type ClientRow } from "@/hooks/use-clients";
 import { Plus, Building2, Mail, Phone, Loader2, Inbox, Trash2, X, Search } from "lucide-react";
 import { CardGridSkeleton } from "@/components/skeletons";
+import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 
 export const Route = createFileRoute("/clientes")({
   head: () => ({ meta: [{ title: "Clientes — Align CRM" }] }),
@@ -20,7 +21,7 @@ function formatBRL(v: number) {
 type ClientFilter = "todos" | "com_contrato" | "sem_contrato";
 
 function ClientesPage() {
-  useRealtimeSync([
+  const realtimeStatus = useRealtimeSync([
     { table: "clients", queryKeys: [["clients"]] },
     { table: "activities", queryKeys: [["activities"], ["client-activities"]] },
     { table: "deals", queryKeys: [["deals"], ["client-deals"]] },
@@ -70,7 +71,7 @@ function ClientesPage() {
       subtitle={`${clients.length} contas ativas · ${formatBRL(totalMRR)} em contratos`}
       action={
         <div className="flex items-center gap-2">
-          <RealtimeBadge />
+          <RealtimeBadge status={realtimeStatus} />
           <PrimaryButton icon={Plus} onClick={() => setOpen(true)}>Novo cliente</PrimaryButton>
         </div>
       }
@@ -125,7 +126,7 @@ function ClientesPage() {
 
               <div className="mt-3 flex items-center gap-3 text-muted-foreground">
                 {c.email && <a href={`mailto:${c.email}`} className="hover:text-primary"><Mail className="h-3.5 w-3.5" /></a>}
-                {c.whatsapp && <a href={`https://wa.me/${c.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="hover:text-success"><Phone className="h-3.5 w-3.5" /></a>}
+                {c.whatsapp && <WhatsAppContactLink phone={c.whatsapp} className="hover:text-success"><Phone className="h-3.5 w-3.5" /></WhatsAppContactLink>}
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-4 text-xs">

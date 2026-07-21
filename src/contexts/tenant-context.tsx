@@ -18,12 +18,17 @@ export type TenantRow = {
   email_principal: string | null;
   whatsapp: string | null;
   logo_url: string | null;
-  segmento?: "geral" | "clinica" | null;
+  segmento?: "geral" | "clinica" | "escolar" | null;
 };
 
 export type Membership = {
   tenant: TenantRow;
   role: TenantRole;
+};
+
+type MembershipQueryRow = {
+  role: TenantRole;
+  tenant: TenantRow | TenantRow[] | null;
 };
 
 type TenantCtx = {
@@ -73,14 +78,15 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         .select("role, tenant:tenants(id, nome, slug, status, plan_id, proximo_vencimento, trial_ate, responsavel, email_principal, whatsapp, logo_url, segmento)")
         .eq("user_id", user!.id);
       if (error) throw error;
-      return (data ?? [])
-        .filter((r: any) => r.tenant)
-        .map((r: any) => ({ role: r.role as TenantRole, tenant: r.tenant as TenantRow }));
+      return ((data ?? []) as unknown as MembershipQueryRow[])
+        .map((row) => ({ ...row, tenant: Array.isArray(row.tenant) ? (row.tenant[0] ?? null) : row.tenant }))
+        .filter((row): row is { role: TenantRole; tenant: TenantRow } => !!row.tenant)
+        .map((row) => ({ role: row.role, tenant: row.tenant }));
     },
   });
 
   const isSuperAdmin = (rolesQ.data ?? []).includes("super_admin");
-  const memberships = membershipsQ.data ?? [];
+  const memberships = useMemo(() => membershipsQ.data ?? [], [membershipsQ.data]);
 
   // Determina tenant ativo
   const current = useMemo<Membership | null>(() => {
@@ -100,9 +106,13 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     return memberships[0];
   }, [memberships, activeSlug]);
 
-  // Sync store global + localStorage
+  // Hooks legados consultam este valor durante o render. Sincronizar antes de
+  // renderizar os filhos evita que deep links montem queries permanentemente
+  // desabilitadas enquanto o tenant ainda estava nulo.
+  _activeTenantId = current?.tenant.id ?? null;
+
+  // Sync localStorage + caches dependentes do tenant
   useEffect(() => {
-    _activeTenantId = current?.tenant.id ?? null;
     if (current && typeof window !== "undefined") {
       localStorage.setItem("ks:tenant", current.tenant.slug);
     }
@@ -118,7 +128,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     qc.invalidateQueries({ queryKey: ["fin-expenses"] });
     qc.invalidateQueries({ queryKey: ["fin-subs"] });
     qc.invalidateQueries({ queryKey: ["fin-comm"] });
-  }, [current?.tenant.id, qc]);
+  }, [current, qc]);
 
   function setCurrentBySlug(slug: string) {
     setActiveSlug(slug);

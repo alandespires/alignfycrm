@@ -50,9 +50,7 @@ function KpiCard({ label, value, delta, trend, icon: Icon, accent, loading }: {
         ].join(" ")}>
           <Icon className="h-4 w-4" />
         </div>
-        <button className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground transition group-hover:bg-surface-3 group-hover:text-foreground">
-          <ArrowUpRight className="h-3.5 w-3.5" />
-        </button>
+        <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
       </div>
       <div className="mt-5 text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-1 flex items-baseline gap-2">
@@ -171,6 +169,7 @@ export function DashboardPage() {
   const topInsights = (insights.data ?? []).filter((i) => !i.lido).slice(0, 3);
   const topActivities = (activities.data ?? []).slice(0, 5);
   const isLoading = leads.isLoading || deals.isLoading;
+  const revenueHasData = (revenue.data ?? []).some((item) => Number(item.previsto) > 0 || Number(item.fechado) > 0);
 
   const hour = new Date().getHours();
   const greeting = hour < 5 ? "Boa madrugada" : hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
@@ -180,11 +179,11 @@ export function DashboardPage() {
       title={`${greeting} 👋`}
       subtitle="Aqui está o panorama da sua operação comercial hoje."
       action={
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <div className="relative">
             <button
               onClick={() => setWidgetsOpen((v) => !v)}
-              className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground"
+              className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground"
               title="Personalizar widgets"
             >
               <LayoutGrid className="h-3.5 w-3.5" /> Personalizar
@@ -220,7 +219,7 @@ export function DashboardPage() {
           <div className="relative">
             <button
               onClick={() => setPeriodoOpen((v) => !v)}
-              className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground"
+              className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground"
             >
               {PERIODO_LABEL[periodo]} <ChevronDown className="h-3.5 w-3.5" />
             </button>
@@ -244,7 +243,7 @@ export function DashboardPage() {
           </div>
           <LeadFormDialog
             trigger={
-              <button className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110">
+              <button className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110">
                 <Plus className="h-4 w-4" /> Novo lead
               </button>
             }
@@ -281,7 +280,7 @@ export function DashboardPage() {
           <div className="h-72 px-2 py-4">
             {revenue.isLoading ? (
               <Skeleton className="h-full w-full rounded-lg" />
-            ) : (
+            ) : revenueHasData ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={revenue.data ?? []} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
                   <defs>
@@ -306,6 +305,15 @@ export function DashboardPage() {
                   <Area type="monotone" dataKey="fechado" stroke="oklch(0.72 0.21 142)" strokeWidth={2.5} fill="url(#g2)" />
                 </AreaChart>
               </ResponsiveContainer>
+            ) : (
+              <div className="grid h-full place-items-center px-6 text-center">
+                <div>
+                  <DollarSign className="mx-auto h-9 w-9 text-primary" aria-hidden="true" />
+                  <div className="mt-3 text-sm font-semibold">Ainda não há receita para comparar</div>
+                  <p className="mt-1 text-xs text-muted-foreground">Adicione valores aos leads e registre recebimentos para acompanhar previsto e fechado.</p>
+                  <Link to="/pipeline" className="mt-4 inline-flex rounded-lg border border-border bg-surface-1 px-3 py-2 text-xs font-semibold text-primary">Abrir pipeline</Link>
+                </div>
+              </div>
             )}
           </div>
         </div>

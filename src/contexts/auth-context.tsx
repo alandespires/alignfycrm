@@ -34,17 +34,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn: AuthCtx["signIn"] = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message };
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      return { error: error?.message };
+    } catch {
+      return { error: "Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente." };
+    }
   };
 
   const signUp: AuthCtx["signUp"] = async (email, password, fullName) => {
     const redirectUrl = typeof window !== "undefined" ? `${window.location.origin}/` : undefined;
-    const { error } = await supabase.auth.signUp({
-      email, password,
-      options: { emailRedirectTo: redirectUrl, data: { full_name: fullName } },
-    });
-    return { error: error?.message };
+    try {
+      const { error } = await supabase.auth.signUp({
+        email, password,
+        options: { emailRedirectTo: redirectUrl, data: { full_name: fullName } },
+      });
+      return { error: error?.message };
+    } catch {
+      return { error: "Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente." };
+    }
   };
 
   const signOut = async () => { await supabase.auth.signOut(); };

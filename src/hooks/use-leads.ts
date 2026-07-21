@@ -34,6 +34,11 @@ export type LeadRow = {
   created_at: string;
   updated_at: string;
   ultimo_contato_em: string | null;
+  whatsapp_consent_status: "unknown" | "granted" | "revoked";
+  whatsapp_consent_at: string | null;
+  whatsapp_consent_source: string | null;
+  whatsapp_opt_out_at: string | null;
+  whatsapp_last_contact_at: string | null;
 };
 
 export function useLeads() {
@@ -131,6 +136,28 @@ export function useDeleteLead() {
       toast.success("Lead removido");
     },
     onError: (e: any) => toast.error(e.message ?? "Erro ao remover"),
+  });
+}
+
+export function useSetWhatsAppConsent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, status, source }: { id: string; status: "granted" | "revoked"; source?: string }) => {
+      if (status === "granted" && !source?.trim()) throw new Error("Informe a origem do consentimento");
+      const now = new Date().toISOString();
+      const { error } = await supabase.from("leads").update({
+        whatsapp_consent_status: status,
+        whatsapp_consent_at: status === "granted" ? now : null,
+        whatsapp_consent_source: status === "granted" ? source!.trim() : null,
+        whatsapp_opt_out_at: status === "revoked" ? now : null,
+      }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["leads"] });
+      toast.success("Preferência de WhatsApp atualizada");
+    },
+    onError: (error: Error) => toast.error(error.message || "Erro ao atualizar consentimento"),
   });
 }
 

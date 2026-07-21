@@ -4,6 +4,7 @@ import { ScorePill } from "./score-pill";
 import { Star, Mail, Phone, Globe, Instagram, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 import { canImportProspectingResult } from "@/lib/prospecting/demo";
+import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 
 export function ProspectingResultsTable({
   results, selected, onToggleSelect, onSelectAll, onOpen, onToggleFav,
@@ -37,7 +38,7 @@ export function ProspectingResultsTable({
           <thead className="border-b border-border bg-surface-1/60">
             <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground">
               <th className="px-4 py-3 font-medium">
-                <input type="checkbox" checked={allSelected} onChange={onSelectAll} className="h-3.5 w-3.5 rounded border-border accent-primary" />
+                <input aria-label="Selecionar todos os resultados importáveis" type="checkbox" checked={allSelected} onChange={onSelectAll} className="h-3.5 w-3.5 rounded border-border accent-primary" />
               </th>
               <th className="px-4 py-3 font-medium">Empresa</th>
               <th className="px-4 py-3 font-medium">Nicho</th>
@@ -64,6 +65,7 @@ export function ProspectingResultsTable({
                       checked={selected.has(r.id)}
                       onChange={() => onToggleSelect(r.id)}
                       disabled={!canImportProspectingResult(r)}
+                      aria-label={`Selecionar ${r.nome}`}
                       title={
                         r.is_demo && !canImportProspectingResult(r)
                           ? "Importação de dados demo bloqueada"
@@ -94,11 +96,13 @@ export function ProspectingResultsTable({
                   </td>
                   <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-2 text-muted-foreground">
-                      {r.whatsapp && <a href={`https://wa.me/${r.whatsapp_norm}`} target="_blank" rel="noreferrer" className="hover:text-success" title="WhatsApp"><Phone className="h-3.5 w-3.5" /></a>}
-                      {r.email && <a href={`mailto:${r.email}`} className="hover:text-primary" title={r.email}><Mail className="h-3.5 w-3.5" /></a>}
-                      {r.site && <a href={r.site} target="_blank" rel="noreferrer" className="hover:text-primary" title={r.site}><Globe className="h-3.5 w-3.5" /></a>}
-                      {r.instagram && <span className="text-muted-foreground" title={r.instagram}><Instagram className="h-3.5 w-3.5" /></span>}
-                      {!r.whatsapp && !r.email && !r.site && <span className="text-xs">—</span>}
+                      {r.is_demo ? <span className="text-[10px] font-semibold uppercase tracking-wide text-warning">Bloqueado no Demo</span> : <>
+                        {r.whatsapp && <WhatsAppContactLink phone={r.whatsapp_norm ?? r.whatsapp} className="hover:text-success"><Phone className="h-3.5 w-3.5" /></WhatsAppContactLink>}
+                        {r.email && <a href={`mailto:${r.email}`} className="hover:text-primary" title={r.email}><Mail className="h-3.5 w-3.5" /></a>}
+                        {r.site && <a href={r.site} target="_blank" rel="noreferrer" className="hover:text-primary" title={r.site}><Globe className="h-3.5 w-3.5" /></a>}
+                        {r.instagram && <span className="text-muted-foreground" title={r.instagram}><Instagram className="h-3.5 w-3.5" /></span>}
+                        {!r.whatsapp && !r.email && !r.site && <span className="text-xs">—</span>}
+                      </>}
                     </div>
                   </td>
                   <td className="px-4 py-3.5"><ScorePill score={r.score} tier={r.tier as any} /></td>
@@ -113,6 +117,7 @@ export function ProspectingResultsTable({
                       <button
                         onClick={() => onToggleFav(r)}
                         title={r.favorito ? "Remover favorito" : "Favoritar"}
+                        aria-label={`${r.favorito ? "Remover dos favoritos" : "Favoritar"} ${r.nome}`}
                         className={`grid h-7 w-7 place-items-center rounded-md transition ${r.favorito ? "text-warning" : "text-muted-foreground hover:text-warning"}`}
                       >
                         <Star className={`h-3.5 w-3.5 ${r.favorito ? "fill-current" : ""}`} />

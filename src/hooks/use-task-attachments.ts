@@ -43,7 +43,7 @@ export function useUploadAttachment() {
       if (input.file.size > 10 * 1024 * 1024) throw new Error("Arquivo maior que 10MB");
 
       const ext = input.file.name.split(".").pop() ?? "bin";
-      const safeName = input.file.name.replace(/[^\w.\-]+/g, "_");
+      const safeName = input.file.name.replace(/[^\w.-]+/g, "_");
       const path = `${tenant_id}/${input.taskId ?? input.projectId ?? "misc"}/${crypto.randomUUID()}.${ext}`;
 
       const { error: upErr } = await supabase.storage

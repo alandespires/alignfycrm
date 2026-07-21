@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
   type DragEndEvent, type DragStartEvent, useDraggable, useDroppable,
@@ -11,7 +11,7 @@ import { formatBRL } from "@/lib/mock-data";
 import { useLeads, useUpdateLeadStatus, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
 import { useScoreLead } from "@/hooks/use-score-lead";
 import { useRealtimeSync } from "@/hooks/use-realtime";
-import { Plus, Filter, Sparkles, Loader2 } from "lucide-react";
+import { Plus, Filter, Sparkles, Loader2, Search, Rows3, X } from "lucide-react";
 import { KanbanSkeleton } from "@/components/skeletons";
 
 const STAGES: { id: LeadStatus; label: string; color: string }[] = [
@@ -42,7 +42,7 @@ function initialsOf(name: string) {
   return name.split(" ").map((s) => s[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() || "?";
 }
 
-function LeadCard({ lead, dragging }: { lead: LeadRow; dragging?: boolean }) {
+function LeadCard({ lead, dragging, compact = false }: { lead: LeadRow; dragging?: boolean; compact?: boolean }) {
   const score = useScoreLead();
   const isScoring = score.isPending && score.variables === lead.id;
   return (
@@ -54,9 +54,9 @@ function LeadCard({ lead, dragging }: { lead: LeadRow; dragging?: boolean }) {
         <h4 className="text-sm font-semibold leading-snug">{lead.empresa || lead.nome}</h4>
         <ScoreBadge score={lead.ai_score ?? 0} />
       </div>
-      <p className="text-xs text-muted-foreground">{lead.nome}{lead.interesse ? ` · ${lead.interesse}` : ""}</p>
+      {!compact && <p className="text-xs text-muted-foreground">{lead.nome}{lead.interesse ? ` · ${lead.interesse}` : ""}</p>}
 
-      {lead.ai_sugestao && (
+      {!compact && lead.ai_sugestao && (
         <div className="mt-2 rounded-md border border-primary/20 bg-primary/5 px-2 py-1.5">
           <div className="flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wider text-primary">
             <Sparkles className="h-2.5 w-2.5" /> Próxima ação
@@ -75,6 +75,7 @@ function LeadCard({ lead, dragging }: { lead: LeadRow; dragging?: boolean }) {
             onClick={(e) => { e.stopPropagation(); score.mutate(lead.id); }}
             disabled={isScoring}
             title="Analisar com IA"
+            aria-label={`Analisar ${lead.nome} com IA`}
             className="grid h-6 w-6 place-items-center rounded-md border border-border bg-surface-1 text-muted-foreground transition hover:border-primary/50 hover:text-primary disabled:opacity-50"
           >
             {isScoring ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
@@ -95,18 +96,20 @@ function LeadCard({ lead, dragging }: { lead: LeadRow; dragging?: boolean }) {
   );
 }
 
-function DraggableLead({ lead }: { lead: LeadRow }) {
+function DraggableLead({ lead, compact }: { lead: LeadRow; compact: boolean }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: lead.id });
   return (
     <div ref={setNodeRef} {...listeners} {...attributes}>
-      <LeadCard lead={lead} dragging={isDragging} />
+      <LeadCard lead={lead} dragging={isDragging} compact={compact} />
     </div>
   );
 }
 
-function Column({ stage, leads }: { stage: typeof STAGES[number]; leads: LeadRow[] }) {
+function Column({ stage, leads, compact }: { stage: typeof STAGES[number]; leads: LeadRow[]; compact: boolean }) {
   const { setNodeRef, isOver } = useDroppable({ id: stage.id });
+  const [visibleCount, setVisibleCount] = useState(30);
   const total = leads.reduce((a, l) => a + Number(l.valor_estimado || 0), 0);
+  const visibleLeads = leads.slice(0, visibleCount);
   return (
     <div
       ref={setNodeRef}
@@ -116,7 +119,7 @@ function Column({ stage, leads }: { stage: typeof STAGES[number]; leads: LeadRow
       ].join(" ")}
     >
       <div className="flex items-center justify-between gap-2 border-b border-border p-3">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="h-2 w-2 rounded-full" style={{ background: stage.color, boxShadow: `0 0 8px ${stage.color}` }} />
           <span className="text-sm font-semibold">{stage.label}</span>
           <span className="rounded-md bg-surface-3 px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground tabular-nums">{leads.length}</span>
@@ -124,15 +127,20 @@ function Column({ stage, leads }: { stage: typeof STAGES[number]; leads: LeadRow
         <LeadFormDialog
           defaultStatus={stage.id}
           trigger={
-            <button className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground">
+            <button aria-label={`Adicionar lead em ${stage.label}`} className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground">
               <Plus className="h-3.5 w-3.5" />
             </button>
           }
         />
       </div>
       <div className="border-b border-border px-3 py-2 text-[11px] text-muted-foreground tabular-nums">{formatBRL(total)}</div>
-      <div className="flex flex-1 flex-col gap-2 overflow-y-auto p-2.5" style={{ minHeight: 200 }}>
-        {leads.map((l) => <DraggableLead key={l.id} lead={l} />)}
+      <div className="flex max-h-[62vh] min-h-[200px] flex-1 flex-col gap-2 overflow-y-auto p-2.5">
+        {visibleLeads.map((l) => <DraggableLead key={l.id} lead={l} compact={compact} />)}
+        {visibleCount < leads.length && (
+          <button type="button" onClick={() => setVisibleCount((count) => count + 30)} className="rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/10">
+            Mostrar mais 30 · {leads.length - visibleCount} restantes
+          </button>
+        )}
         {leads.length === 0 && (
           <div className="grid place-items-center rounded-lg border border-dashed border-border/50 p-4 text-center text-[11px] text-muted-foreground">
             Arraste um lead aqui
@@ -144,13 +152,25 @@ function Column({ stage, leads }: { stage: typeof STAGES[number]; leads: LeadRow
 }
 
 function PipelinePage() {
-  useRealtimeSync([
+  const realtimeStatus = useRealtimeSync([
     { table: "leads", queryKeys: [["leads"]] },
     { table: "activities", queryKeys: [["activities"]] },
   ]);
   const { data: leads = [], isLoading } = useLeads();
   const updateStatus = useUpdateLeadStatus();
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [minimumScore, setMinimumScore] = useState(0);
+  const [compact, setCompact] = useState(true);
+  const hasActiveFilters = Boolean(query.trim()) || minimumScore > 0;
+  const displayedLeads = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
+    return leads.filter((lead) => {
+      if ((lead.ai_score ?? 0) < minimumScore) return false;
+      return !normalizedQuery || [lead.nome, lead.empresa, lead.email].some((value) => (value ?? "").toLocaleLowerCase("pt-BR").includes(normalizedQuery));
+    });
+  }, [leads, minimumScore, query]);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   function onDragStart(e: DragStartEvent) { setActiveId(String(e.active.id)); }
@@ -165,51 +185,49 @@ function PipelinePage() {
   }
 
   const activeLead = leads.find((l) => l.id === activeId);
-  const totalValue = leads.reduce((a, l) => a + Number(l.valor_estimado || 0), 0);
+  const totalValue = displayedLeads.reduce((a, l) => a + Number(l.valor_estimado || 0), 0);
 
   return (
     <AppShell
       title="Pipeline"
-      subtitle={`${leads.length} leads no funil · ${formatBRL(totalValue)} em pipeline`}
+      subtitle={`${displayedLeads.length}${displayedLeads.length !== leads.length ? ` de ${leads.length}` : ""} leads no funil · ${formatBRL(totalValue)} em pipeline`}
       action={
         <div className="flex items-center gap-2">
-          <RealtimeBadge />
-          <button className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground">
+          <RealtimeBadge status={realtimeStatus} />
+          <button type="button" aria-pressed={compact} onClick={() => setCompact((value) => !value)} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground">
+            <Rows3 className="h-3.5 w-3.5" /> {compact ? "Compacto" : "Detalhado"}
+          </button>
+          <button type="button" aria-expanded={filtersOpen} onClick={() => setFiltersOpen((value) => !value)} className="relative inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground">
             <Filter className="h-3.5 w-3.5" /> Filtros
+            {hasActiveFilters && <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-label="Há filtros ativos" />}
           </button>
           <LeadFormDialog />
         </div>
       }
     >
+      <div className="mb-4 flex flex-wrap gap-3 rounded-2xl border border-border bg-surface-2 p-3 shadow-card">
+        <label className="relative min-w-[240px] flex-1">
+          <span className="sr-only">Buscar no pipeline</span>
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar lead ou empresa" className="h-10 w-full rounded-lg border border-border bg-surface-1 pl-9 pr-10 text-sm focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20" />
+          {query && <button type="button" aria-label="Limpar busca" onClick={() => setQuery("")} className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground"><X className="h-3.5 w-3.5" /></button>}
+        </label>
+        {filtersOpen && <label className="flex items-center gap-2 text-xs text-muted-foreground">Score mínimo
+            <select value={minimumScore} onChange={(event) => setMinimumScore(Number(event.target.value))} className="h-10 rounded-lg border border-border bg-surface-1 px-3 text-sm text-foreground">
+              <option value={0}>Todos</option><option value={50}>50+</option><option value={80}>80+</option>
+            </select>
+          </label>}
+        <div className="self-center text-xs text-muted-foreground">{displayedLeads.length} resultado{displayedLeads.length === 1 ? "" : "s"}</div>
+        {hasActiveFilters && <button type="button" onClick={() => { setQuery(""); setMinimumScore(0); }} className="inline-flex h-10 items-center gap-1 rounded-lg px-3 text-xs font-semibold text-primary hover:bg-primary/10"><X className="h-3.5 w-3.5" /> Limpar</button>}
+      </div>
       {isLoading ? (
         <KanbanSkeleton columns={6} />
       ) : (
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-          {/* Navbar horizontal de stages — sumário acima dos cards */}
-          <div className="mb-4 overflow-x-auto rounded-2xl border border-border bg-surface-2 p-2 shadow-card">
-            <div className="flex min-w-max items-center gap-1">
-              {STAGES.map((s) => {
-                const stageLeads = leads.filter((l) => l.status === s.id);
-                const total = stageLeads.reduce((a, l) => a + Number(l.valor_estimado || 0), 0);
-                return (
-                  <div
-                    key={s.id}
-                    className="flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 transition hover:border-border hover:bg-surface-1"
-                  >
-                    <span className="h-2 w-2 rounded-full" style={{ background: s.color, boxShadow: `0 0 8px ${s.color}` }} />
-                    <span className="text-xs font-semibold uppercase tracking-wide text-foreground">{s.label}</span>
-                    <span className="rounded-md bg-surface-3 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-muted-foreground">{stageLeads.length}</span>
-                    <span className="text-[11px] tabular-nums text-muted-foreground">{formatBRL(total)}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="-mx-5 overflow-x-auto px-5 pb-4 md:-mx-8 md:px-8">
+          <div className="-mx-5 overflow-x-auto px-5 pb-4 md:-mx-8 md:px-8" aria-label="Etapas do pipeline; deslize horizontalmente para ver todas">
             <div className="flex gap-4">
               {STAGES.map((s) => (
-                <Column key={s.id} stage={s} leads={leads.filter((l) => l.status === s.id)} />
+                <Column key={s.id} stage={s} leads={displayedLeads.filter((l) => l.status === s.id)} compact={compact} />
               ))}
             </div>
           </div>

@@ -16,6 +16,7 @@ import {
   useCalendarItems, useSaveCalendarItem, useDeleteCalendarItem,
   type Campaign, type CalendarItem,
 } from "@/hooks/use-marketing";
+import { AppShell } from "@/components/app-shell";
 
 export const Route = createFileRoute("/campanhas")({
   head: () => ({ meta: [{ title: "Campanhas — Align CRM" }] }),
@@ -31,17 +32,14 @@ function CampanhasPage() {
   const roiMedio = camps.length ? camps.reduce((s, c) => s + (c.roi ?? 0), 0) / camps.length : 0;
 
   return (
-    <div className="p-6 space-y-6 anim-fade-up">
-      <header className="stack-tight">
-        <h1 className="text-3xl font-bold tracking-tight">Marketing</h1>
-        <p className="text-sm text-muted-foreground">Campanhas, calendário editorial e desempenho.</p>
-      </header>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <AppShell title="Campanhas" subtitle="Campanhas, calendário editorial e desempenho.">
+      <div className="space-y-6 anim-fade-up">
+      {camps.length > 0 && <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Kpi icon={<Megaphone className="size-4" />} label="Campanhas ativas" value={ativas} />
         <Kpi icon={<Target className="size-4" />} label="Total campanhas" value={camps.length} />
         <Kpi icon={<TrendingUp className="size-4" />} label="Orçamento total" value={brl(orcamento)} />
         <Kpi icon={<TrendingUp className="size-4" />} label="ROI médio" value={`${roiMedio.toFixed(1)}x`} />
-      </div>
+      </div>}
       <Tabs defaultValue="campanhas">
         <TabsList>
           <TabsTrigger value="campanhas">Campanhas</TabsTrigger>
@@ -52,10 +50,11 @@ function CampanhasPage() {
         <TabsContent value="calendario" className="mt-4"><CalendarTab statusFilter={["planejado", "producao", "revisao", "publicado"]} /></TabsContent>
         <TabsContent value="ideias" className="mt-4"><CalendarTab statusFilter={["ideia"]} /></TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </AppShell>
   );
 }
-function Kpi({ icon, label, value }: { icon: React.ReactNode; label: string; value: any }) {
+function Kpi({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
   return <Card className="p-4 lift"><div className="flex items-center gap-2 text-muted-foreground text-xs">{icon}{label}</div><div className="text-2xl font-bold mt-1">{value}</div></Card>;
 }
 
@@ -70,7 +69,8 @@ function CampaignsTab() {
         <div className="text-sm text-muted-foreground">{camps.length} campanhas</div>
         <Button onClick={() => { setF({ status: "planejada" }); setOpen(true); }}><Plus className="size-4 mr-1" />Nova campanha</Button>
       </div>
-      <Table>
+      <div className="overflow-x-auto" tabIndex={0} aria-label="Tabela de campanhas; deslize horizontalmente para ver todas as colunas">
+      <Table className="min-w-[860px]">
         <TableHeader><TableRow>
           <TableHead>Nome</TableHead><TableHead>Status</TableHead><TableHead>Plataforma</TableHead>
           <TableHead>Período</TableHead><TableHead>Orçamento</TableHead><TableHead>ROI</TableHead><TableHead className="w-24"></TableHead>
@@ -85,14 +85,15 @@ function CampaignsTab() {
               <TableCell>{c.orcamento ? brl(c.orcamento) : "—"}</TableCell>
               <TableCell>{c.roi ? `${c.roi.toFixed(1)}x` : "—"}</TableCell>
               <TableCell>
-                <Button variant="ghost" size="icon" onClick={() => { setF(c); setOpen(true); }}><Pencil className="size-4" /></Button>
-                <Button variant="ghost" size="icon" onClick={() => confirm("Remover?") && del.mutate(c.id)}><Trash2 className="size-4" /></Button>
+                <Button aria-label={`Editar campanha ${c.nome}`} variant="ghost" size="icon" onClick={() => { setF(c); setOpen(true); }}><Pencil className="size-4" /></Button>
+                <Button aria-label={`Remover campanha ${c.nome}`} variant="ghost" size="icon" onClick={() => confirm("Remover?") && del.mutate(c.id)}><Trash2 className="size-4" /></Button>
               </TableCell>
             </TableRow>
           ))}
-          {camps.length === 0 && <TableRow><TableCell colSpan={7} className="text-center text-sm text-muted-foreground py-8">Nenhuma campanha.</TableCell></TableRow>}
+          {camps.length === 0 && <TableRow><TableCell colSpan={7} className="py-14 text-center"><Megaphone className="mx-auto h-9 w-9 text-primary" /><div className="mt-3 text-base font-semibold text-foreground">Crie sua primeira campanha</div><div className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Defina objetivo, plataforma, período e orçamento. O desempenho aparecerá aqui assim que houver dados.</div></TableCell></TableRow>}
         </TableBody>
       </Table>
+      </div>
       <CampaignDialog open={open} onOpenChange={setOpen} f={f} setF={setF} />
     </Card>
   );
@@ -149,8 +150,8 @@ function CalendarTab({ statusFilter }: { statusFilter: string[] }) {
             <div className="flex justify-between items-start">
               <div className="font-semibold text-sm">{i.titulo}</div>
               <div className="flex gap-1">
-                <Button variant="ghost" size="icon" onClick={() => { setF(i); setOpen(true); }}><Pencil className="size-3" /></Button>
-                <Button variant="ghost" size="icon" onClick={() => confirm("Remover?") && del.mutate(i.id)}><Trash2 className="size-3" /></Button>
+                <Button aria-label={`Editar item ${i.titulo}`} variant="ghost" size="icon" onClick={() => { setF(i); setOpen(true); }}><Pencil className="size-3" /></Button>
+                <Button aria-label={`Remover item ${i.titulo}`} variant="ghost" size="icon" onClick={() => confirm("Remover?") && del.mutate(i.id)}><Trash2 className="size-3" /></Button>
               </div>
             </div>
             <div className="text-xs text-muted-foreground mt-1">{i.tema ?? "—"}</div>

@@ -14,8 +14,9 @@ import {
 import { useLeads, useDeleteLead, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
 import { useScoreLead } from "@/hooks/use-score-lead";
 import { useRealtimeSync } from "@/hooks/use-realtime";
-import { Trash2, Mail, Phone, Loader2, Inbox, Sparkles, X } from "lucide-react";
+import { Trash2, Mail, Phone, Loader2, Inbox, Sparkles, Search, X } from "lucide-react";
 import { TableRowsSkeleton } from "@/components/skeletons";
+import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 
 export const Route = createFileRoute("/leads")({
   head: () => ({ meta: [{ title: "Leads — Align CRM" }] }),
@@ -101,13 +102,38 @@ function LeadsPage() {
       title="Leads"
       subtitle={`${leads.length} leads ativos · ${novosSemana} novos esta semana`}
       action={
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <LeadImportDialog leads={leads} />
           <LeadFiltersDialog leads={leads} value={filters} onChange={setFilters} />
           <LeadFormDialog />
         </div>
       }
     >
+      <div className="mb-4 flex flex-wrap gap-3 rounded-2xl border border-border bg-surface-2 p-3 shadow-card">
+        <label className="relative min-w-[240px] flex-1">
+          <span className="sr-only">Buscar leads</span>
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <input
+            value={filters.q}
+            onChange={(event) => setFilters({ ...filters, q: event.target.value })}
+            placeholder="Buscar por nome, empresa ou contato"
+            className="h-10 w-full rounded-lg border border-border bg-surface-1 pl-9 pr-10 text-sm focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+          {filters.q && (
+            <button
+              type="button"
+              aria-label="Limpar busca"
+              onClick={() => setFilters({ ...filters, q: "" })}
+              className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </label>
+        <div className="self-center text-xs text-muted-foreground">
+          {filteredLeads.length} resultado{filteredLeads.length === 1 ? "" : "s"}
+        </div>
+      </div>
       {isLoading ? (
         <div className="overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-card">
           <div className="overflow-x-auto">
@@ -219,14 +245,9 @@ function LeadsPage() {
                             </a>
                           )}
                           {l.whatsapp && (
-                            <a
-                              href={`https://wa.me/${l.whatsapp.replace(/\D/g, "")}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="hover:text-success"
-                            >
+                            <WhatsAppContactLink phone={l.whatsapp} leadId={l.id} consent={l.whatsapp_consent_status} className="hover:text-success">
                               <Phone className="h-3.5 w-3.5" />
-                            </a>
+                            </WhatsAppContactLink>
                           )}
                           {!l.email && !l.whatsapp && <span className="text-xs">—</span>}
                         </div>
@@ -283,6 +304,7 @@ function LeadsPage() {
                               if (confirm(`Remover ${l.nome}?`)) del.mutate(l.id);
                             }}
                             className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground transition hover:text-destructive"
+                            aria-label={`Remover lead ${l.nome}`}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>

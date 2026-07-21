@@ -75,12 +75,12 @@ function readState(): TourState {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) return JSON.parse(raw);
-  } catch {}
+  } catch { /* estado inválido: usa o padrão seguro */ }
   return { seen: false, step: 0, done: {}, visited: {} };
 }
 
 function writeState(s: TourState) {
-  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
+  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* storage pode estar indisponível */ }
 }
 
 export function useLaunchTour() {
@@ -123,16 +123,7 @@ export function ProductTour() {
     return m;
   }, [ctx, state.done]);
 
-  // Auto-open on first visit; resume from last incomplete step
-  useEffect(() => {
-    const s = readState();
-    if (!s.seen) {
-      const t = setTimeout(() => setOpen(true), 900);
-      return () => clearTimeout(t);
-    }
-  }, []);
-
-  // Global trigger
+  // O tour é iniciado sob demanda para não bloquear a primeira tarefa do usuário.
   useEffect(() => {
     function trigger() {
       const s = readState();

@@ -24,9 +24,9 @@ function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => vo
             />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Something went wrong</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Não foi possível carregar os dados</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          An unexpected error occurred. Please try again.
+          O CRM encontrou uma falha e não vai apresentar esses dados como uma lista vazia. Tente novamente ou volte ao início.
         </p>
         {import.meta.env.DEV && error.message && (
           <pre className="mt-4 max-h-40 overflow-auto rounded-md bg-muted p-3 text-left font-mono text-xs text-destructive">
@@ -41,13 +41,13 @@ function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => vo
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            Tentar novamente
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            Voltar ao início
           </a>
         </div>
       </div>
@@ -65,6 +65,9 @@ export const getRouter = () => {
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
         retry: 1,
+        // Falhas de backend devem interromper a tela; nunca podem parecer um
+        // conjunto de dados legitimamente vazio.
+        throwOnError: true,
         // Mostra dados antigos enquanto busca novos (sem flicker de loading)
         placeholderData: (prev: unknown) => prev,
       },

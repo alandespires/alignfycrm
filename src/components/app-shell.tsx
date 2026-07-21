@@ -2,13 +2,13 @@ import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   LayoutDashboard, Users, Kanban, Building2, ListChecks, Zap, Sparkles,
-  BarChart3, Settings, Search, Plus, LogOut, Loader2, Sun, Moon, Shield, Wallet,
+  BarChart3, Settings, Plus, LogOut, Loader2, Sun, Moon, Shield, Wallet,
   Stethoscope, Target, FileText, UserCircle, Building, History, Megaphone, Mail,
   Globe, LifeBuoy, BookOpen, MessageCircle, LineChart, Briefcase, GraduationCap,
   BookMarked, ClipboardList, CalendarCheck, Bell, IdCard, MoreHorizontal, X,
   ShoppingBag, ChevronRight, Calculator, Landmark, Award,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import alignIcon from "@/assets/align-icon.png";
 import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
@@ -19,6 +19,7 @@ import { NotificationsPopover } from "@/components/notifications-popover";
 import { LaunchPanel } from "@/components/launch-panel";
 import { LaunchIcon } from "@/components/launch-icon";
 import { ProductTour } from "@/components/product-tour";
+import { LeadFormDialog } from "@/components/lead-form-dialog";
 
 
 /* ============================================================
@@ -28,7 +29,7 @@ import { ProductTour } from "@/components/product-tour";
  *  - 5 slots: Dashboard · Comercial · Tarefas · Financeiro · Mais
  * ============================================================ */
 
-type SubItem = { to: string; label: string; icon: any; clinicOnly?: boolean; schoolOnly?: boolean };
+type SubItem = { to: string; label: string; icon: any; clinicOnly?: boolean; schoolOnly?: boolean; availability?: "coming-soon" };
 type SubGroup = { id: string; label: string; icon: any; items: SubItem[]; schoolOnly?: boolean };
 
 // Items under "Comercial" dock slot
@@ -70,8 +71,8 @@ const OPERACIONAL_GROUPS: SubGroup[] = [
     id: "marketing", label: "Marketing", icon: Megaphone,
     items: [
       { to: "/campanhas", label: "Campanhas", icon: Megaphone },
-      { to: "/email-marketing", label: "E-mail", icon: Mail },
-      { to: "/landing-pages", label: "Landing Pages", icon: Globe },
+      { to: "/email-marketing", label: "E-mail", icon: Mail, availability: "coming-soon" },
+      { to: "/landing-pages", label: "Landing Pages", icon: Globe, availability: "coming-soon" },
       { to: "/automacao", label: "Automação", icon: Zap },
     ],
   },
@@ -91,7 +92,7 @@ const OPERACIONAL_GROUPS: SubGroup[] = [
     items: [
       { to: "/tickets", label: "Tickets", icon: LifeBuoy },
       { to: "/base-conhecimento", label: "Base", icon: BookOpen },
-      { to: "/chat", label: "Chat", icon: MessageCircle },
+      { to: "/chat", label: "Chat", icon: MessageCircle, availability: "coming-soon" },
     ],
   },
 ];
@@ -250,10 +251,11 @@ export function AppShell({ children, title, subtitle, action }: {
   const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
   const isComercialActive = COMERCIAL_PATHS.some((p) => pathname.startsWith(p));
   const isOperacionalActive = OPERACIONAL_PATHS.some((p) => pathname.startsWith(p));
+  const showGlobalLeadAction = !["/", "/leads", "/pipeline"].includes(pathname);
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground md:pl-44">
       {/* Ambient backdrop — barely-there glow, sets the premium mood */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-[var(--gradient-glow)] opacity-70 blur-3xl" />
@@ -276,30 +278,19 @@ export function AppShell({ children, title, subtitle, action }: {
             </div>
           </Link>
 
-          <div className="relative ml-2 hidden flex-1 md:block">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="search"
-              placeholder="Buscar leads, negócios, clientes…"
-              className="h-10 w-full max-w-md rounded-2xl border border-white/[0.06] bg-white/[0.03] pl-10 pr-3 text-sm placeholder:text-muted-foreground focus:border-primary/40 focus:bg-white/[0.05] focus:outline-none focus:ring-2 focus:ring-primary/15"
-            />
-          </div>
+          <div className="flex-1" />
 
           <div className="ml-auto flex items-center gap-1.5">
-            <Link
-              to="/leads"
-              aria-label="Novo lead"
-              className="hidden h-10 items-center gap-2 rounded-2xl bg-primary px-3.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 sm:inline-flex"
-            >
-              <Plus className="h-3.5 w-3.5" /> Novo
-            </Link>
-            <Link
-              to="/leads"
-              aria-label="Novo lead"
-              className="grid h-10 w-10 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-glow sm:hidden"
-            >
-              <Plus className="h-4 w-4" />
-            </Link>
+            {showGlobalLeadAction && <LeadFormDialog trigger={(
+              <button aria-label="Novo lead" className="hidden h-10 items-center gap-2 rounded-2xl bg-primary px-3.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 sm:inline-flex">
+                <Plus className="h-3.5 w-3.5" /> Novo lead
+              </button>
+            )} />}
+            {showGlobalLeadAction && <LeadFormDialog trigger={(
+              <button aria-label="Novo lead" className="grid h-10 w-10 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-glow sm:hidden">
+                <Plus className="h-4 w-4" />
+              </button>
+            )} />}
             <button
               onClick={toggleTheme}
               aria-label="Alternar tema"
@@ -327,17 +318,6 @@ export function AppShell({ children, title, subtitle, action }: {
           </div>
         </div>
 
-        {/* Mobile search row */}
-        <div className="px-4 pb-3 md:hidden">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="search"
-              placeholder="Buscar…"
-              className="h-10 w-full rounded-2xl border border-white/[0.06] bg-white/[0.03] pl-10 pr-3 text-sm placeholder:text-muted-foreground focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/15"
-            />
-          </div>
-        </div>
       </header>
 
       {/* ===== Main ===== */}
@@ -430,14 +410,13 @@ function LiquidDock({
   return (
     <nav
       aria-label="Navegação principal"
-      className="fixed inset-x-0 z-40 flex justify-center px-2 sm:px-3"
-      style={{ bottom: "calc(env(safe-area-inset-bottom) + 14px)" }}
+      className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+14px)] z-40 flex justify-center px-2 sm:px-3 md:inset-x-auto md:bottom-auto md:left-4 md:top-1/2 md:w-40 md:-translate-y-1/2 md:justify-start md:px-0"
     >
-      <div className="relative w-full max-w-[calc(100vw-1rem)] sm:w-auto">
+      <div className="relative w-full max-w-[calc(100vw-1rem)] sm:w-auto md:w-full md:max-w-none">
         {/* glow under the dock */}
         <div aria-hidden className="pointer-events-none absolute -inset-6 -z-10 rounded-[40px] bg-primary/[0.06] blur-2xl" />
         <ul
-          className="flex items-center justify-between gap-0.5 overflow-x-auto rounded-[28px] border border-white/[0.08] bg-white/[0.04] p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl backdrop-saturate-150 dark:bg-white/[0.04] sm:gap-1 sm:justify-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex items-center justify-between gap-0.5 overflow-x-auto rounded-[28px] border border-white/[0.08] bg-background/90 p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl backdrop-saturate-150 sm:gap-1 sm:justify-center md:flex-col md:items-stretch md:overflow-visible md:rounded-3xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <DockItem to="/" label="Dashboard" icon={LayoutDashboard} active={active.home} />
           <DockButton label="Comercial" icon={ShoppingBag} active={active.comercial || comercialOpen} onClick={onOpenComercial} />
@@ -446,7 +425,7 @@ function LiquidDock({
           <DockButton label="Mais" icon={MoreHorizontal} active={maisOpen} onClick={onOpenMais} />
 
           {/* divider */}
-          <li aria-hidden className="mx-1 hidden h-7 w-px bg-white/[0.08] sm:block" />
+          <li aria-hidden className="mx-1 hidden h-7 w-px bg-white/[0.08] sm:block md:my-1 md:h-px md:w-auto" />
           <LaunchDockButton active={launchOpen} onClick={onOpenLaunch} />
         </ul>
       </div>
@@ -462,7 +441,7 @@ function LaunchDockButton({ active, onClick }: { active: boolean; onClick: () =>
         onClick={onClick}
         aria-label="Launch — Inteligência"
         className={[
-          "group relative flex h-12 items-center gap-2 overflow-hidden rounded-[20px] px-3.5 transition-all duration-300 ease-out",
+          "group relative flex h-12 items-center gap-2 overflow-hidden rounded-[20px] px-3.5 transition-all duration-300 ease-out md:w-full",
           "border border-white/[0.10] bg-gradient-to-b from-white/[0.08] to-white/[0.02]",
           "shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_8px_24px_-10px_oklch(0.7_0.18_145_/_0.45)]",
           "hover:from-white/[0.12] hover:to-white/[0.04] active:scale-[0.97]",
@@ -489,7 +468,7 @@ function DockItem({ to, label, icon: Icon, active }: { to: string; label: string
         to={to as any}
         aria-label={label}
         className={[
-          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-colors duration-300 ease-out",
+          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-colors duration-300 ease-out md:w-full",
           active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
         ].join(" ")}
       >
@@ -517,7 +496,7 @@ function DockButton({ label, icon: Icon, active, onClick, badge }: { label: stri
         onClick={onClick}
         aria-label={badge ? `${label} (${badge} item${badge === 1 ? "" : "s"} pendente${badge === 1 ? "" : "s"})` : label}
         className={[
-          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-colors duration-300 ease-out",
+          "group relative flex h-12 shrink-0 items-center gap-2 rounded-[20px] px-3 transition-colors duration-300 ease-out md:w-full",
           active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
         ].join(" ")}
       >
@@ -558,17 +537,48 @@ function DockSheet({
   title: string; onClose: () => void; groups: SubGroup[]; pathname: string; footer?: ReactNode;
 }) {
   const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
+  const panelRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    const panel = panelRef.current;
+    const focusable = () => Array.from(panel?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])') ?? []);
+    focusable()[0]?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const items = focusable();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      previousFocusRef.current?.focus();
+    };
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={title}>
       {/* dimmer */}
       <button
-        aria-label="Fechar"
+        aria-label={`Dispensar menu ${title}`}
         onClick={onClose}
         className="absolute inset-0 bg-black/40 backdrop-blur-[6px] animate-in fade-in duration-200"
       />
       {/* sheet */}
       <div
+        ref={panelRef}
         className="absolute inset-x-3 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-[min(900px,calc(100vw-32px))] rounded-[28px] border border-white/[0.08] bg-background/85 p-4 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-2xl backdrop-saturate-150 animate-in fade-in slide-in-from-bottom-4 duration-300 md:p-6"
         style={{ bottom: "calc(env(safe-area-inset-bottom) + 82px)" }}
       >
@@ -577,7 +587,7 @@ function DockSheet({
             <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Menu</div>
             <h2 className="font-display text-xl font-semibold tracking-tight">{title}</h2>
           </div>
-          <button onClick={onClose} aria-label="Fechar" className="grid h-10 w-10 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground">
+          <button onClick={onClose} aria-label={`Fechar menu ${title}`} className="grid h-10 w-10 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -592,7 +602,7 @@ function DockSheet({
                   <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{g.label}</div>
                 </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {g.items.map(({ to, label, icon: Icon }) => {
+                  {g.items.map(({ to, label, icon: Icon, availability }) => {
                     const active = isActive(to);
                     return (
                       <Link
@@ -612,7 +622,12 @@ function DockSheet({
                           <Icon className="h-4 w-4" strokeWidth={2.4} />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="truncate text-[13px] font-medium tracking-tight">{label}</div>
+                          <div className="flex min-w-0 items-center gap-2">
+                            <span className="truncate text-[13px] font-medium tracking-tight">{label}</span>
+                            {availability === "coming-soon" && (
+                              <span className="shrink-0 rounded-full bg-warning/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-warning">Em breve</span>
+                            )}
+                          </div>
                         </div>
                         <ChevronRight className={["h-3.5 w-3.5 shrink-0 transition", active ? "text-primary opacity-80" : "opacity-0 group-hover:translate-x-0.5 group-hover:opacity-60"].join(" ")} />
                       </Link>

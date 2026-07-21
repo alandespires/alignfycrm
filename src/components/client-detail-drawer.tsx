@@ -4,6 +4,7 @@ import { Mail, Phone, Sparkles, Loader2, CheckCircle2, MessageSquare, Calendar, 
 import type { ClientRow } from "@/hooks/use-clients";
 import { formatBRL } from "@/lib/mock-data";
 import { AlignPanel, AlignPanelSection } from "@/components/align-panel";
+import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 
 const TIPO_ICON: Record<string, any> = {
   ligacao: Phone, email: Mail, whatsapp: MessageSquare, reuniao: Calendar,
@@ -91,9 +92,9 @@ export function ClientDetailDrawer({ client, onClose }: { client: ClientRow | nu
               </a>
             )}
             {client.whatsapp && (
-              <a href={`https://wa.me/${client.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-3 text-xs hover:border-success/40 hover:text-success">
+              <WhatsAppContactLink phone={client.whatsapp} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-3 text-xs hover:border-success/40 hover:text-success">
                 <MessageSquare className="h-3.5 w-3.5" /> WhatsApp
-              </a>
+              </WhatsAppContactLink>
             )}
           </div>
         )}

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { ProspectingFiltersBar } from "@/components/prospecting/prospecting-filters";
 import { ProspectingResultsTable } from "@/components/prospecting/prospecting-results-table";
@@ -81,10 +81,19 @@ function ProspeccaoPage() {
     refetch: refetchResults,
   } = useProspectingResults(activeSearchId);
 
+  useEffect(() => {
+    if (activeSearchId || !searches.length) return;
+    const latestWithResults = searches.find((search) => search.encontrados > 0);
+    setActiveSearchId((latestWithResults ?? searches[0]).id);
+  }, [activeSearchId, searches]);
+
   const activeResults = useMemo(
     () => results.filter((result) => !["ignorado", "invalido"].includes(result.status)),
     [results],
   );
+  const realActiveResults = useMemo(() => activeResults.filter((result) => !result.is_demo), [activeResults]);
+  const demoCount = activeResults.length - realActiveResults.length;
+  const selectedRealResults = realActiveResults.filter((result) => selected.has(result.id));
   const activeSearch = searches.find((search) => search.id === activeSearchId);
   const searching = !!activeSearch && ACTIVE_STATUSES.includes(activeSearch.status);
   const openLive = opened ? (results.find((result) => result.id === opened.id) ?? null) : null;
@@ -130,16 +139,17 @@ function ProspeccaoPage() {
   return (
     <AppShell
       title="Prospecção B2B"
-      subtitle="Busque, qualifique e importe leads reais com score inteligente"
+      subtitle="Encontre, qualifique e organize oportunidades B2B com score inteligente"
       action={
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() =>
               exportProspectingCsv(
-                selected.size ? results.filter((result) => selected.has(result.id)) : activeResults,
+                selectedRealResults.length ? selectedRealResults : realActiveResults,
               )
             }
-            disabled={!activeResults.length || !canEdit}
+            disabled={!realActiveResults.length || !canEdit}
+            title={!realActiveResults.length ? "Dados de demonstração não podem ser exportados" : undefined}
             className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border px-3 text-sm disabled:opacity-50"
           >
             <Download className="h-3.5 w-3.5" /> CSV
@@ -147,10 +157,11 @@ function ProspeccaoPage() {
           <button
             onClick={() =>
               exportProspectingXlsx(
-                selected.size ? results.filter((result) => selected.has(result.id)) : activeResults,
+                selectedRealResults.length ? selectedRealResults : realActiveResults,
               )
             }
-            disabled={!activeResults.length || !canEdit}
+            disabled={!realActiveResults.length || !canEdit}
+            title={!realActiveResults.length ? "Dados de demonstração não podem ser exportados" : undefined}
             className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border px-3 text-sm disabled:opacity-50"
           >
             <FileSpreadsheet className="h-3.5 w-3.5" /> XLSX
@@ -167,6 +178,15 @@ function ProspeccaoPage() {
       }
     >
       <div className="space-y-5">
+        {demoCount > 0 && (
+          <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-warning/35 bg-warning/10 px-4 py-3 text-sm">
+            <div>
+              <div className="font-semibold text-warning">Ambiente de demonstração</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{demoCount} resultado{demoCount === 1 ? "" : "s"} simulado{demoCount === 1 ? "" : "s"}. Esses dados não entram nos KPIs reais e não podem ser exportados, importados ou contatados.</div>
+            </div>
+            <span className="rounded-full bg-warning/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-warning">Demo</span>
+          </div>
+        )}
         <motion.div
           variants={staggerContainer}
           initial="initial"
@@ -268,7 +288,7 @@ function ProspeccaoPage() {
                     : "border-border bg-surface-1 text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {search.nome ?? "(sem nome)"} · {search.qualificados}/{search.encontrados}
+                {search.nome ?? "(sem nome)"} · {search.qualificados}/{search.encontrados}{search.is_demo ? " · Demo" : ""}
               </button>
             ))}
           </motion.div>

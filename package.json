@@ -9,9 +9,11 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
+    "lint:core": "eslint src/lib/access-control.ts src/lib/whatsapp-policy.ts src/lib/feature-flags.ts src/components/whatsapp-contact-link.tsx src/components/unavailable-module.tsx src/components/realtime-badge.tsx src/contexts/tenant-context.tsx src/hooks/use-realtime.ts src/hooks/use-tenant-settings.ts src/routes/__root.tsx src/routes/configuracoes.tsx --rule @typescript-eslint/no-explicit-any:error",
     "test": "vitest run",
     "test:watch": "vitest",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",

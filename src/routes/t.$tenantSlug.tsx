@@ -54,6 +54,11 @@ function TenantLayout() {
     );
   }
 
+  // Não renderiza queries do tenant anterior durante a troca de slug.
+  if (current?.tenant.slug !== tenantSlug) {
+    return <div className="grid min-h-screen place-items-center bg-background"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  }
+
   if (current?.tenant.status === "suspenso" || current?.tenant.status === "cancelado") {
     return (
       <div className="grid min-h-screen place-items-center bg-background px-4">

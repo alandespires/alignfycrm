@@ -160,7 +160,7 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
     setLoading(true);
 
     // persist user msg (best-effort)
-    if (convId) try { appendMsg.mutate({ conversation_id: convId, role: "user", content: text }); } catch {}
+    if (convId) try { appendMsg.mutate({ conversation_id: convId, role: "user", content: text }); } catch { /* persistência best-effort */ }
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -221,7 +221,7 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
         }
       }
       // persist assistant msg
-      if (convId && acc) try { appendMsg.mutate({ conversation_id: convId, role: "assistant", content: acc }); } catch {}
+      if (convId && acc) try { appendMsg.mutate({ conversation_id: convId, role: "assistant", content: acc }); } catch { /* persistência best-effort */ }
 
       // If the AI called a tool, open the confirmation dialog pre-populated
       const firstTool = Object.values(toolCalls)[0];

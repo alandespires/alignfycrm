@@ -1,6 +1,7 @@
 import * as XLSX from "xlsx";
 import type { LeadRow, LeadStatus } from "@/hooks/use-leads";
 import { normalizeEmail, normalizePhone } from "@/lib/prospecting/normalize";
+import { repairMojibake } from "@/lib/text-encoding";
 
 export const MAX_LEAD_IMPORT_ROWS = 2_000;
 export const MAX_LEAD_IMPORT_FILE_BYTES = 5 * 1024 * 1024;
@@ -73,7 +74,7 @@ function normalizeText(value: unknown) {
 }
 
 function cellText(value: unknown) {
-  return String(value ?? "").trim();
+  return repairMojibake(String(value ?? "").trim());
 }
 
 function parseMoney(value: string): number | undefined {

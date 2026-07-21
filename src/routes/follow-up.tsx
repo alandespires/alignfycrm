@@ -74,7 +74,7 @@ function FollowUpPage() {
   const del = useDeletePipelineAutomation();
   const [editing, setEditing] = useState<{ stage: string; prefill?: PipelineStageAutomation | null } | null>(null);
 
-  function useTemplate(t: typeof TEMPLATES[number]) {
+  function applyTemplate(t: typeof TEMPLATES[number]) {
     create.mutate({ nome: t.label, stage: t.stage, ativo: true, tarefas: t.tarefas, notificar: true });
   }
 
@@ -95,7 +95,7 @@ function FollowUpPage() {
           {TEMPLATES.map((t) => (
             <button
               key={t.id}
-              onClick={() => useTemplate(t)}
+              onClick={() => applyTemplate(t)}
               disabled={create.isPending}
               className="group relative overflow-hidden rounded-2xl border border-border bg-surface-2 p-4 text-left shadow-card transition hover:border-primary/40 hover:-translate-y-0.5 disabled:opacity-50"
             >

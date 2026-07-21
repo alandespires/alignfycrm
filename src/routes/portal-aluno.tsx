@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { useMyStudentProfile, useStudentGrades, useStudentAttendance, useAnnouncements } from "@/hooks/use-school";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { AppShell } from "@/components/app-shell";
+import { StudentPortalShell } from "@/components/student-portal-shell";
 import { GraduationCap, BookOpen, CalendarCheck, Bell, CalendarDays, CheckCircle2, XCircle } from "lucide-react";
 
 export const Route = createFileRoute("/portal-aluno")({ component: Portal });
@@ -34,7 +34,7 @@ function Portal() {
   const [tab, setTab] = useState<typeof TABS[number]["v"]>("frequencia");
 
   return (
-    <AppShell title="Portal do Aluno" subtitle="Suas aulas, notas, frequência e comunicados.">
+    <StudentPortalShell>
       <div className="ks-escolar-theme relative overflow-hidden border border-primary/25 p-4 shadow-elevated md:p-6">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
@@ -73,7 +73,7 @@ function Portal() {
           </div>
         )}
       </div>
-    </AppShell>
+    </StudentPortalShell>
   );
 }
 

@@ -29,13 +29,46 @@ const TONE: Record<string, string> = {
   baixa: "text-muted-foreground",
 };
 
+type NotificationGroup = {
+  key: string;
+  items: Notification[];
+  notification: Notification;
+  title: string;
+  description: string | null;
+};
+
+function groupNotifications(list: Notification[]): NotificationGroup[] {
+  const groups = new Map<string, Notification[]>();
+  for (const notification of list) {
+    const importGroup = notification.tipo === "lead_novo" && /importa[cç][aã]o/i.test(notification.descricao ?? "");
+    const day = notification.created_at.slice(0, 10);
+    const key = importGroup ? `lead-import:${day}:${notification.descricao}` : notification.id;
+    groups.set(key, [...(groups.get(key) ?? []), notification]);
+  }
+  return Array.from(groups, ([key, items]) => ({
+    key,
+    items,
+    notification: items[0],
+    title: items.length > 1 ? `${items.length} novos leads importados` : items[0].titulo,
+    description: items.length > 1 ? `${items[0].descricao} · toque para abrir a lista` : items[0].descricao,
+  }));
+}
+
 export function NotificationsPopover() {
-  const { list, unread, markRead, markAllRead, remove, clearAll } = useNotifications();
+  const { list, unread, markRead, markManyRead, markAllRead, remove, removeMany, clearAll } = useNotifications();
   const navigate = useNavigate();
+  const grouped = groupNotifications(list);
 
   function handleClick(n: Notification) {
     if (!n.lida) markRead.mutate(n.id);
     if (n.link) navigate({ to: n.link as any });
+  }
+
+  function handleGroupClick(group: NotificationGroup) {
+    if (group.items.length === 1) return handleClick(group.notification);
+    const unreadIds = group.items.filter((item) => !item.lida).map((item) => item.id);
+    if (unreadIds.length) markManyRead.mutate(unreadIds);
+    navigate({ to: "/leads" });
   }
 
   return (
@@ -48,7 +81,7 @@ export function NotificationsPopover() {
           <Bell className="h-4 w-4" />
           {unread > 0 && (
             <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground shadow-glow">
-              {unread > 99 ? "99+" : unread}
+              {unread >= 50 ? "50+" : unread}
             </span>
           )}
         </button>
@@ -93,28 +126,30 @@ export function NotificationsPopover() {
               <div className="text-xs text-muted-foreground">Você será avisado por aqui.</div>
             </div>
           ) : (
-            list.map((n) => {
+            grouped.map((group) => {
+              const n = group.notification;
               const Icon = ICONS[n.tipo] ?? Bell;
               const tone = TONE[n.prioridade] ?? "text-primary";
+              const isUnread = group.items.some((item) => !item.lida);
               return (
                 <div
-                  key={n.id}
+                  key={group.key}
                   className={[
                     "group flex gap-3 border-b border-border/60 px-4 py-3 transition hover:bg-surface-2/60",
-                    !n.lida ? "bg-primary/[0.04]" : "",
+                    isUnread ? "bg-primary/[0.04]" : "",
                   ].join(" ")}
                 >
-                  <button onClick={() => handleClick(n)} className="flex flex-1 gap-3 text-left">
+                  <button onClick={() => handleGroupClick(group)} className="flex flex-1 gap-3 text-left">
                     <div className={["mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-surface-2", tone].join(" ")}>
                       <Icon className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start gap-2">
-                        <div className="line-clamp-1 flex-1 text-sm font-medium">{n.titulo}</div>
-                        {!n.lida && <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />}
+                        <div className="line-clamp-1 flex-1 text-sm font-medium">{group.title}</div>
+                        {isUnread && <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />}
                       </div>
-                      {n.descricao && (
-                        <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{n.descricao}</div>
+                      {group.description && (
+                        <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{group.description}</div>
                       )}
                       <div className="mt-1 text-[10px] text-muted-foreground">
                         {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: ptBR })}
@@ -122,8 +157,8 @@ export function NotificationsPopover() {
                     </div>
                   </button>
                   <button
-                    onClick={() => remove.mutate(n.id)}
-                    title="Remover"
+                    onClick={() => group.items.length > 1 ? removeMany.mutate(group.items.map((item) => item.id)) : remove.mutate(n.id)}
+                    aria-label={group.items.length > 1 ? `Remover grupo ${group.title}` : `Remover notificação ${group.title}`}
                     className="self-start opacity-0 transition group-hover:opacity-100"
                   >
                     <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />

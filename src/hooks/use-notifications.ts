@@ -62,6 +62,19 @@ export function useNotifications() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications", user?.id] }),
   });
 
+  const markManyRead = useMutation({
+    mutationFn: async (ids: string[]) => {
+      if (!ids.length) return;
+      const { error } = await supabase
+        .from("notifications")
+        .update({ lida: true, lida_em: new Date().toISOString() })
+        .eq("user_id", user!.id)
+        .in("id", ids);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications", user?.id] }),
+  });
+
   const remove = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("notifications").delete().eq("id", id);
@@ -78,8 +91,21 @@ export function useNotifications() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications", user?.id] }),
   });
 
+  const removeMany = useMutation({
+    mutationFn: async (ids: string[]) => {
+      if (!ids.length) return;
+      const { error } = await supabase
+        .from("notifications")
+        .delete()
+        .eq("user_id", user!.id)
+        .in("id", ids);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications", user?.id] }),
+  });
+
   const list = q.data ?? [];
   const unread = list.filter((n) => !n.lida).length;
 
-  return { list, unread, loading: q.isLoading, markRead, markAllRead, remove, clearAll };
+  return { list, unread, loading: q.isLoading, markRead, markManyRead, markAllRead, remove, removeMany, clearAll };
 }

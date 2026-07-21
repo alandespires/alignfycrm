@@ -85,7 +85,12 @@ function ProjetosPage() {
     setQ(""); setStatusFilter("todos"); setLeadFilter(""); setClientFilter(""); setFrom(""); setTo("");
   }
   function togglePick(id: string) {
-    setPicked((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+    setPicked((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   }
   function pickAll() {
     setPicked(picked.size === filtered.length ? new Set() : new Set(filtered.map((p) => p.id)));

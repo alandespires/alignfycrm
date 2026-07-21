@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
 import { toast } from "sonner";
 import alignIcon from "@/assets/align-icon.png";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Entrar — Align CRM" }] }),
@@ -15,14 +16,18 @@ function AuthPage() {
   const navigate = useNavigate();
   const { user, loading, signIn, signUp } = useAuth();
   const { loading: tenantLoading, isSuperAdmin, memberships } = useTenant();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot" | "recovery">(() => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("recovery") === "true") return "recovery";
+    return "signin";
+  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (loading || !user || tenantLoading) return;
+    if (mode === "recovery" || loading || !user || tenantLoading) return;
     if (memberships.length > 0) {
       navigate({ to: "/t/$tenantSlug", params: { tenantSlug: memberships[0].tenant.slug } });
     } else if (isSuperAdmin) {
@@ -30,14 +35,27 @@ function AuthPage() {
     } else {
       navigate({ to: "/onboarding" });
     }
-  }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate]);
+  }, [user, loading, tenantLoading, memberships, isSuperAdmin, navigate, mode]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const res = mode === "signin"
-      ? await signIn(email, password)
-      : await signUp(email, password, fullName);
+    if (mode === "forgot") {
+      const redirectTo = `${window.location.origin}/auth?recovery=true`;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+      setBusy(false);
+      if (error) toast.error(error.message);
+      else { toast.success("Enviamos as instruções para o seu e-mail."); setMode("signin"); }
+      return;
+    }
+    if (mode === "recovery") {
+      const { error } = await supabase.auth.updateUser({ password });
+      setBusy(false);
+      if (error) toast.error(error.message);
+      else { toast.success("Senha atualizada."); setMode("signin"); navigate({ to: "/" }); }
+      return;
+    }
+    const res = mode === "signin" ? await signIn(email, password) : await signUp(email, password, fullName);
     setBusy(false);
     if (res.error) {
       toast.error(res.error);
@@ -87,10 +105,10 @@ function AuthPage() {
           </div>
 
           <h1 className="text-2xl font-semibold tracking-tight">
-            {mode === "signin" ? "Entrar na sua conta" : "Criar sua conta"}
+            {mode === "signin" ? "Entrar na sua conta" : mode === "signup" ? "Criar sua conta" : mode === "forgot" ? "Recuperar senha" : "Definir nova senha"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "signin" ? "Acesse seu pipeline em segundos." : "Comece grátis. Sem cartão."}
+            {mode === "signin" ? "Acesse seu pipeline em segundos." : mode === "signup" ? "Comece grátis. Sem cartão." : mode === "forgot" ? "Enviaremos um link seguro para o seu e-mail." : "Escolha uma nova senha com pelo menos 6 caracteres."}
           </p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
@@ -104,32 +122,39 @@ function AuthPage() {
                 />
               </div>
             )}
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Email</label>
+            {mode !== "recovery" && <div>
+              <label htmlFor="auth-email" className="text-xs font-medium text-muted-foreground">Email</label>
               <input
+                id="auth-email"
                 type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
                 className="mt-1.5 h-11 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="voce@empresa.com"
               />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Senha</label>
+            </div>}
+            {mode !== "forgot" && <div>
+              <label htmlFor="auth-password" className="text-xs font-medium text-muted-foreground">Senha</label>
+              <div className="relative mt-1.5">
               <input
-                type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
-                className="mt-1.5 h-11 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                id="auth-password" type={showPassword ? "text" : "password"} required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
+                className="h-11 w-full rounded-lg border border-border bg-surface-1 px-3 pr-11 text-sm focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="••••••••"
               />
-            </div>
+              <button type="button" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"} onClick={() => setShowPassword((value) => !value)} className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded-md text-muted-foreground hover:text-foreground">
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+              </div>
+            </div>}
+            {mode === "signin" && <button type="button" onClick={() => setMode("forgot")} className="text-xs font-semibold text-primary hover:underline">Esqueci minha senha</button>}
             <button
               type="submit" disabled={busy}
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 disabled:opacity-60"
             >
               {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-              {mode === "signin" ? "Entrar" : "Criar conta"}
+              {mode === "signin" ? "Entrar" : mode === "signup" ? "Criar conta" : mode === "forgot" ? "Enviar link de recuperação" : "Atualizar senha"}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-muted-foreground">
+          {mode !== "forgot" && mode !== "recovery" && <div className="mt-6 text-center text-sm text-muted-foreground">
             {mode === "signin" ? "Ainda não tem conta?" : "Já tem conta?"}{" "}
             <button
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
@@ -137,7 +162,8 @@ function AuthPage() {
             >
               {mode === "signin" ? "Criar agora" : "Entrar"}
             </button>
-          </div>
+          </div>}
+          {(mode === "forgot" || mode === "recovery") && <button type="button" onClick={() => setMode("signin")} className="mt-6 w-full text-center text-sm font-semibold text-primary hover:underline">Voltar ao login</button>}
         </div>
       </div>
     </div>

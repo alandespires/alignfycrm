@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from "react";
 import { Sparkles, Loader2, Mail, Phone, MessageSquare, Calendar, Plus, Building2, RefreshCw, Trash2, UserCheck, X } from "lucide-react";
 import { useScoreLead } from "@/hooks/use-score-lead";
-import { useDeleteLead, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
+import { useDeleteLead, useSetWhatsAppConsent, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
 import { useLeadActivities, useCreateActivity, type ActivityType } from "@/hooks/use-activities";
 import { useTasks, useCreateTask, useToggleTask } from "@/hooks/use-tasks";
 import { useConvertLeadToClient } from "@/hooks/use-convert-lead";
 import { formatBRL } from "@/lib/mock-data";
 import { AlignPanel, AlignPanelSection, AlignPanelFooter } from "@/components/align-panel";
+import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 
 const STATUS_LABEL: Record<LeadStatus, string> = {
   novo: "Novo", contato_inicial: "Em contato", qualificacao: "Qualificado",
@@ -28,6 +29,7 @@ function fmtDateTime(s: string) {
 }
 
 export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onClose: () => void }) {
+  const consentMutation = useSetWhatsAppConsent();
   const open = !!lead;
   const score = useScoreLead();
   const del = useDeleteLead();
@@ -130,11 +132,30 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
               </a>
             )}
             {lead.whatsapp && (
-              <a href={`https://wa.me/${lead.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 text-xs hover:border-success/40 hover:text-success">
+              <WhatsAppContactLink phone={lead.whatsapp} leadId={lead.id} consent={lead.whatsapp_consent_status} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 text-xs hover:border-success/40 hover:text-success">
                 <MessageSquare className="h-3 w-3" /> WhatsApp
-              </a>
+              </WhatsAppContactLink>
             )}
           </div>
+
+          {lead.whatsapp && (
+            <AlignPanelSection title="Consentimento de WhatsApp" icon={MessageSquare}>
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface-2 p-3">
+                <div>
+                  <div className="text-xs font-semibold">{lead.whatsapp_consent_status === "granted" ? "Consentimento registrado" : lead.whatsapp_consent_status === "revoked" ? "Contato bloqueado pelo lead" : "Consentimento não registrado"}</div>
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">{lead.whatsapp_consent_source ? `Origem: ${lead.whatsapp_consent_source}` : "É obrigatório registrar a origem antes do primeiro contato."}</div>
+                </div>
+                {lead.whatsapp_consent_status === "granted" ? (
+                  <button type="button" disabled={consentMutation.isPending} onClick={() => consentMutation.mutate({ id: lead.id, status: "revoked" })} className="rounded-lg border border-destructive/30 px-3 py-2 text-xs text-destructive">Registrar opt-out</button>
+                ) : (
+                  <button type="button" disabled={consentMutation.isPending} onClick={() => {
+                    const source = window.prompt("Informe a origem do consentimento (ex.: formulário do site, contrato, solicitação do cliente):");
+                    if (source?.trim()) consentMutation.mutate({ id: lead.id, status: "granted", source });
+                  }} className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary">Registrar consentimento</button>
+                )}
+              </div>
+            </AlignPanelSection>
+          )}
 
           <AlignPanelSection title="Análise IA" icon={Sparkles}>
             {lead.ai_score || lead.ai_resumo || lead.ai_sugestao ? (

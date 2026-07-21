@@ -5,6 +5,7 @@ import { CheckCircle2, AlertTriangle, Mail, Phone, Globe, Instagram, Linkedin, M
 import { useToggleFavorite, useUpdateResultStatus } from "@/hooks/use-prospecting";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { canImportProspectingResult } from "@/lib/prospecting/demo";
+import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 
 export function ProspectingResultDrawer({
   result,
@@ -90,10 +91,15 @@ export function ProspectingResultDrawer({
 
         <AlignPanelSection title="Contato">
           <div className="grid grid-cols-1 gap-2 text-sm">
-            <ContactRow icon={Phone} label={result.telefone ?? "—"} href={result.telefone_norm ? `tel:${result.telefone_norm}` : undefined} />
-            <ContactRow icon={Phone} label={result.whatsapp ?? "—"} href={result.whatsapp_norm ? `https://wa.me/${result.whatsapp_norm}` : undefined} accent="text-success" />
-            <ContactRow icon={Mail} label={result.email ?? "—"} href={result.email ? `mailto:${result.email}` : undefined} />
-            <ContactRow icon={Globe} label={result.site ?? "—"} href={result.site ?? undefined} />
+            <ContactRow icon={Phone} label={result.telefone ?? "—"} href={!result.is_demo && result.telefone_norm ? `tel:${result.telefone_norm}` : undefined} />
+            {!result.is_demo && result.whatsapp_norm ? (
+              <WhatsAppContactLink phone={result.whatsapp_norm} className="flex items-center gap-2 rounded-lg border border-border bg-surface-1 px-3 py-2 text-left text-success hover:border-success/40">
+                <Phone className="h-4 w-4" />
+                <span>{result.whatsapp ?? result.whatsapp_norm}</span>
+              </WhatsAppContactLink>
+            ) : <ContactRow icon={Phone} label={result.whatsapp ?? "—"} accent="text-success" />}
+            <ContactRow icon={Mail} label={result.email ?? "—"} href={!result.is_demo && result.email ? `mailto:${result.email}` : undefined} />
+            <ContactRow icon={Globe} label={result.site ?? "—"} href={!result.is_demo ? result.site ?? undefined : undefined} />
             <ContactRow icon={Instagram} label={result.instagram ?? "—"} />
             <ContactRow icon={Linkedin} label={result.linkedin ?? "—"} />
             <ContactRow icon={MapPin} label={result.endereco ? `${result.endereco} · ${result.cidade ?? ""}/${result.uf ?? ""}` : (result.cidade ? `${result.cidade}/${result.uf ?? ""}` : "—")} />

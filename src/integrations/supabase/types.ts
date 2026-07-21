@@ -2280,6 +2280,11 @@ export type Database = {
           updated_at: string
           valor_estimado: number | null
           whatsapp: string | null
+          whatsapp_consent_at: string | null
+          whatsapp_consent_source: string | null
+          whatsapp_consent_status: string
+          whatsapp_last_contact_at: string | null
+          whatsapp_opt_out_at: string | null
         }
         Insert: {
           ai_resumo?: string | null
@@ -2308,6 +2313,11 @@ export type Database = {
           updated_at?: string
           valor_estimado?: number | null
           whatsapp?: string | null
+          whatsapp_consent_at?: string | null
+          whatsapp_consent_source?: string | null
+          whatsapp_consent_status?: string
+          whatsapp_last_contact_at?: string | null
+          whatsapp_opt_out_at?: string | null
         }
         Update: {
           ai_resumo?: string | null
@@ -2336,6 +2346,11 @@ export type Database = {
           updated_at?: string
           valor_estimado?: number | null
           whatsapp?: string | null
+          whatsapp_consent_at?: string | null
+          whatsapp_consent_source?: string | null
+          whatsapp_consent_status?: string
+          whatsapp_last_contact_at?: string | null
+          whatsapp_opt_out_at?: string | null
         }
         Relationships: [
           {
@@ -4641,6 +4656,41 @@ export type Database = {
           },
         ]
       }
+      tenant_settings: {
+        Row: {
+          marketing: Json
+          preferences: Json
+          sales: Json
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          marketing?: Json
+          preferences?: Json
+          sales?: Json
+          tenant_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          marketing?: Json
+          preferences?: Json
+          sales?: Json
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenants: {
         Row: {
           created_at: string
@@ -4878,6 +4928,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      authorize_whatsapp_contact: {
+        Args: { _lead_id: string }
+        Returns: Json
+      }
       can_delete_commercial: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
