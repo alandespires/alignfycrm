@@ -36,6 +36,10 @@ export function WhatsAppContactLink({
         aria-label={title}
         onClick={async (event) => {
           event.stopPropagation();
+          if (!leadId) {
+            toast.error("Lead não identificado");
+            return;
+          }
           setAuthorizing(true);
           const popup = window.open("", "_blank");
           const { data, error } = await supabase.rpc("authorize_whatsapp_contact", { _lead_id: leadId });
