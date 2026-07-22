@@ -41,7 +41,7 @@ export function useTenantSettings() {
     queryKey: ["tenant-settings", tenantId],
     enabled: !!tenantId,
     queryFn: async (): Promise<TenantSettings> => {
-      const { data, error } = await supabase.from("tenant_settings").select("preferences, sales, marketing").eq("tenant_id", tenantId).maybeSingle();
+      const { data, error } = await supabase.from("tenant_settings").select("preferences, sales, marketing").eq("tenant_id", tenantId!).maybeSingle();
       if (error) throw error;
       const row = data as SettingsRow | null;
       return {
