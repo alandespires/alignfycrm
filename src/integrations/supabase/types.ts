@@ -2280,6 +2280,11 @@ export type Database = {
           updated_at: string
           valor_estimado: number | null
           whatsapp: string | null
+          whatsapp_consent_at: string | null
+          whatsapp_consent_source: string | null
+          whatsapp_consent_status: string
+          whatsapp_last_contact_at: string | null
+          whatsapp_opt_out_at: string | null
         }
         Insert: {
           ai_resumo?: string | null
@@ -2308,6 +2313,11 @@ export type Database = {
           updated_at?: string
           valor_estimado?: number | null
           whatsapp?: string | null
+          whatsapp_consent_at?: string | null
+          whatsapp_consent_source?: string | null
+          whatsapp_consent_status?: string
+          whatsapp_last_contact_at?: string | null
+          whatsapp_opt_out_at?: string | null
         }
         Update: {
           ai_resumo?: string | null
@@ -2336,6 +2346,11 @@ export type Database = {
           updated_at?: string
           valor_estimado?: number | null
           whatsapp?: string | null
+          whatsapp_consent_at?: string | null
+          whatsapp_consent_source?: string | null
+          whatsapp_consent_status?: string
+          whatsapp_last_contact_at?: string | null
+          whatsapp_opt_out_at?: string | null
         }
         Relationships: [
           {
@@ -4609,6 +4624,41 @@ export type Database = {
           },
         ]
       }
+      tenant_settings: {
+        Row: {
+          marketing: Json
+          preferences: Json
+          sales: Json
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          marketing?: Json
+          preferences?: Json
+          sales?: Json
+          tenant_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          marketing?: Json
+          preferences?: Json
+          sales?: Json
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_users: {
         Row: {
           created_at: string
@@ -4873,11 +4923,57 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_contact_attempts: {
+        Row: {
+          created_at: string
+          decision: string
+          id: string
+          lead_id: string
+          reason: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision: string
+          id?: string
+          lead_id: string
+          reason: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decision?: string
+          id?: string
+          lead_id?: string
+          reason?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_contact_attempts_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_contact_attempts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      authorize_whatsapp_contact: { Args: { _lead_id: string }; Returns: Json }
       can_delete_commercial: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
@@ -5000,6 +5096,7 @@ export type Database = {
         Args: { _project_id: string }
         Returns: undefined
       }
+      repair_utf8_mojibake: { Args: { _value: string }; Returns: string }
       user_tenant_ids: { Args: { _user_id: string }; Returns: string[] }
     }
     Enums: {
