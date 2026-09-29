@@ -1,132 +1,72 @@
-# Módulo Prospecção — Plano de implementação
+# Navegação, fluidez, busca global e padronização de painéis
 
-Novo módulo dentro de **Comercial** (`/comercial/prospeccao`) para encontrar, qualificar e importar leads B2B para o módulo `Leads` já existente. Reutiliza `AppShell`, `AlignPanel`, `Skeleton`, tokens do design system Launch OS, hooks React Query, RLS por `tenant_id` e o padrão de rotas TanStack Start.
+## Objetivo
 
-Como não há APIs de dados B2B configuradas hoje, a entrega ocorre em duas frentes: (1) toda a arquitetura funcional real (banco, RLS, hooks, UI, importação, histórico, listas, perfis, permissões) e (2) um **provider adapter** com modo demo claramente marcado. Nenhuma integração paga é ativada sem que o usuário configure a chave.
+Evoluir a estrutura compartilhada do Align para que a navegação ocupe toda a lateral no desktop, as trocas de página preservem a interface e os dados em cache, o `Cmd+K` encontre registros reais e toda falha seja distinguida de um resultado vazio.
 
-## 1. Auditoria e reuso (sem duplicar)
+## 1. Estrutura global e navegação
 
-- Bottom nav "Comercial" em `src/components/app-shell.tsx` → adicionar item **Prospecção**.
-- Reusar: `AppShell`, `StatusPill`, `AlignPanel`, `Skeleton`/`TableRowsSkeleton`, `LeadFormDialog`, `useCreateLead`, `useLeads` (para dedup), `useTeam`, `useMyCommercialRole`, `getActiveTenantId`, `useRealtimeSync`, tokens de `src/styles.css`, motion de `src/lib/motion.ts`.
-- Origem `"Prospecção"` já é aceita como texto livre em `leads.origem` — não requer enum novo.
+- Transformar a navegação desktop em uma barra lateral de altura total, respeitando a área segura, com conteúdo distribuído verticalmente e sem alterar o comportamento dos menus Comercial, Operacional e Mais.
+- Manter a barra inferior atual no mobile.
+- Garantir que o cabeçalho e o `<main>` permaneçam montados durante a navegação.
+- Completar metadados próprios (`head`) nas rotas de conteúdo que ainda não os possuem.
 
-## 2. Banco (migração única)
+## 2. Carregamento e cache consistentes
 
-Todas as tabelas em `public`, com GRANT + RLS `tenant_id IN user_tenant_ids(auth.uid())`.
+- Extrair opções de consulta reutilizáveis para leads, clientes e oportunidades e pré-carregá-las nas rotas principais com `ensureQueryData`.
+- Adotar o mesmo padrão progressivamente nas páginas de maior uso (dashboard, pipeline, tarefas, projetos, relatórios e módulos dos menus principais), sem duplicar consultas.
+- Exibir skeleton apenas no primeiro carregamento sem cache; em atualizações silenciosas, manter os dados atuais e indicar atualização sem substituir toda a tela.
+- Preservar dados entre páginas com chaves por tenant, tempos de cache consistentes e prefetch dos destinos de navegação.
+- Criar estados compartilhados de carregamento, vazio e erro para tabelas, listas e páginas.
 
-- `prospecting_profiles` — perfis salvos (nicho, localização, filtros JSONB, score_minimo, exclusoes, funil/tag padrão).
-- `prospecting_searches` — execuções (profile_id nullable, filtros JSONB, provider, status, encontrados/qualificados/importados, custo_estimado).
-- `prospecting_results` — leads encontrados (search_id, nome, razao_social, cnpj, segmento, cidade/uf/bairro/lat/lng, telefone/whatsapp/email/site/instagram/facebook/linkedin, rating, reviews_count, score 0-100, confiabilidade `alta|media|baixa`, motivos JSONB, oportunidade TEXT, status `novo|favorito|ignorado|invalido|importado`, imported_lead_id FK `leads.id`, raw JSONB, source TEXT, source_ref TEXT).
-- `prospecting_lists` + `prospecting_list_items(list_id, result_id)`.
-- `prospecting_import_logs` — quem/quando/quantos importados, ignorados, atualizados, falhos.
-- `prospecting_score_rules` — pesos por tenant (default seed).
-- `prospecting_sources` — status/configuração por provedor (sem armazenar chave; apenas flags `configurado`, `provider`, `limite_mensal`, `usado_mes`).
-- Validação/audit: reaproveitar `activities` para logs de importação.
+## 3. Transições sem travamento
 
-Índices: `(tenant_id, telefone_norm)`, `(tenant_id, email)`, `(tenant_id, cnpj)`, `(tenant_id, site_domain)`, `(tenant_id, cidade, uf)`, `(tenant_id, score DESC)`, `(search_id)`.
+- Remover o `AnimatePresence mode="wait"` que desmonta todo o conteúdo da página a cada troca.
+- Animar somente a entrada da área nova, mantendo AppShell, cabeçalho e navegação estáveis.
+- Usar transform/opacity de curta duração, cancelar animações concorrentes e respeitar `prefers-reduced-motion`.
+- Evitar shimmer baseado em `background-position`; usar animação composta e limitar o efeito aos skeletons realmente visíveis.
 
-Unique parcial para dedup dentro do tenant: `(tenant_id, coalesce(cnpj,''), coalesce(telefone_norm,''))` como índice de suporte à detecção (não constraint hard, para permitir "possível duplicidade").
+## 4. AlignPanel global e acessível
 
-Chaves de API (`GOOGLE_PLACES_API_KEY`, `RECEITAWS_API_KEY`, etc.) via `add_secret` **somente quando o usuário pedir** para ativar um provedor. Nada exposto no client.
+- Fortalecer o `AlignPanel` com foco inicial, focus trap, restauração de foco, Escape, bloqueio de rolagem, `aria-labelledby`/`aria-describedby` e estrutura semântica correta.
+- Migrar os overlays de funcionalidades que ainda são feitos manualmente para o AlignPanel, preservando os menus de navegação sem alteração.
+- Cobrir formulários, confirmações, detalhes e previews com variantes apropriadas do mesmo painel, mantendo drawer lateral no desktop e bottom sheet no mobile.
+- Remover overlays aninhados ou concorrentes que possam deixar a tela sem foco ou com rolagem bloqueada.
 
-## 3. Camada de provedores (backend)
+## 5. Busca real no Cmd+K
 
-`src/lib/prospecting/` (client-safe types) + `src/lib/prospecting.functions.ts` (createServerFn):
+- Separar o `Cmd+K` do chat Launch: abrir uma busca global dedicada e manter o Launch no botão próprio.
+- Buscar e filtrar leads, clientes e oportunidades do tenant com debounce, cache e agrupamento por tipo.
+- Mostrar nome/título, empresa, status e valor relevantes, com loading, erro e vazio próprios.
+- Ao selecionar um resultado, navegar para a seção correspondente e abrir o registro quando a tela já oferecer detalhe; caso contrário, destacar o registro via parâmetro de busca.
+- Incluir ação explícita para enviar o texto ao Launch, sem misturar resultados de registros com respostas da IA.
 
-- `ProspectingProvider` interface: `search(filters) → RawLead[]`, `validatePhone`, `validateEmail`, `enrich(cnpj)`.
-- Adapters: `google-places.ts`, `receitaws.ts`, `mock.ts` (usado quando nenhuma chave está presente).
-- Server fn `runProspectingSearch` autenticada (`requireSupabaseAuth` + `has_commercial_role`): valida filtros com zod, chama provider, normaliza, calcula score, deduplica contra `leads` + resultados anteriores, persiste `prospecting_searches` + `prospecting_results`, retorna resumo.
-- Server fn `importProspectingResults` — cria/atualiza `leads` em lote com `origem='Prospecção'`, `metadata.prospecting_search_id`, e escreve `prospecting_import_logs`.
-- Provider mock retorna dados marcados `is_demo=true`; server fn recusa importação em produção se `is_demo=true` **e** flag ambiente `PROSPECTING_ALLOW_DEMO_IMPORT` não estiver definida.
+## 6. Erros explícitos
 
-## 4. Score de qualificação
+- Impedir o padrão `data ?? []` de mascarar consultas com falha nas páginas prioritárias.
+- Exibir mensagem de erro com tentativa novamente quando a consulta falhar e estado vazio somente quando a consulta concluir com zero registros.
+- Manter o último conteúdo válido durante refetch; erros de atualização aparecem de forma não destrutiva.
+- Ajustar o erro global para invalidar consultas e rotas corretamente.
 
-Função pura em `src/lib/prospecting/score.ts`, pesos vindos de `prospecting_score_rules` (default seed). Critérios: telefone válido, whatsapp presente, email válido, match nicho, match região, completude, rating/reviews, site presente, atividade recente, ausência no CRM, sinais anti-fraude. Faixas: Excelente ≥85, Bom 70–84, Médio 50–69, Baixo <50. Retorna `{score, tier, motivos_positivos[], motivos_atencao[], confiabilidade}`.
+## 7. Validação
 
-## 5. Rotas e UI
+- Testar navegação e altura da barra em desktop e mobile.
+- Testar `Cmd+K`, busca com e sem resultados, teclado, foco, Escape e restauração de foco.
+- Testar AlignPanel em desktop/mobile e verificar que nenhum overlay de funcionalidade antigo permanece.
+- Simular falhas de consulta para confirmar que não aparecem como “sem dados”.
+- Validar build, testes relevantes, console e screenshots Playwright autenticadas.
 
-Arquivos novos (padrão dot):
+## Ordem de entrega
 
-- `src/routes/comercial.prospeccao.tsx` — layout (`<Outlet/>`).
-- `src/routes/comercial.prospeccao.index.tsx` — página principal: KPIs (6 cards), painel de filtros, botão **Gerar leads**, tabela/cards de resultados, histórico lateral.
-- `src/routes/comercial.prospeccao.perfis.tsx` — CRUD de perfis.
-- `src/routes/comercial.prospeccao.listas.tsx` — CRUD de listas + items.
-- `src/routes/comercial.prospeccao.historico.tsx` — searches passadas.
-- `src/routes/comercial.prospeccao.configuracoes.tsx` — provedores, pesos, permissões (gate `admin` comercial).
+1. Fundação: AppShell, barra lateral, transições, estados compartilhados e AlignPanel acessível.
+2. Dados: query options, loaders/prefetch e tratamento explícito de erros nas páginas prioritárias.
+3. Busca global real no `Cmd+K`.
+4. Migração dos overlays restantes para AlignPanel.
+5. Auditoria semântica, metadados e testes desktop/mobile.
 
-Componentes novos em `src/components/prospecting/`:
-- `filters-panel.tsx`, `results-table.tsx`, `result-card.tsx`, `result-detail-panel.tsx` (via `AlignPanel`), `import-dialog.tsx` (via `AlignPanel`), `score-pill.tsx`, `confidence-badge.tsx`, `search-progress.tsx` (etapas reais), `approach-suggestion.tsx`, `empty-state.tsx`.
+## Decisões técnicas
 
-Todos os textos em pt-BR, tipografia/cores existentes, responsivo, motion via `src/lib/motion.ts`, skeletons via `src/components/skeletons.tsx`.
-
-## 6. Fluxo de "Gerar leads"
-
-1. Zod valida filtros no client.
-2. `useMutation` → `runProspectingSearch`.
-3. Server fn envia updates de progresso via retorno em etapas (polling curto na `prospecting_searches.status`: `buscando|validando|deduplicando|analisando|calculando|pronto`).
-4. UI mostra progresso real por etapa; nada de fake loading.
-5. Ao concluir, resultados aparecem ordenados por score DESC.
-
-## 7. Detalhe do lead + importação
-
-- `AlignPanel` (drawer direito desktop / bottom sheet mobile) com todos os campos, "Por que este lead pode converter?" gerado por regras a partir dos motivos reais, "Sugestão de abordagem" (tons: consultivo/direto/amigável/profissional/agressivo) usando `kassia-chat` já existente — **nunca envia** automaticamente.
-- Botão "Adicionar aos Leads" abre `import-dialog` (responsável, funil, etapa, tags, opções de dedup, score mínimo). Após importar: badge "Adicionado" + link para `/leads`.
-- Seleção em massa: toolbar com adicionar/ignorar/invalidar/etiquetar/atribuir/adicionar à lista/exportar CSV+XLSX.
-
-## 8. Dedup
-
-`detectDuplicate(result, leads[])` compara telefone normalizado, email lowercase, cnpj, domínio do site, similaridade de nome+cidade. Níveis: **confirmada** (match forte), **possível** (match parcial), **novo**. Modal de importação exibe os conflitos por linha e permite: ignorar, atualizar existente, criar novo.
-
-## 9. Permissões
-
-Reusar `useMyCommercialRole`/`has_commercial_role`:
-- `visualizador`: ver módulo + resultados próprios.
-- `comercial`: gerar, importar, favoritar, criar listas/perfis.
-- `admin`: excluir searches, configurar provedores, editar pesos, ver custos.
-
-RLS reforça no backend; server fns checam `can_edit_commercial` / `is_tenant_admin` conforme ação.
-
-## 10. Exportação
-
-`src/lib/prospecting-exports.ts` reaproveitando padrão de `consultor-exports.ts` (CSV + XLSX via `xlsx` já instalado? Se não, usar `papaparse` + JSON download; XLSX apenas se lib disponível).
-
-## 11. Segurança / LGPD
-
-- Todos os server fns com `requireSupabaseAuth` + verificação de role.
-- Chaves só em `process.env`, nunca no client.
-- Rate limit por tenant (contador em `prospecting_sources.usado_mes`).
-- Motivo de descarte visível — nada removido silenciosamente.
-- Ação "Excluir dados" em cada resultado/lead conforme LGPD.
-- Sanitização de entrada (zod) + escape em queries por PostgREST.
-- Dados demo marcados com badge "Simulado" visível; bloqueio de import em prod.
-
-## 12. Estados de UI
-
-Empty (primeira uso com CTA "Criar primeira pesquisa"), loading (skeletons), searching (progresso por etapa), no-results, provider-error, missing-credentials (com link para Configurações), quota-exceeded, partial-result, duplicate-warning, import-success, import-error, permission-denied, stale-data.
-
-## 13. Ordem de execução
-
-1. Migração DB + RLS + seed de `prospecting_score_rules`.
-2. Types + `src/lib/prospecting/` (score, dedup, normalize, provider interface, mock adapter).
-3. `prospecting.functions.ts` (runSearch, import, listas, perfis, sources).
-4. Hooks React Query (`use-prospecting.ts`).
-5. Rotas + componentes de UI.
-6. Adicionar item no bottom nav Comercial.
-7. Testes manuais via Playwright autenticado no smoke existente.
-8. Resumo técnico ao usuário.
-
-## Detalhes técnicos (para revisão)
-
-- Todas as tabelas seguem o bloco `CREATE TABLE → GRANT authenticated + service_role → ENABLE RLS → CREATE POLICY` com `is_tenant_member` / `can_edit_commercial` / `can_delete_commercial`.
-- Servidor: `createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(zod).handler(...)`; `supabaseAdmin` só se necessário para bypass (não previsto aqui).
-- Cliente Supabase pelo `@/integrations/supabase/client` para leituras não sensíveis (RLS aplica).
-- Sem `useEffect + fetch`; padrão `queryOptions` + `useQuery`.
-- Sem quebrar rotas existentes; apenas adição.
-
-## Fora deste escopo (a combinar depois)
-
-- Ativação real de Google Places / ReceitaWS / provedores B2B pagos — requer o usuário fornecer chaves via `add_secret`.
-- Automações recorrentes (executar perfil em cron) — estrutura pronta, gatilho não ativado.
-- Envio automático de mensagens de abordagem.
-
-Ao aprovar, começo pela migração de banco (uma call), depois entrego as demais camadas em ondas.
+- Nenhuma mudança de banco é necessária para a busca: ela usa registros já protegidos por tenant.
+- O cache continua pertencendo ao TanStack Query; loaders apenas aquecem o cache antes da página aparecer.
+- O AppShell não terá mais saída animada; apenas o conteúdo novo recebe uma entrada discreta.
+- Menus Comercial, Operacional e Mais permanecem com o comportamento atual, conforme solicitado anteriormente.
