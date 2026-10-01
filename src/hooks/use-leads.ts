@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { requireTenantId, getActiveTenantId } from "@/contexts/tenant-context";
 import { toast } from "sonner";
@@ -41,21 +41,25 @@ export type LeadRow = {
   whatsapp_last_contact_at: string | null;
 };
 
-export function useLeads() {
-  const tenantId = getActiveTenantId();
-  return useQuery({
+export function leadsQueryOptions(tenantId: string | null) {
+  return queryOptions({
     queryKey: ["leads", tenantId],
     enabled: !!tenantId,
     queryFn: async (): Promise<LeadRow[]> => {
+      if (!tenantId) throw new Error("Nenhum workspace ativo");
       const { data, error } = await supabase
         .from("leads")
         .select("*")
-        .eq("tenant_id", tenantId!)
+        .eq("tenant_id", tenantId)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as LeadRow[];
     },
   });
+}
+
+export function useLeads() {
+  return useQuery(leadsQueryOptions(getActiveTenantId()));
 }
 
 export function useCreateLead() {

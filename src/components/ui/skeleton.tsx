@@ -17,9 +17,9 @@ function Skeleton({ className, variant = "default", ...props }: SkeletonProps) {
     "relative isolate overflow-hidden rounded-md bg-[oklch(from_var(--foreground)_l_c_h_/_0.06)]";
 
   const sweep =
-    "before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(90deg,transparent,oklch(from_var(--foreground)_l_c_h_/_0.10),transparent)] before:animate-[ks-sweep_1.6s_ease-in-out_infinite]";
+    "before:absolute before:inset-0 before:-translate-x-full before:will-change-transform before:bg-[linear-gradient(90deg,transparent,oklch(from_var(--foreground)_l_c_h_/_0.10),transparent)] before:animate-[ks-sweep_1.6s_ease-in-out_infinite]";
   const sweepPrimary =
-    "before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(90deg,transparent,oklch(from_var(--primary)_l_c_h_/_0.22),transparent)] before:animate-[ks-sweep_1.6s_ease-in-out_infinite]";
+    "before:absolute before:inset-0 before:-translate-x-full before:will-change-transform before:bg-[linear-gradient(90deg,transparent,oklch(from_var(--primary)_l_c_h_/_0.22),transparent)] before:animate-[ks-sweep_1.6s_ease-in-out_infinite]";
 
   const variants: Record<Variant, string> = {
     default: sweep,
