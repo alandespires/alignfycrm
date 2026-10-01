@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   LayoutDashboard, Users, Kanban, Building2, ListChecks, Zap, Sparkles,
   BarChart3, Settings, Plus, LogOut, Loader2, Sun, Moon, Shield, Wallet,
@@ -143,6 +143,7 @@ export function AppShell({ children, title, subtitle, action }: {
   const { theme, toggleTheme } = useTheme();
   const { role: commercialRole } = useMyCommercialRole();
   const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
 
   const [comercialOpen, setComercialOpen] = useState(false);
   const [operacionalOpen, setOperacionalOpen] = useState(false);
@@ -332,18 +333,15 @@ export function AppShell({ children, title, subtitle, action }: {
           </div>
           {action && <div className="w-full sm:w-auto">{action}</div>}
         </div>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-            className="min-w-0 overflow-x-hidden"
-          >
-            {children}
-          </motion.div>
-        </AnimatePresence>
+        <motion.div
+          key={pathname}
+          initial={reduceMotion ? false : { opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.18, ease: [0.32, 0.72, 0, 1] }}
+          className="min-w-0 overflow-x-hidden"
+        >
+          {children}
+        </motion.div>
       </main>
 
       {/* ===== Liquid-glass floating dock ===== */}

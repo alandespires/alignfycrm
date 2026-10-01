@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { requireTenantId, getActiveTenantId } from "@/contexts/tenant-context";
 import { toast } from "sonner";
@@ -21,21 +21,25 @@ export type DealRow = {
   updated_at: string;
 };
 
-export function useDeals() {
-  const tenantId = getActiveTenantId();
-  return useQuery({
+export function dealsQueryOptions(tenantId: string | null) {
+  return queryOptions({
     queryKey: ["deals", tenantId],
     enabled: !!tenantId,
     queryFn: async (): Promise<DealRow[]> => {
+      if (!tenantId) throw new Error("Nenhum workspace ativo");
       const { data, error } = await supabase
         .from("deals")
         .select("*")
-        .eq("tenant_id", tenantId!)
+        .eq("tenant_id", tenantId)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as DealRow[];
     },
   });
+}
+
+export function useDeals() {
+  return useQuery(dealsQueryOptions(getActiveTenantId()));
 }
 
 export type DealInput = {

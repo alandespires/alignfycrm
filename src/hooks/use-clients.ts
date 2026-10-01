@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { requireTenantId, getActiveTenantId } from "@/contexts/tenant-context";
 import { toast } from "sonner";
@@ -18,21 +18,25 @@ export type ClientRow = {
   updated_at: string;
 };
 
-export function useClients() {
-  const tenantId = getActiveTenantId();
-  return useQuery({
+export function clientsQueryOptions(tenantId: string | null) {
+  return queryOptions({
     queryKey: ["clients", tenantId],
     enabled: !!tenantId,
     queryFn: async (): Promise<ClientRow[]> => {
+      if (!tenantId) throw new Error("Nenhum workspace ativo");
       const { data, error } = await supabase
         .from("clients")
         .select("*")
-        .eq("tenant_id", tenantId!)
+        .eq("tenant_id", tenantId)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as ClientRow[];
     },
   });
+}
+
+export function useClients() {
+  return useQuery(clientsQueryOptions(getActiveTenantId()));
 }
 
 export function useCreateClient() {
