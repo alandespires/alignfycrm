@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import { RealtimeBadge } from "@/components/realtime-badge";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import {
@@ -279,17 +280,26 @@ function AutomationForm({
   const showScoreValue = trigger === "score_alto";
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
-      <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-elevated">
-        <div className="flex items-center justify-between border-b border-border p-5">
-          <div>
-            <h3 className="text-lg font-semibold">Nova automação</h3>
-            <p className="text-xs text-muted-foreground">Configure o gatilho e as ações que serão executadas</p>
-          </div>
-          <button type="button" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
-        </div>
-
-        <div className="space-y-5 p-5">
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Automação"
+      title="Nova automação"
+      subtitle="Configure o gatilho e as ações que serão executadas"
+      widthClass="md:max-w-[720px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{
+            label: "Criar fluxo",
+            onClick: () => (document.getElementById("automacao-form") as HTMLFormElement | null)?.requestSubmit(),
+            disabled: !nome.trim() || acoes.length === 0,
+            loading: pending,
+          }}
+        />
+      }
+    >
+      <form id="automacao-form" onSubmit={submit} className="space-y-5">
           <div className="grid gap-3 md:grid-cols-2">
             <Field label="Nome do fluxo *">
               <input required value={nome} onChange={(e) => setNome(e.target.value)} className={inp} placeholder="Ex.: Follow-up de proposta" />
@@ -384,16 +394,8 @@ function AutomationForm({
               ))}
             </div>
           </div>
-        </div>
-
-        <div className="flex justify-end gap-2 border-t border-border p-4">
-          <button type="button" onClick={onClose} className="h-10 rounded-lg border border-border bg-surface-1 px-4 text-sm text-muted-foreground">Cancelar</button>
-          <button type="submit" disabled={pending || !nome.trim() || acoes.length === 0} className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60">
-            {pending && <Loader2 className="h-4 w-4 animate-spin" />} Criar fluxo
-          </button>
-        </div>
       </form>
-    </div>
+    </AlignPanel>
   );
 }
 

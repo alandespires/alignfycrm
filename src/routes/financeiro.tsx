@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import {
   useEntries, useCreateEntry, useUpdateEntry, useDeleteEntry,
   useExpenses, useCreateExpense, useUpdateExpense, useDeleteExpense,
@@ -1027,21 +1028,24 @@ function EmptyState({ icon: Icon, title, text }: { icon: any; title: string; tex
 }
 function Modal({ title, onClose, onSubmit, loading, children }: { title: string; onClose: () => void; onSubmit: (e: FormEvent) => void; loading?: boolean; children: React.ReactNode }) {
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
-      <form onClick={(e) => e.stopPropagation()} onSubmit={onSubmit} className="w-full max-w-lg rounded-2xl border border-border bg-surface-2 shadow-elevated">
-        <div className="flex items-center justify-between border-b border-border p-5">
-          <h3 className="text-lg font-semibold">{title}</h3>
-          <button type="button" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
-        </div>
-        <div className="space-y-3 p-5">{children}</div>
-        <div className="flex justify-end gap-2 border-t border-border p-4">
-          <button type="button" onClick={onClose} className="h-10 rounded-lg border border-border bg-surface-1 px-4 text-sm text-muted-foreground">Cancelar</button>
-          <button type="submit" disabled={loading} className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60">
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />} Salvar
-          </button>
-        </div>
-      </form>
-    </div>
+    <AlignPanel
+      open
+      onClose={onClose}
+      title={title}
+      widthClass="md:max-w-[560px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{
+            label: "Salvar",
+            onClick: () => (document.getElementById("financeiro-modal-form") as HTMLFormElement | null)?.requestSubmit(),
+            loading,
+          }}
+        />
+      }
+    >
+      <form id="financeiro-modal-form" onSubmit={onSubmit} className="space-y-3">{children}</form>
+    </AlignPanel>
   );
 }
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

@@ -4,7 +4,8 @@ import { useQuotas, useCreateQuota, useRegisterContemplation, QUOTA_STATUS_LABEL
 import { useLeads } from "@/hooks/use-leads";
 import { SEGMENT_LABEL, type ConsortiumSegment } from "@/hooks/use-consortium";
 import { ConsultorExportBar } from "@/components/consultor-export-bar";
-import { Plus, Award, X } from "lucide-react";
+import { AlignPanel } from "@/components/align-panel";
+import { Plus, Award } from "lucide-react";
 
 export const Route = createFileRoute("/consultor/cotas")({
   component: CotasPage,
@@ -165,15 +166,9 @@ function CotasPage() {
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: any }) {
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" onClick={onClose}>
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-5" onClick={e => e.stopPropagation()}>
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-base font-semibold">{title}</h3>
-          <button onClick={onClose}><X className="h-4 w-4 text-muted-foreground" /></button>
-        </div>
-        {children}
-      </div>
-    </div>
+    <AlignPanel open onClose={onClose} title={title} widthClass="md:max-w-[560px]">
+      {children}
+    </AlignPanel>
   );
 }
 function FieldText({ name, label, required }: any) {
