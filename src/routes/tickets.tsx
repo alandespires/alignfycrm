@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import { useTickets, useUpsertTicket, useDeleteTicket, type TicketRow, type TicketStatus, type TicketPriority } from "@/hooks/use-tickets";
 import { useCompanies } from "@/hooks/use-companies";
 import { useRealtimeSync } from "@/hooks/use-realtime";
@@ -165,13 +166,20 @@ function EmptyState({ icon: Icon, label, cta }: { icon: any; label: string; cta?
 function TicketDialog({ draft, companies, onClose, onSave }: { draft: Partial<TicketRow>; companies: { id: string; nome: string }[]; onClose: () => void; onSave: (t: Partial<TicketRow>) => void }) {
   const [t, setT] = useState(draft);
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-elevated" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h3 className="text-sm font-semibold">{t.id ? `Ticket #${t.numero}` : "Novo ticket"}</h3>
-          <button onClick={onClose} className="grid h-7 w-7 place-items-center rounded-lg text-muted-foreground hover:bg-surface-2"><X className="h-4 w-4" /></button>
-        </div>
-        <div className="space-y-3 px-5 py-4">
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Ticket"
+      title={t.id ? `Ticket #${t.numero}` : "Novo ticket"}
+      widthClass="md:max-w-[560px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{ label: "Salvar", onClick: () => onSave(t) }}
+        />
+      }
+    >
+      <div className="space-y-3">
           <L label="Assunto"><Inp value={t.assunto ?? ""} onChange={(v) => setT({ ...t, assunto: v })} autoFocus /></L>
           <L label="Descrição">
             <textarea value={t.descricao ?? ""} onChange={(e) => setT({ ...t, descricao: e.target.value })} rows={3}
@@ -198,13 +206,8 @@ function TicketDialog({ draft, companies, onClose, onSave }: { draft: Partial<Ti
               {companies.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
             </select>
           </L>
-        </div>
-        <div className="flex items-center justify-end gap-2 border-t border-border bg-surface-2/50 px-5 py-3">
-          <button onClick={onClose} className="h-9 rounded-lg border border-border bg-background px-3 text-xs font-semibold hover:bg-surface-2">Cancelar</button>
-          <button onClick={() => onSave(t)} className="h-9 rounded-lg bg-primary px-4 text-xs font-semibold text-primary-foreground hover:opacity-90">Salvar</button>
-        </div>
       </div>
-    </div>
+    </AlignPanel>
   );
 }
 

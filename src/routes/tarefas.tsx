@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import { useTasks, useToggleTask, useDeleteTask, useCreateTask, type TaskPriority, type TaskRow, type TaskStatus, TASK_STATUS_LABEL } from "@/hooks/use-tasks";
 import { useLeads } from "@/hooks/use-leads";
 import { useProjects } from "@/hooks/use-projects";
@@ -180,55 +181,57 @@ function TarefasPage() {
           <ListView ativas={ativas} concluidas={concluidas} toggle={toggle} del={del} onPick={setSelected} leads={leads} projects={projects} />
         )}
 
-      {open && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm" onClick={() => setOpen(false)}>
-          <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="w-full max-w-md rounded-2xl border border-border bg-surface-2 shadow-elevated">
-            <div className="flex items-center justify-between border-b border-border p-5">
-              <h3 className="text-lg font-semibold">Nova tarefa</h3>
-              <button type="button" onClick={() => setOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
-            </div>
-            <div className="space-y-3 p-5">
-              <label className="block">
-                <span className="text-xs font-medium text-muted-foreground">Título *</span>
-                <input required value={titulo} onChange={(e) => setTitulo(e.target.value)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm focus:border-primary/60 focus:outline-none" />
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block">
-                  <span className="text-xs font-medium text-muted-foreground">Prioridade</span>
-                  <select value={prioridade} onChange={(e) => setPrioridade(e.target.value as TaskPriority)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm">
-                    <option value="baixa">Baixa</option><option value="media">Média</option>
-                    <option value="alta">Alta</option><option value="urgente">Urgente</option>
-                  </select>
-                </label>
-                <label className="block">
-                  <span className="text-xs font-medium text-muted-foreground">Prazo</span>
-                  <input type="datetime-local" value={prazo} onChange={(e) => setPrazo(e.target.value)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm" />
-                </label>
-              </div>
-              <label className="block">
-                <span className="text-xs font-medium text-muted-foreground">Projeto</span>
-                <select value={projectId} onChange={(e) => setProjectId(e.target.value)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm">
-                  <option value="">— Sem projeto —</option>
-                  {projects.map((p) => <option key={p.id} value={p.id}>{p.titulo}</option>)}
-                </select>
-              </label>
-              <label className="block">
-                <span className="text-xs font-medium text-muted-foreground">Lead vinculado</span>
-                <select value={leadId} onChange={(e) => setLeadId(e.target.value)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm">
-                  <option value="">— Sem vínculo —</option>
-                  {leads.map((l) => <option key={l.id} value={l.id}>{l.empresa ? `${l.empresa} (${l.nome})` : l.nome}</option>)}
-                </select>
-              </label>
-            </div>
-            <div className="flex justify-end gap-2 border-t border-border p-4">
-              <button type="button" onClick={() => setOpen(false)} className="h-10 rounded-lg border border-border bg-surface-1 px-4 text-sm text-muted-foreground">Cancelar</button>
-              <button type="submit" disabled={create.isPending} className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60">
-                {create.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Criar
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      <AlignPanel
+        open={open}
+        onClose={() => setOpen(false)}
+        eyebrow="Tarefa"
+        title="Nova tarefa"
+        widthClass="md:max-w-[520px]"
+        footer={
+          <AlignPanelFooter
+            secondary={{ label: "Cancelar", onClick: () => setOpen(false) }}
+            primary={{
+              label: "Criar",
+              onClick: () => (document.getElementById("nova-tarefa-form") as HTMLFormElement | null)?.requestSubmit(),
+              loading: create.isPending,
+            }}
+          />
+        }
+      >
+        <form id="nova-tarefa-form" onSubmit={submit} className="space-y-3">
+          <label className="block">
+            <span className="text-xs font-medium text-muted-foreground">Título *</span>
+            <input required value={titulo} onChange={(e) => setTitulo(e.target.value)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm focus:border-primary/60 focus:outline-none" />
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="text-xs font-medium text-muted-foreground">Prioridade</span>
+              <select value={prioridade} onChange={(e) => setPrioridade(e.target.value as TaskPriority)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm">
+                <option value="baixa">Baixa</option><option value="media">Média</option>
+                <option value="alta">Alta</option><option value="urgente">Urgente</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="text-xs font-medium text-muted-foreground">Prazo</span>
+              <input type="datetime-local" value={prazo} onChange={(e) => setPrazo(e.target.value)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm" />
+            </label>
+          </div>
+          <label className="block">
+            <span className="text-xs font-medium text-muted-foreground">Projeto</span>
+            <select value={projectId} onChange={(e) => setProjectId(e.target.value)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm">
+              <option value="">— Sem projeto —</option>
+              {projects.map((p) => <option key={p.id} value={p.id}>{p.titulo}</option>)}
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-xs font-medium text-muted-foreground">Lead vinculado</span>
+            <select value={leadId} onChange={(e) => setLeadId(e.target.value)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-surface-1 px-3 text-sm">
+              <option value="">— Sem vínculo —</option>
+              {leads.map((l) => <option key={l.id} value={l.id}>{l.empresa ? `${l.empresa} (${l.nome})` : l.nome}</option>)}
+            </select>
+          </label>
+        </form>
+      </AlignPanel>
 
       {selected && <TaskDetailDrawer task={selected} allTasks={tasks} onClose={() => setSelected(null)} />}
     </AppShell>

@@ -4,6 +4,7 @@ import { getActiveTenantId } from "@/contexts/tenant-context";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import { useDeals, useUpsertDeal, useDeleteDeal, type DealRow, type DealStage } from "@/hooks/use-deals";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { useRealtimeSync } from "@/hooks/use-realtime";
@@ -188,31 +189,33 @@ function EmptyState({ icon: Icon, label, cta }: { icon: any; label: string; cta?
 function DealDialog({ draft, onClose, onSave }: { draft: Partial<DealRow>; onClose: () => void; onSave: (d: Partial<DealRow>) => void }) {
   const [d, setD] = useState(draft);
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card shadow-elevated" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h3 className="text-sm font-semibold">{d.id ? "Editar oportunidade" : "Nova oportunidade"}</h3>
-          <button onClick={onClose} className="grid h-7 w-7 place-items-center rounded-lg text-muted-foreground hover:bg-surface-2"><X className="h-4 w-4" /></button>
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Oportunidade"
+      title={d.id ? "Editar oportunidade" : "Nova oportunidade"}
+      widthClass="md:max-w-[520px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{ label: "Salvar", onClick: () => onSave(d) }}
+        />
+      }
+    >
+      <div className="space-y-3">
+        <L label="Título"><Inp value={d.titulo ?? ""} onChange={(v) => setD({ ...d, titulo: v })} autoFocus /></L>
+        <div className="grid grid-cols-2 gap-3">
+          <L label="Valor (R$)"><Inp type="number" value={String(d.valor ?? 0)} onChange={(v) => setD({ ...d, valor: Number(v) })} /></L>
+          <L label="Probabilidade %"><Inp type="number" value={String(d.probabilidade ?? 0)} onChange={(v) => setD({ ...d, probabilidade: Number(v) })} /></L>
         </div>
-        <div className="space-y-3 px-5 py-4">
-          <L label="Título"><Inp value={d.titulo ?? ""} onChange={(v) => setD({ ...d, titulo: v })} autoFocus /></L>
-          <div className="grid grid-cols-2 gap-3">
-            <L label="Valor (R$)"><Inp type="number" value={String(d.valor ?? 0)} onChange={(v) => setD({ ...d, valor: Number(v) })} /></L>
-            <L label="Probabilidade %"><Inp type="number" value={String(d.probabilidade ?? 0)} onChange={(v) => setD({ ...d, probabilidade: Number(v) })} /></L>
-          </div>
-          <L label="Estágio">
-            <select value={d.stage ?? "qualificacao"} onChange={(e) => setD({ ...d, stage: e.target.value as DealStage })}
-              className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm">
-              {Object.entries(STAGE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select>
-          </L>
-        </div>
-        <div className="flex items-center justify-end gap-2 border-t border-border bg-surface-2/50 px-5 py-3">
-          <button onClick={onClose} className="h-9 rounded-lg border border-border bg-background px-3 text-xs font-semibold hover:bg-surface-2">Cancelar</button>
-          <button onClick={() => onSave(d)} className="h-9 rounded-lg bg-primary px-4 text-xs font-semibold text-primary-foreground hover:opacity-90">Salvar</button>
-        </div>
+        <L label="Estágio">
+          <select value={d.stage ?? "qualificacao"} onChange={(e) => setD({ ...d, stage: e.target.value as DealStage })}
+            className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm">
+            {Object.entries(STAGE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+        </L>
       </div>
-    </div>
+    </AlignPanel>
   );
 }
 

@@ -3,6 +3,7 @@ import { getActiveTenantId } from "@/contexts/tenant-context";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import { RealtimeBadge } from "@/components/realtime-badge";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import { ClientDetailDrawer } from "@/components/client-detail-drawer";
@@ -152,34 +153,32 @@ function ClientesPage() {
         </div>
       )}
 
-      {open && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm" onClick={() => setOpen(false)}>
-          <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="w-full max-w-lg rounded-2xl border border-border bg-surface-2 shadow-elevated">
-            <div className="flex items-center justify-between border-b border-border p-5">
-              <h3 className="text-lg font-semibold">Novo cliente</h3>
-              <button type="button" onClick={() => setOpen(false)} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
-            </div>
-            <div className="grid grid-cols-2 gap-3 p-5">
-              <Field label="Nome do contato *"><input required value={form.nome} onChange={(e) => set("nome", e.target.value)} className={inp} /></Field>
-              <Field label="Empresa"><input value={form.empresa} onChange={(e) => set("empresa", e.target.value)} className={inp} /></Field>
-              <Field label="Email"><input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} className={inp} /></Field>
-              <Field label="WhatsApp"><input value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} className={inp} /></Field>
-              <Field label="Valor do contrato (R$)" full>
-                <input type="number" min="0" step="100" value={form.contrato_valor} onChange={(e) => set("contrato_valor", e.target.value)} className={inp} />
-              </Field>
-              <Field label="Observações" full>
-                <textarea rows={3} value={form.observacoes} onChange={(e) => set("observacoes", e.target.value)} className={inp + " resize-none"} />
-              </Field>
-            </div>
-            <div className="flex justify-end gap-2 border-t border-border p-4">
-              <button type="button" onClick={() => setOpen(false)} className="h-10 rounded-lg border border-border bg-surface-1 px-4 text-sm text-muted-foreground">Cancelar</button>
-              <button type="submit" disabled={create.isPending} className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60">
-                {create.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Criar cliente
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      <AlignPanel
+        open={open}
+        onClose={() => setOpen(false)}
+        eyebrow="Cliente"
+        title="Novo cliente"
+        widthClass="md:max-w-[560px]"
+        footer={
+          <AlignPanelFooter
+            secondary={{ label: "Cancelar", onClick: () => setOpen(false) }}
+            primary={{ label: "Criar cliente", onClick: () => (document.getElementById("novo-cliente-form") as HTMLFormElement | null)?.requestSubmit(), loading: create.isPending }}
+          />
+        }
+      >
+        <form id="novo-cliente-form" onSubmit={submit} className="grid grid-cols-2 gap-3">
+          <Field label="Nome do contato *"><input required value={form.nome} onChange={(e) => set("nome", e.target.value)} className={inp} /></Field>
+          <Field label="Empresa"><input value={form.empresa} onChange={(e) => set("empresa", e.target.value)} className={inp} /></Field>
+          <Field label="Email"><input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} className={inp} /></Field>
+          <Field label="WhatsApp"><input value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} className={inp} /></Field>
+          <Field label="Valor do contrato (R$)" full>
+            <input type="number" min="0" step="100" value={form.contrato_valor} onChange={(e) => set("contrato_valor", e.target.value)} className={inp} />
+          </Field>
+          <Field label="Observações" full>
+            <textarea rows={3} value={form.observacoes} onChange={(e) => set("observacoes", e.target.value)} className={inp + " resize-none"} />
+          </Field>
+        </form>
+      </AlignPanel>
 
       <ClientDetailDrawer client={selected} onClose={() => setSelected(null)} />
     </AppShell>

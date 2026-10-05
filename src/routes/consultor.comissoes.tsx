@@ -3,7 +3,8 @@ import { useState, type FormEvent } from "react";
 import { useCommissions, useCreateCommission, useUpdateCommissionStatus, COMMISSION_STATUS_LABEL, type CommissionStatus } from "@/hooks/use-consultor-commissions";
 import { useLeads } from "@/hooks/use-leads";
 import { ConsultorExportBar } from "@/components/consultor-export-bar";
-import { Plus, X, Check, DollarSign } from "lucide-react";
+import { AlignPanel } from "@/components/align-panel";
+import { Plus, Check, DollarSign } from "lucide-react";
 
 export const Route = createFileRoute("/consultor/comissoes")({
   component: ComissoesPage,
@@ -126,34 +127,26 @@ function ComissoesPage() {
         </table>
       </div>
 
-      {open && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" onClick={() => setOpen(false)}>
-          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-5" onClick={e => e.stopPropagation()}>
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-base font-semibold">Nova comissão</h3>
-              <button onClick={() => setOpen(false)}><X className="h-4 w-4" /></button>
-            </div>
-            <form onSubmit={onSubmit} className="space-y-3">
-              <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Descrição</span>
-                <input name="descricao" required className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" /></label>
-              <div className="grid grid-cols-2 gap-3">
-                <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Base (R$)</span>
-                  <input name="base" type="number" step="0.01" required className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" /></label>
-                <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Percentual (%)</span>
-                  <input name="percentual" type="number" step="0.01" required className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" /></label>
-              </div>
-              <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Lead</span>
-                <select name="lead_id" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm">
-                  <option value="">— —</option>
-                  {leads.map(l => <option key={l.id} value={l.id}>{l.nome}</option>)}
-                </select></label>
-              <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Pagar em</span>
-                <input name="pagar_em" type="date" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" /></label>
-              <button className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Salvar</button>
-            </form>
+      <AlignPanel open={open} onClose={() => setOpen(false)} title="Nova comissão" widthClass="md:max-w-[560px]">
+        <form onSubmit={onSubmit} className="space-y-3">
+          <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Descrição</span>
+            <input name="descricao" required className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" /></label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Base (R$)</span>
+              <input name="base" type="number" step="0.01" required className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" /></label>
+            <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Percentual (%)</span>
+              <input name="percentual" type="number" step="0.01" required className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" /></label>
           </div>
-        </div>
-      )}
+          <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Lead</span>
+            <select name="lead_id" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm">
+              <option value="">— —</option>
+              {leads.map(l => <option key={l.id} value={l.id}>{l.nome}</option>)}
+            </select></label>
+          <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Pagar em</span>
+            <input name="pagar_em" type="date" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" /></label>
+          <button className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Salvar</button>
+        </form>
+      </AlignPanel>
     </div>
   );
 }
