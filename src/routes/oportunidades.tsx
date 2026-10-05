@@ -1,3 +1,6 @@
+import { dealsQueryOptions } from "@/hooks/use-deals";
+import { leadsQueryOptions } from "@/hooks/use-leads";
+import { getActiveTenantId } from "@/contexts/tenant-context";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
@@ -10,6 +13,12 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/oportunidades")({
   head: () => ({ meta: [{ title: "Oportunidades — Align CRM" }] }),
+  loader: ({ context }) => {
+    const tenantId = typeof window === "undefined" ? null : getActiveTenantId();
+    if (!tenantId) return;
+    void context.queryClient.prefetchQuery(dealsQueryOptions(tenantId));
+    void context.queryClient.prefetchQuery(leadsQueryOptions(tenantId));
+  },
   component: OportunidadesPage,
 });
 

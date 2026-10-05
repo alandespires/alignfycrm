@@ -1,3 +1,5 @@
+import { clientsQueryOptions } from "@/hooks/use-clients";
+import { getActiveTenantId } from "@/contexts/tenant-context";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
@@ -11,6 +13,11 @@ import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 
 export const Route = createFileRoute("/clientes")({
   head: () => ({ meta: [{ title: "Clientes — Align CRM" }] }),
+  loader: ({ context }) => {
+    const tenantId = typeof window === "undefined" ? null : getActiveTenantId();
+    if (!tenantId) return;
+    void context.queryClient.prefetchQuery(clientsQueryOptions(tenantId));
+  },
   component: ClientesPage,
 });
 
