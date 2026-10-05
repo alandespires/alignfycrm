@@ -1,3 +1,6 @@
+import { dealsQueryOptions } from "@/hooks/use-deals";
+import { leadsQueryOptions } from "@/hooks/use-leads";
+import { getActiveTenantId } from "@/contexts/tenant-context";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
@@ -26,6 +29,12 @@ const STAGES: { id: LeadStatus; label: string; color: string }[] = [
 
 export const Route = createFileRoute("/pipeline")({
   head: () => ({ meta: [{ title: "Pipeline — Align CRM" }] }),
+  loader: ({ context }) => {
+    const tenantId = typeof window === "undefined" ? null : getActiveTenantId();
+    if (!tenantId) return;
+    void context.queryClient.prefetchQuery(dealsQueryOptions(tenantId));
+    void context.queryClient.prefetchQuery(leadsQueryOptions(tenantId));
+  },
   component: PipelinePage,
 });
 

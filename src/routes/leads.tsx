@@ -1,3 +1,5 @@
+import { leadsQueryOptions } from "@/hooks/use-leads";
+import { getActiveTenantId } from "@/contexts/tenant-context";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, StatusPill } from "@/components/app-shell";
@@ -20,6 +22,11 @@ import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 
 export const Route = createFileRoute("/leads")({
   head: () => ({ meta: [{ title: "Leads — Align CRM" }] }),
+  loader: ({ context }) => {
+    const tenantId = typeof window === "undefined" ? null : getActiveTenantId();
+    if (!tenantId) return;
+    void context.queryClient.prefetchQuery(leadsQueryOptions(tenantId));
+  },
   component: LeadsPage,
 });
 
