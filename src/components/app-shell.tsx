@@ -408,13 +408,13 @@ function LiquidDock({
   return (
     <nav
       aria-label="Navegação principal"
-      className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+14px)] z-40 flex justify-center px-2 sm:px-3 md:inset-x-auto md:bottom-auto md:left-4 md:top-1/2 md:w-40 md:-translate-y-1/2 md:justify-start md:px-0"
+      className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+14px)] z-40 flex justify-center px-2 sm:px-3 md:inset-x-auto md:bottom-[max(1rem,env(safe-area-inset-bottom))] md:left-4 md:top-[max(1rem,env(safe-area-inset-top))] md:w-40 md:justify-start md:px-0"
     >
-      <div className="relative w-full max-w-[calc(100vw-1rem)] sm:w-auto md:w-full md:max-w-none">
+      <div className="relative w-full max-w-[calc(100vw-1rem)] sm:w-auto md:h-full md:w-full md:max-w-none">
         {/* glow under the dock */}
         <div aria-hidden className="pointer-events-none absolute -inset-6 -z-10 rounded-[40px] bg-primary/[0.06] blur-2xl" />
         <ul
-          className="flex items-center justify-between gap-0.5 overflow-x-auto rounded-[28px] border border-white/[0.08] bg-background/90 p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl backdrop-saturate-150 sm:gap-1 sm:justify-center md:flex-col md:items-stretch md:overflow-visible md:rounded-3xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex items-center justify-between gap-0.5 overflow-x-auto rounded-[28px] border border-white/[0.08] bg-background/90 p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-2xl backdrop-saturate-150 sm:gap-1 sm:justify-center md:h-full md:flex-col md:items-stretch md:overflow-y-auto md:rounded-3xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <DockItem to="/" label="Dashboard" icon={LayoutDashboard} active={active.home} />
           <DockButton label="Comercial" icon={ShoppingBag} active={active.comercial || comercialOpen} onClick={onOpenComercial} />
@@ -423,7 +423,7 @@ function LiquidDock({
           <DockButton label="Mais" icon={MoreHorizontal} active={maisOpen} onClick={onOpenMais} />
 
           {/* divider */}
-          <li aria-hidden className="mx-1 hidden h-7 w-px bg-white/[0.08] sm:block md:my-1 md:h-px md:w-auto" />
+          <li aria-hidden className="mx-1 hidden h-7 w-px bg-white/[0.08] sm:block md:mb-1 md:mt-auto md:h-px md:w-auto" />
           <LaunchDockButton active={launchOpen} onClick={onOpenLaunch} />
         </ul>
       </div>
