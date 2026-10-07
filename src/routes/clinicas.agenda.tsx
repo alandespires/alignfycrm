@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Plus, Loader2, CalendarDays, User, CheckCircle2, XCircle } from "lucide-react";
 import { useAppointments, useUpsertAppointment, useUpdateAppointmentStatus, useProfessionals, usePatients } from "@/hooks/use-clinic";
 import { PrimaryButton } from "@/components/app-shell";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 
 export const Route = createFileRoute("/clinicas/agenda")({
   component: AgendaPage,
@@ -173,40 +174,46 @@ function NewAppointmentDialog({ onClose }: { onClose: () => void }) {
     onClose();
   }
 
+  const inputCls = "h-9 w-full rounded-lg border border-border bg-surface-2 px-2.5 text-sm text-foreground outline-none focus:border-primary/60";
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 p-4 backdrop-blur-sm" onClick={onClose}>
-      <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="w-full max-w-lg rounded-xl border border-border bg-surface-1 p-6 shadow-2xl">
-        <div className="mb-4 flex items-center gap-2">
-          <CalendarDays className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-semibold">Novo agendamento</h3>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Paciente" full>
-            <select required value={patientId} onChange={(e) => setPatientId(e.target.value)} className="input">
-              <option value="">Selecione...</option>
-              {patients.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
-            </select>
-          </Field>
-          <Field label="Profissional" full>
-            <select value={profId} onChange={(e) => setProfId(e.target.value)} className="input">
-              <option value="">Sem profissional</option>
-              {profs.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
-            </select>
-          </Field>
-          <Field label="Data"><input required type="date" value={date} onChange={(e) => setDate(e.target.value)} className="input" /></Field>
-          <Field label="Horário"><input required type="time" value={time} onChange={(e) => setTime(e.target.value)} className="input" /></Field>
-          <Field label="Duração (min)"><input type="number" min={5} step={5} value={duracao} onChange={(e) => setDuracao(Number(e.target.value))} className="input" /></Field>
-          <Field label="Valor (R$)"><input type="number" step="0.01" value={valor} onChange={(e) => setValor(e.target.value === "" ? "" : Number(e.target.value))} className="input" /></Field>
-          <Field label="Procedimento" full><input value={procedimento} onChange={(e) => setProcedimento(e.target.value)} placeholder="Ex: Limpeza, restauração..." className="input" /></Field>
-          <Field label="Observações" full><textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} rows={2} className="input resize-none" /></Field>
-        </div>
-        <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="h-9 rounded-lg border border-border bg-surface-2 px-4 text-sm font-medium text-muted-foreground hover:text-foreground">Cancelar</button>
-          <button type="submit" disabled={upsert.isPending} className="h-9 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow hover:brightness-110 disabled:opacity-50">{upsert.isPending ? "Salvando..." : "Agendar"}</button>
-        </div>
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Agenda"
+      title="Novo agendamento"
+      widthClass="md:max-w-[560px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{
+            label: "Agendar",
+            onClick: () => document.getElementById("appointment-form")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true })),
+            loading: upsert.isPending,
+          }}
+        />
+      }
+    >
+      <form id="appointment-form" onSubmit={submit} className="grid grid-cols-2 gap-3">
+        <Field label="Paciente" full>
+          <select required value={patientId} onChange={(e) => setPatientId(e.target.value)} className={inputCls}>
+            <option value="">Selecione...</option>
+            {patients.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+          </select>
+        </Field>
+        <Field label="Profissional" full>
+          <select value={profId} onChange={(e) => setProfId(e.target.value)} className={inputCls}>
+            <option value="">Sem profissional</option>
+            {profs.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+          </select>
+        </Field>
+        <Field label="Data"><input required type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputCls} /></Field>
+        <Field label="Horário"><input required type="time" value={time} onChange={(e) => setTime(e.target.value)} className={inputCls} /></Field>
+        <Field label="Duração (min)"><input type="number" min={5} step={5} value={duracao} onChange={(e) => setDuracao(Number(e.target.value))} className={inputCls} /></Field>
+        <Field label="Valor (R$)"><input type="number" step="0.01" value={valor} onChange={(e) => setValor(e.target.value === "" ? "" : Number(e.target.value))} className={inputCls} /></Field>
+        <Field label="Procedimento" full><input value={procedimento} onChange={(e) => setProcedimento(e.target.value)} placeholder="Ex: Limpeza, restauração..." className={inputCls} /></Field>
+        <Field label="Observações" full><textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} rows={2} className={`${inputCls} h-auto py-2 resize-none`} /></Field>
       </form>
-      <style>{`.input{height:36px;width:100%;border-radius:8px;border:1px solid hsl(var(--border));background:hsl(var(--surface-2));padding:0 10px;font-size:13px;color:hsl(var(--foreground));}textarea.input{height:auto;padding:8px 10px;}`}</style>
-    </div>
+    </AlignPanel>
   );
 }
 

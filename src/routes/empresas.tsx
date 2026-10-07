@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton } from "@/components/app-shell";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import { useCompanies, useUpsertCompany, useDeleteCompany, type CompanyRow } from "@/hooks/use-companies";
 import { useContacts } from "@/hooks/use-contacts";
 import { useDeals } from "@/hooks/use-deals";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import { formatBRL } from "@/lib/mock-data";
-import { Building2, Plus, Pencil, Trash2, Search, X, Users, Briefcase } from "lucide-react";
+import { Building2, Plus, Pencil, Trash2, Search, Users, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/empresas")({
@@ -143,31 +144,33 @@ function EmptyState({ icon: Icon, label, cta }: { icon: any; label: string; cta?
 function CompanyDialog({ draft, onClose, onSave }: { draft: Partial<CompanyRow>; onClose: () => void; onSave: (c: Partial<CompanyRow>) => void }) {
   const [c, setC] = useState(draft);
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-elevated" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h3 className="text-sm font-semibold">{c.id ? "Editar empresa" : "Nova empresa"}</h3>
-          <button onClick={onClose} className="grid h-7 w-7 place-items-center rounded-lg text-muted-foreground hover:bg-surface-2"><X className="h-4 w-4" /></button>
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Empresa"
+      title={c.id ? "Editar empresa" : "Nova empresa"}
+      widthClass="md:max-w-[560px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{ label: "Salvar", onClick: () => onSave(c) }}
+        />
+      }
+    >
+      <div className="space-y-3">
+        <L label="Nome"><Inp value={c.nome ?? ""} onChange={(v) => setC({ ...c, nome: v })} autoFocus /></L>
+        <div className="grid grid-cols-2 gap-3">
+          <L label="CNPJ"><Inp value={c.cnpj ?? ""} onChange={(v) => setC({ ...c, cnpj: v })} /></L>
+          <L label="Segmento"><Inp value={c.segmento ?? ""} onChange={(v) => setC({ ...c, segmento: v })} /></L>
         </div>
-        <div className="space-y-3 px-5 py-4">
-          <L label="Nome"><Inp value={c.nome ?? ""} onChange={(v) => setC({ ...c, nome: v })} autoFocus /></L>
-          <div className="grid grid-cols-2 gap-3">
-            <L label="CNPJ"><Inp value={c.cnpj ?? ""} onChange={(v) => setC({ ...c, cnpj: v })} /></L>
-            <L label="Segmento"><Inp value={c.segmento ?? ""} onChange={(v) => setC({ ...c, segmento: v })} /></L>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <L label="Cidade"><Inp value={c.cidade ?? ""} onChange={(v) => setC({ ...c, cidade: v })} /></L>
-            <L label="Estado"><Inp value={c.estado ?? ""} onChange={(v) => setC({ ...c, estado: v })} /></L>
-          </div>
-          <L label="Site"><Inp value={c.site ?? ""} onChange={(v) => setC({ ...c, site: v })} /></L>
-          <L label="Observações"><Inp value={c.observacoes ?? ""} onChange={(v) => setC({ ...c, observacoes: v })} /></L>
+        <div className="grid grid-cols-2 gap-3">
+          <L label="Cidade"><Inp value={c.cidade ?? ""} onChange={(v) => setC({ ...c, cidade: v })} /></L>
+          <L label="Estado"><Inp value={c.estado ?? ""} onChange={(v) => setC({ ...c, estado: v })} /></L>
         </div>
-        <div className="flex items-center justify-end gap-2 border-t border-border bg-surface-2/50 px-5 py-3">
-          <button onClick={onClose} className="h-9 rounded-lg border border-border bg-background px-3 text-xs font-semibold hover:bg-surface-2">Cancelar</button>
-          <button onClick={() => onSave(c)} className="h-9 rounded-lg bg-primary px-4 text-xs font-semibold text-primary-foreground hover:opacity-90">Salvar</button>
-        </div>
+        <L label="Site"><Inp value={c.site ?? ""} onChange={(v) => setC({ ...c, site: v })} /></L>
+        <L label="Observações"><Inp value={c.observacoes ?? ""} onChange={(v) => setC({ ...c, observacoes: v })} /></L>
       </div>
-    </div>
+    </AlignPanel>
   );
 }
 

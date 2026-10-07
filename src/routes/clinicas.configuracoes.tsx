@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus, Loader2, UserCog } from "lucide-react";
 import { useProfessionals, useUpsertProfessional } from "@/hooks/use-clinic";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 
 export const Route = createFileRoute("/clinicas/configuracoes")({
   component: ConfigClinicaPage,
@@ -61,25 +62,45 @@ function NewProfDialog({ onClose, onSave }: { onClose: () => void; onSave: (d: a
   const [especialidade, setEspecialidade] = useState("");
   const [cro, setCro] = useState("");
   const [cor, setCor] = useState("#3b82f6");
+  const [saving, setSaving] = useState(false);
+  const inputCls = "h-9 w-full rounded-lg border border-border bg-surface-2 px-2.5 text-sm text-foreground outline-none focus:border-primary/60";
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await onSave({ nome, especialidade, cro, cor });
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 p-4 backdrop-blur-sm" onClick={onClose}>
-      <form onClick={(e) => e.stopPropagation()} onSubmit={async (e) => { e.preventDefault(); await onSave({ nome, especialidade, cro, cor }); }} className="w-full max-w-md rounded-xl border border-border bg-surface-1 p-6 shadow-2xl">
-        <h3 className="mb-4 text-lg font-semibold">Novo profissional</h3>
-        <div className="space-y-3">
-          <div><label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Nome</label><input required value={nome} onChange={(e) => setNome(e.target.value)} className="input" /></div>
-          <div><label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Especialidade</label><input value={especialidade} onChange={(e) => setEspecialidade(e.target.value)} className="input" /></div>
-          <div className="grid grid-cols-[1fr_80px] gap-2">
-            <div><label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">CRO</label><input value={cro} onChange={(e) => setCro(e.target.value)} className="input" /></div>
-            <div><label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Cor</label><input type="color" value={cor} onChange={(e) => setCor(e.target.value)} className="h-9 w-full rounded-lg border border-border bg-surface-2" /></div>
-          </div>
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Equipe"
+      title="Novo profissional"
+      widthClass="md:max-w-[480px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{
+            label: "Salvar",
+            onClick: () => document.getElementById("professional-form")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true })),
+            loading: saving,
+          }}
+        />
+      }
+    >
+      <form id="professional-form" onSubmit={submit} className="space-y-3">
+        <div><label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Nome</label><input required value={nome} onChange={(e) => setNome(e.target.value)} className={inputCls} /></div>
+        <div><label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Especialidade</label><input value={especialidade} onChange={(e) => setEspecialidade(e.target.value)} className={inputCls} /></div>
+        <div className="grid grid-cols-[1fr_80px] gap-2">
+          <div><label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">CRO</label><input value={cro} onChange={(e) => setCro(e.target.value)} className={inputCls} /></div>
+          <div><label className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Cor</label><input type="color" value={cor} onChange={(e) => setCor(e.target.value)} className="h-9 w-full rounded-lg border border-border bg-surface-2" /></div>
         </div>
-        <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="h-9 rounded-lg border border-border bg-surface-2 px-4 text-sm font-medium text-muted-foreground hover:text-foreground">Cancelar</button>
-          <button type="submit" className="h-9 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow hover:brightness-110">Salvar</button>
-        </div>
-        <style>{`.input{height:36px;width:100%;border-radius:8px;border:1px solid hsl(var(--border));background:hsl(var(--surface-2));padding:0 10px;font-size:13px;color:hsl(var(--foreground));}`}</style>
       </form>
-    </div>
+    </AlignPanel>
   );
 }

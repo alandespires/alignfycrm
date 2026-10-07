@@ -5,7 +5,8 @@ import {
   usePipelineStageAutomations, useCreatePipelineAutomation, useUpdatePipelineAutomation, useDeletePipelineAutomation,
   type StageTaskTemplate, type PipelineStageAutomation,
 } from "@/hooks/use-pipeline-stage-automations";
-import { Plus, Trash2, Bell, Power, ListChecks, Sparkles, Clock, Loader2, X } from "lucide-react";
+import { Plus, Trash2, Bell, Power, ListChecks, Sparkles, Clock, Loader2 } from "lucide-react";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 
 export const Route = createFileRoute("/follow-up")({
   head: () => ({ meta: [{ title: "Follow-up & Cadências — Align CRM" }] }),
@@ -223,56 +224,57 @@ function CadenceForm({
   }
 
   return (
-    <div className="fixed inset-0 z-[70] grid place-items-center bg-black/70 p-4 backdrop-blur-md" onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-elevated">
-        <div className="flex items-center justify-between border-b border-border px-5 py-3">
-          <h3 className="text-base font-semibold">Nova cadência</h3>
-          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Cadência"
+      title="Nova cadência"
+      widthClass="md:max-w-[560px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{
+            label: "Criar cadência",
+            onClick: () => nome.trim() && tarefas.length > 0 && onSave({ nome, stage: selectedStage, ativo: true, tarefas, notificar: true }),
+            disabled: !nome.trim() || tarefas.length === 0,
+            loading: pending,
+          }}
+        />
+      }
+    >
+      <div className="space-y-3">
+        <div>
+          <label className="text-[11px] font-semibold text-muted-foreground">Nome</label>
+          <input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex.: Cadência de qualificação"
+            className="mt-1 w-full rounded-md border border-border bg-surface-1 px-3 py-2 text-sm" />
         </div>
-        <div className="max-h-[70vh] space-y-3 overflow-auto p-5">
-          <div>
-            <label className="text-[11px] font-semibold text-muted-foreground">Nome</label>
-            <input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex.: Cadência de qualificação"
-              className="mt-1 w-full rounded-md border border-border bg-surface-1 px-3 py-2 text-sm" />
+        <div>
+          <label className="text-[11px] font-semibold text-muted-foreground">Dispara ao entrar no estágio</label>
+          <select value={selectedStage} onChange={(e) => setSelectedStage(e.target.value)}
+            className="mt-1 w-full rounded-md border border-border bg-surface-1 px-3 py-2 text-sm">
+            {STAGES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] font-semibold text-muted-foreground">Tarefas</label>
+            <button onClick={() => setTarefas((p) => [...p, { titulo: "Nova tarefa", prioridade: "media", prazo_dias: 1 }])}
+              className="text-[11px] font-semibold text-primary hover:underline">+ Adicionar</button>
           </div>
-          <div>
-            <label className="text-[11px] font-semibold text-muted-foreground">Dispara ao entrar no estágio</label>
-            <select value={selectedStage} onChange={(e) => setSelectedStage(e.target.value)}
-              className="mt-1 w-full rounded-md border border-border bg-surface-1 px-3 py-2 text-sm">
-              {STAGES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-[11px] font-semibold text-muted-foreground">Tarefas</label>
-              <button onClick={() => setTarefas((p) => [...p, { titulo: "Nova tarefa", prioridade: "media", prazo_dias: 1 }])}
-                className="text-[11px] font-semibold text-primary hover:underline">+ Adicionar</button>
-            </div>
-            {tarefas.map((t, i) => (
-              <div key={i} className="rounded-lg border border-border bg-surface-1 p-2">
-                <div className="flex items-center gap-2">
-                  <input value={t.titulo} onChange={(e) => patch(i, { titulo: e.target.value })}
-                    className="flex-1 rounded-md border border-border bg-surface-2 px-2 py-1 text-xs" />
-                  <input type="number" min={0} value={t.prazo_dias ?? 1} onChange={(e) => patch(i, { prazo_dias: parseInt(e.target.value || "0", 10) })}
-                    className="w-16 rounded-md border border-border bg-surface-2 px-2 py-1 text-xs tabular-nums" />
-                  <span className="text-[10px] text-muted-foreground">dias</span>
-                  <button onClick={() => setTarefas((p) => p.filter((_, idx) => idx !== i))} className="grid h-6 w-6 place-items-center rounded text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
-                </div>
+          {tarefas.map((t, i) => (
+            <div key={i} className="rounded-lg border border-border bg-surface-1 p-2">
+              <div className="flex items-center gap-2">
+                <input value={t.titulo} onChange={(e) => patch(i, { titulo: e.target.value })}
+                  className="flex-1 rounded-md border border-border bg-surface-2 px-2 py-1 text-xs" />
+                <input type="number" min={0} value={t.prazo_dias ?? 1} onChange={(e) => patch(i, { prazo_dias: parseInt(e.target.value || "0", 10) })}
+                  className="w-16 rounded-md border border-border bg-surface-2 px-2 py-1 text-xs tabular-nums" />
+                <span className="text-[10px] text-muted-foreground">dias</span>
+                <button onClick={() => setTarefas((p) => p.filter((_, idx) => idx !== i))} className="grid h-6 w-6 place-items-center rounded text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-2 border-t border-border bg-surface-1/50 px-5 py-3">
-          <button onClick={onClose} className="h-9 rounded-md px-3 text-xs text-muted-foreground hover:text-foreground">Cancelar</button>
-          <button
-            onClick={() => nome.trim() && tarefas.length > 0 && onSave({ nome, stage: selectedStage, ativo: true, tarefas, notificar: true })}
-            disabled={pending || !nome.trim() || tarefas.length === 0}
-            className="inline-flex h-9 items-center gap-1 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-50"
-          >
-            {pending && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Criar cadência
-          </button>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </AlignPanel>
   );
 }
