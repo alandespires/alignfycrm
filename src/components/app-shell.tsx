@@ -18,6 +18,7 @@ import { useOperacionalBadges } from "@/hooks/use-operacional-badges";
 import { NotificationsPopover } from "@/components/notifications-popover";
 import { LaunchPanel } from "@/components/launch-panel";
 import { LaunchIcon } from "@/components/launch-icon";
+import { DesktopSidebar, useSidebarCollapsed } from "@/components/desktop-sidebar";
 import { ProductTour } from "@/components/product-tour";
 import { LeadFormDialog } from "@/components/lead-form-dialog";
 
@@ -149,6 +150,7 @@ export function AppShell({ children, title, subtitle, action }: {
   const [operacionalOpen, setOperacionalOpen] = useState(false);
   const [maisOpen, setMaisOpen] = useState(false);
   const [launchOpen, setLaunchOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useSidebarCollapsed();
   const { data: opBadges } = useOperacionalBadges();
   const opBadgeTotal = (opBadges?.tasksOverdue ?? 0) + (opBadges?.projectsAtRisk ?? 0);
 
@@ -256,7 +258,21 @@ export function AppShell({ children, title, subtitle, action }: {
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground md:pl-44">
+    <div className={["min-h-screen bg-background text-foreground transition-[padding] duration-200", sidebarCollapsed ? "md:pl-[72px]" : "md:pl-60"].join(" ")}>
+      <DesktopSidebar
+        collapsed={sidebarCollapsed}
+        onToggle={setSidebarCollapsed}
+        pathname={pathname}
+        comercial={filteredComercial}
+        operacional={filteredOperacional}
+        mais={filteredMais}
+        active={{ home: isActive("/"), comercial: isComercialActive, operacional: isOperacionalActive, financeiro: isActive("/financeiro") }}
+        operacionalBadge={opBadgeTotal}
+        onLaunch={() => setLaunchOpen((v) => !v)}
+        launchOpen={launchOpen}
+        isSuperAdmin={isSuperAdmin}
+        onSignOut={() => signOut()}
+      />
       {/* Ambient backdrop — barely-there glow, sets the premium mood */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-[var(--gradient-glow)] opacity-70 blur-3xl" />
@@ -408,7 +424,7 @@ function LiquidDock({
   return (
     <nav
       aria-label="Navegação principal"
-      className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+14px)] z-40 flex justify-center px-2 sm:px-3 md:inset-x-auto md:bottom-[max(1rem,env(safe-area-inset-bottom))] md:left-4 md:top-[max(1rem,env(safe-area-inset-top))] md:w-40 md:justify-start md:px-0"
+      className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+14px)] z-40 flex justify-center px-2 sm:px-3 md:hidden"
     >
       <div className="relative w-full max-w-[calc(100vw-1rem)] sm:w-auto md:h-full md:w-full md:max-w-none">
         {/* glow under the dock */}
