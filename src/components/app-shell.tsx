@@ -18,6 +18,7 @@ import { useOperacionalBadges } from "@/hooks/use-operacional-badges";
 import { NotificationsPopover } from "@/components/notifications-popover";
 import { LaunchPanel } from "@/components/launch-panel";
 import { LaunchIcon } from "@/components/launch-icon";
+import { DesktopSidebar, useSidebarCollapsed } from "@/components/desktop-sidebar";
 import { ProductTour } from "@/components/product-tour";
 import { LeadFormDialog } from "@/components/lead-form-dialog";
 
