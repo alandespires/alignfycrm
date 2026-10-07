@@ -6,10 +6,11 @@ import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
 import {
   Loader2, Shield, Building2, Users, DollarSign, TrendingUp, Search, Plus,
-  CheckCircle2, XCircle, PauseCircle, Sparkles, ArrowLeft, Trash2, Edit3, X,
+  CheckCircle2, XCircle, PauseCircle, Sparkles, ArrowLeft, Trash2, Edit3,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 
 export const Route = createFileRoute("/super-admin")({
   component: SuperAdminPage,
@@ -428,52 +429,56 @@ function TenantFormDialog({ tenant, plans, onClose, onSaved }: {
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-surface-1 p-6 shadow-2xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold">{isNew ? "Nova empresa" : "Editar empresa"}</h3>
-          <button onClick={onClose} className="rounded-md p-1 text-muted-foreground hover:bg-surface-2 hover:text-foreground"><X className="h-4 w-4" /></button>
-        </div>
-        <form onSubmit={save} className="space-y-3">
-          <Field label="Nome *">
-            <input required value={nome} onChange={(e) => setNome(e.target.value)} className={inputCls} />
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Tenant"
+      title={isNew ? "Nova empresa" : "Editar empresa"}
+      widthClass="md:max-w-[560px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{
+            label: "Salvar",
+            onClick: () => document.getElementById("tenant-form")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true })),
+            disabled: !nome.trim(),
+            loading: busy,
+          }}
+        />
+      }
+    >
+      <form id="tenant-form" onSubmit={save} className="space-y-3">
+        <Field label="Nome *">
+          <input required value={nome} onChange={(e) => setNome(e.target.value)} className={inputCls} />
+        </Field>
+        {!isNew && (
+          <Field label="Slug">
+            <input value={slug} onChange={(e) => setSlug(e.target.value)} className={`${inputCls} font-mono`} />
           </Field>
-          {!isNew && (
-            <Field label="Slug">
-              <input value={slug} onChange={(e) => setSlug(e.target.value)} className={`${inputCls} font-mono`} />
-            </Field>
-          )}
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Responsável"><input value={responsavel} onChange={(e) => setResponsavel(e.target.value)} className={inputCls} /></Field>
-            <Field label="Email"><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} /></Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="WhatsApp"><input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className={inputCls} /></Field>
-            <Field label="Status">
-              <select value={status} onChange={(e) => setStatus(e.target.value as TenantStatus)} className={inputCls}>
-                <option value="trial">Trial</option>
-                <option value="ativo">Ativo</option>
-                <option value="suspenso">Suspenso</option>
-                <option value="cancelado">Cancelado</option>
-              </select>
-            </Field>
-          </div>
-          <Field label="Plano">
-            <select value={planId} onChange={(e) => setPlanId(e.target.value)} className={inputCls}>
-              <option value="">— Sem plano —</option>
-              {plans.map((p) => <option key={p.id} value={p.id}>{p.nome} — {brl(Number(p.preco_mensal))}/mês</option>)}
+        )}
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Responsável"><input value={responsavel} onChange={(e) => setResponsavel(e.target.value)} className={inputCls} /></Field>
+          <Field label="Email"><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} /></Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="WhatsApp"><input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className={inputCls} /></Field>
+          <Field label="Status">
+            <select value={status} onChange={(e) => setStatus(e.target.value as TenantStatus)} className={inputCls}>
+              <option value="trial">Trial</option>
+              <option value="ativo">Ativo</option>
+              <option value="suspenso">Suspenso</option>
+              <option value="cancelado">Cancelado</option>
             </select>
           </Field>
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="h-10 rounded-lg border border-border px-4 text-sm font-medium text-muted-foreground hover:bg-surface-2">Cancelar</button>
-            <button type="submit" disabled={busy || !nome.trim()}
-              className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 disabled:opacity-60">
-              {busy && <Loader2 className="h-4 w-4 animate-spin" />} Salvar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+        <Field label="Plano">
+          <select value={planId} onChange={(e) => setPlanId(e.target.value)} className={inputCls}>
+            <option value="">— Sem plano —</option>
+            {plans.map((p) => <option key={p.id} value={p.id}>{p.nome} — {brl(Number(p.preco_mensal))}/mês</option>)}
+          </select>
+        </Field>
+      </form>
+    </AlignPanel>
   );
 }
 

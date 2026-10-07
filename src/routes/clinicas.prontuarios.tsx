@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, FileText, Plus, Loader2, User } from "lucide-react";
 import { usePatients, useClinicalRecords, useCreateRecord } from "@/hooks/use-clinic";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 
 export const Route = createFileRoute("/clinicas/prontuarios")({
   component: ProntuariosPage,
@@ -167,35 +168,44 @@ function NewRecordDialog({ patientId, onClose, onSave }: { patientId: string; on
     } finally { setSaving(false); }
   }
 
+  const inputCls = "h-9 w-full rounded-lg border border-border bg-surface-2 px-2.5 text-sm text-foreground outline-none focus:border-primary/60";
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 p-4 backdrop-blur-sm" onClick={onClose}>
-      <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="w-full max-w-xl rounded-xl border border-border bg-surface-1 p-6 shadow-2xl">
-        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold"><FileText className="h-5 w-5 text-primary" /> Novo registro clínico</h3>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Tipo">
-            <select value={tipo} onChange={(e) => setTipo(e.target.value as any)} className="input">
-              <option value="anamnese">Anamnese</option>
-              <option value="evolucao">Evolução</option>
-              <option value="procedimento">Procedimento</option>
-              <option value="retorno">Retorno</option>
-              <option value="observacao">Observação</option>
-            </select>
-          </Field>
-          <Field label="Dente / Região"><input value={dente} onChange={(e) => setDente(e.target.value)} placeholder="Ex: 36, sup. esq." className="input" /></Field>
-          <Field label="Título" full><input value={titulo} onChange={(e) => setTitulo(e.target.value)} className="input" /></Field>
-          <Field label="Queixa principal" full><input value={queixa} onChange={(e) => setQueixa(e.target.value)} className="input" /></Field>
-          <Field label="Procedimento realizado" full><input value={procedimento} onChange={(e) => setProcedimento(e.target.value)} className="input" /></Field>
-          <Field label="Descrição clínica" full>
-            <textarea required value={conteudo} onChange={(e) => setConteudo(e.target.value)} rows={5} className="input resize-none" placeholder="Descreva a evolução, exame clínico, conduta..." />
-          </Field>
-        </div>
-        <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="h-9 rounded-lg border border-border bg-surface-2 px-4 text-sm font-medium text-muted-foreground hover:text-foreground">Cancelar</button>
-          <button type="submit" disabled={saving} className="h-9 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow hover:brightness-110 disabled:opacity-50">{saving ? "Salvando..." : "Salvar registro"}</button>
-        </div>
-        <style>{`.input{height:36px;width:100%;border-radius:8px;border:1px solid hsl(var(--border));background:hsl(var(--surface-2));padding:0 10px;font-size:13px;color:hsl(var(--foreground));}textarea.input{height:auto;padding:8px 10px;}`}</style>
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Prontuário"
+      title="Novo registro clínico"
+      widthClass="md:max-w-[640px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{
+            label: "Salvar registro",
+            onClick: () => document.getElementById("record-form")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true })),
+            loading: saving,
+          }}
+        />
+      }
+    >
+      <form id="record-form" onSubmit={submit} className="grid grid-cols-2 gap-3">
+        <Field label="Tipo">
+          <select value={tipo} onChange={(e) => setTipo(e.target.value as any)} className={inputCls}>
+            <option value="anamnese">Anamnese</option>
+            <option value="evolucao">Evolução</option>
+            <option value="procedimento">Procedimento</option>
+            <option value="retorno">Retorno</option>
+            <option value="observacao">Observação</option>
+          </select>
+        </Field>
+        <Field label="Dente / Região"><input value={dente} onChange={(e) => setDente(e.target.value)} placeholder="Ex: 36, sup. esq." className={inputCls} /></Field>
+        <Field label="Título" full><input value={titulo} onChange={(e) => setTitulo(e.target.value)} className={inputCls} /></Field>
+        <Field label="Queixa principal" full><input value={queixa} onChange={(e) => setQueixa(e.target.value)} className={inputCls} /></Field>
+        <Field label="Procedimento realizado" full><input value={procedimento} onChange={(e) => setProcedimento(e.target.value)} className={inputCls} /></Field>
+        <Field label="Descrição clínica" full>
+          <textarea required value={conteudo} onChange={(e) => setConteudo(e.target.value)} rows={5} className={`${inputCls} h-auto py-2 resize-none`} placeholder="Descreva a evolução, exame clínico, conduta..." />
+        </Field>
       </form>
-    </div>
+    </AlignPanel>
   );
 }
 

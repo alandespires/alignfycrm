@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton } from "@/components/app-shell";
+import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import { useContacts, useUpsertContact, useDeleteContact, type ContactRow } from "@/hooks/use-contacts";
 import { useCompanies } from "@/hooks/use-companies";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { useRealtimeSync } from "@/hooks/use-realtime";
-import { Users, Plus, Pencil, Trash2, Search, X, Mail, Phone, Building2 } from "lucide-react";
+import { Users, Plus, Pencil, Trash2, Search, Mail, Phone, Building2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/contatos")({
@@ -146,36 +147,38 @@ function EmptyState({ icon: Icon, label, cta }: { icon: any; label: string; cta?
 function ContactDialog({ draft, companies, onClose, onSave }: { draft: Partial<ContactRow>; companies: { id: string; nome: string }[]; onClose: () => void; onSave: (c: Partial<ContactRow>) => void }) {
   const [c, setC] = useState(draft);
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-card shadow-elevated" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h3 className="text-sm font-semibold">{c.id ? "Editar contato" : "Novo contato"}</h3>
-          <button onClick={onClose} className="grid h-7 w-7 place-items-center rounded-lg text-muted-foreground hover:bg-surface-2"><X className="h-4 w-4" /></button>
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Contato"
+      title={c.id ? "Editar contato" : "Novo contato"}
+      widthClass="md:max-w-[560px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{ label: "Salvar", onClick: () => onSave(c) }}
+        />
+      }
+    >
+      <div className="space-y-3">
+        <L label="Nome"><Inp value={c.nome ?? ""} onChange={(v) => setC({ ...c, nome: v })} autoFocus /></L>
+        <div className="grid grid-cols-2 gap-3">
+          <L label="Cargo"><Inp value={c.cargo ?? ""} onChange={(v) => setC({ ...c, cargo: v })} /></L>
+          <L label="Empresa">
+            <select value={c.company_id ?? ""} onChange={(e) => setC({ ...c, company_id: e.target.value || null })}
+              className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm">
+              <option value="">— Nenhuma —</option>
+              {companies.map((co) => <option key={co.id} value={co.id}>{co.nome}</option>)}
+            </select>
+          </L>
         </div>
-        <div className="space-y-3 px-5 py-4">
-          <L label="Nome"><Inp value={c.nome ?? ""} onChange={(v) => setC({ ...c, nome: v })} autoFocus /></L>
-          <div className="grid grid-cols-2 gap-3">
-            <L label="Cargo"><Inp value={c.cargo ?? ""} onChange={(v) => setC({ ...c, cargo: v })} /></L>
-            <L label="Empresa">
-              <select value={c.company_id ?? ""} onChange={(e) => setC({ ...c, company_id: e.target.value || null })}
-                className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm">
-                <option value="">— Nenhuma —</option>
-                {companies.map((co) => <option key={co.id} value={co.id}>{co.nome}</option>)}
-              </select>
-            </L>
-          </div>
-          <L label="Email"><Inp type="email" value={c.email ?? ""} onChange={(v) => setC({ ...c, email: v })} /></L>
-          <div className="grid grid-cols-2 gap-3">
-            <L label="WhatsApp"><Inp value={c.whatsapp ?? ""} onChange={(v) => setC({ ...c, whatsapp: v })} /></L>
-            <L label="Telefone"><Inp value={c.telefone ?? ""} onChange={(v) => setC({ ...c, telefone: v })} /></L>
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-2 border-t border-border bg-surface-2/50 px-5 py-3">
-          <button onClick={onClose} className="h-9 rounded-lg border border-border bg-background px-3 text-xs font-semibold hover:bg-surface-2">Cancelar</button>
-          <button onClick={() => onSave(c)} className="h-9 rounded-lg bg-primary px-4 text-xs font-semibold text-primary-foreground hover:opacity-90">Salvar</button>
+        <L label="Email"><Inp type="email" value={c.email ?? ""} onChange={(v) => setC({ ...c, email: v })} /></L>
+        <div className="grid grid-cols-2 gap-3">
+          <L label="WhatsApp"><Inp value={c.whatsapp ?? ""} onChange={(v) => setC({ ...c, whatsapp: v })} /></L>
+          <L label="Telefone"><Inp value={c.telefone ?? ""} onChange={(v) => setC({ ...c, telefone: v })} /></L>
         </div>
       </div>
-    </div>
+    </AlignPanel>
   );
 }
 

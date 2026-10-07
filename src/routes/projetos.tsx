@@ -319,50 +319,50 @@ function ProjectFormModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm" onClick={onClose}>
-      <form onSubmit={submit} className="w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-surface-1 shadow-elevated" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-border p-5">
-          <h2 className="text-base font-semibold">Novo projeto</h2>
-          <button type="button" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
-        </div>
-        <div className="space-y-3 p-5">
-          <Field label="Título *"><input required maxLength={200} value={titulo} onChange={(e) => setTitulo(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm focus:border-primary/60 focus:outline-none" /></Field>
-          <Field label="Descrição"><textarea maxLength={2000} value={descricao} onChange={(e) => setDescricao(e.target.value)} rows={3} className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm focus:border-primary/60 focus:outline-none" /></Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Status">
-              <select value={status} onChange={(e) => setStatus(e.target.value as ProjectStatus)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
-                {STATUS_LIST.map((s) => <option key={s} value={s}>{PROJECT_STATUS_LABEL[s]}</option>)}
-              </select>
-            </Field>
-            <Field label="Prioridade">
-              <select value={prioridade} onChange={(e) => setPrioridade(e.target.value as any)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
-                {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
-              </select>
-            </Field>
-            <Field label="Prazo"><input type="date" value={prazo} onChange={(e) => setPrazo(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm" /></Field>
-            <Field label="Valor total (R$)"><input type="number" step="0.01" min="0" value={valor} onChange={(e) => setValor(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm tabular-nums" /></Field>
-            <Field label="Cliente">
-              <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
-                <option value="">—</option>
-                {clients.map((c) => <option key={c.id} value={c.id}>{c.empresa || c.nome}</option>)}
-              </select>
-            </Field>
-            <Field label="Lead (Pipeline)">
-              <select value={leadId} onChange={(e) => setLeadId(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
-                <option value="">—</option>
-                {leads.map((l) => <option key={l.id} value={l.id}>{l.empresa ? `${l.nome} · ${l.empresa}` : l.nome}</option>)}
-              </select>
-            </Field>
-          </div>
-        </div>
-        <div className="flex justify-end gap-2 border-t border-border p-4">
-          <button type="button" onClick={onClose} className="rounded-lg border border-border bg-surface-2 px-4 py-2 text-xs font-medium">Cancelar</button>
-          <button type="submit" disabled={create.isPending} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-50">
-            {create.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />} Criar projeto
-          </button>
+    <AlignPanel
+      open
+      onClose={onClose}
+      eyebrow="Projeto"
+      title="Novo projeto"
+      widthClass="md:max-w-[640px]"
+      footer={
+        <AlignPanelFooter
+          secondary={{ label: "Cancelar", onClick: onClose }}
+          primary={{ label: "Criar projeto", onClick: () => document.getElementById("project-form")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true })), loading: create.isPending }}
+        />
+      }
+    >
+      <form id="project-form" onSubmit={submit} className="space-y-3">
+        <Field label="Título *"><input required maxLength={200} value={titulo} onChange={(e) => setTitulo(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm focus:border-primary/60 focus:outline-none" /></Field>
+        <Field label="Descrição"><textarea maxLength={2000} value={descricao} onChange={(e) => setDescricao(e.target.value)} rows={3} className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm focus:border-primary/60 focus:outline-none" /></Field>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Status">
+            <select value={status} onChange={(e) => setStatus(e.target.value as ProjectStatus)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
+              {STATUS_LIST.map((s) => <option key={s} value={s}>{PROJECT_STATUS_LABEL[s]}</option>)}
+            </select>
+          </Field>
+          <Field label="Prioridade">
+            <select value={prioridade} onChange={(e) => setPrioridade(e.target.value as any)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
+              {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </Field>
+          <Field label="Prazo"><input type="date" value={prazo} onChange={(e) => setPrazo(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm" /></Field>
+          <Field label="Valor total (R$)"><input type="number" step="0.01" min="0" value={valor} onChange={(e) => setValor(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm tabular-nums" /></Field>
+          <Field label="Cliente">
+            <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
+              <option value="">—</option>
+              {clients.map((c) => <option key={c.id} value={c.id}>{c.empresa || c.nome}</option>)}
+            </select>
+          </Field>
+          <Field label="Lead (Pipeline)">
+            <select value={leadId} onChange={(e) => setLeadId(e.target.value)} className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm">
+              <option value="">—</option>
+              {leads.map((l) => <option key={l.id} value={l.id}>{l.empresa ? `${l.nome} · ${l.empresa}` : l.nome}</option>)}
+            </select>
+          </Field>
         </div>
       </form>
-    </div>
+    </AlignPanel>
   );
 }
 
