@@ -424,7 +424,7 @@ function LiquidDock({
   return (
     <nav
       aria-label="Navegação principal"
-      className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+14px)] z-40 flex justify-center px-2 sm:px-3 md:inset-x-auto md:bottom-[max(1rem,env(safe-area-inset-bottom))] md:left-4 md:top-[max(1rem,env(safe-area-inset-top))] md:w-40 md:justify-start md:px-0"
+      className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+14px)] z-40 flex justify-center px-2 sm:px-3 md:hidden"
     >
       <div className="relative w-full max-w-[calc(100vw-1rem)] sm:w-auto md:h-full md:w-full md:max-w-none">
         {/* glow under the dock */}
