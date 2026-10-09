@@ -17,6 +17,7 @@ import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { useOperacionalBadges } from "@/hooks/use-operacional-badges";
 import { NotificationsPopover } from "@/components/notifications-popover";
 import { LaunchPanel } from "@/components/launch-panel";
+import { GlobalSearch } from "@/components/global-search";
 import { LaunchIcon } from "@/components/launch-icon";
 import { DesktopSidebar, useSidebarCollapsed } from "@/components/desktop-sidebar";
 import { ProductTour } from "@/components/product-tour";
@@ -150,6 +151,7 @@ export function AppShell({ children, title, subtitle, action }: {
   const [operacionalOpen, setOperacionalOpen] = useState(false);
   const [maisOpen, setMaisOpen] = useState(false);
   const [launchOpen, setLaunchOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useSidebarCollapsed();
   const { data: opBadges } = useOperacionalBadges();
   const opBadgeTotal = (opBadges?.tasksOverdue ?? 0) + (opBadges?.projectsAtRisk ?? 0);
@@ -209,8 +211,8 @@ export function AppShell({ children, title, subtitle, action }: {
       // Cmd/Ctrl+K → Launch
       if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
         e.preventDefault();
-        setComercialOpen(false); setOperacionalOpen(false); setMaisOpen(false);
-        setLaunchOpen((v) => !v);
+        setComercialOpen(false); setOperacionalOpen(false); setMaisOpen(false); setLaunchOpen(false);
+        setSearchOpen((v) => !v);
         return;
       }
       if (isTyping(e.target) || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -407,6 +409,7 @@ export function AppShell({ children, title, subtitle, action }: {
       )}
 
       <LaunchPanel open={launchOpen} onClose={() => setLaunchOpen(false)} />
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} onAskLaunch={() => setLaunchOpen(true)} />
       <ProductTour />
     </div>
   );
