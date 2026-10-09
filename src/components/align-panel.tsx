@@ -61,6 +61,9 @@ export interface AlignPanelProps {
   expandable?: boolean;
 }
 
+// Stack of open panels — only the topmost handles Escape/Tab.
+const panelStack: object[] = [];
+
 export function AlignPanel({
   open,
   onClose,
@@ -98,6 +101,9 @@ export function AlignPanel({
 
   React.useEffect(() => {
     if (!open) return;
+    const token = {};
+    panelStack.push(token);
+    const isTop = () => panelStack[panelStack.length - 1] === token;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const focusables = () =>
       Array.from(
@@ -112,6 +118,7 @@ export function AlignPanel({
       (auto ?? focusables()[0] ?? panel).focus();
     });
     const onKey = (e: KeyboardEvent) => {
+      if (!isTop()) return;
       if (e.key === "Escape") {
         e.stopPropagation();
         onCloseRef.current();
@@ -141,6 +148,8 @@ export function AlignPanel({
     return () => {
       cancelAnimationFrame(raf);
       document.removeEventListener("keydown", onKey);
+      const idx = panelStack.indexOf(token);
+      if (idx >= 0) panelStack.splice(idx, 1);
       document.body.style.overflow = prev;
       if (previouslyFocused && document.contains(previouslyFocused)) previouslyFocused.focus();
     };

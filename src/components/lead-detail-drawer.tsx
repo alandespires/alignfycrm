@@ -252,12 +252,7 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
 
       {/* Convert confirmation — small modal on top */}
       {convertOpen && (
-        <div className="fixed inset-0 z-[70] grid place-items-center bg-black/70 p-4 backdrop-blur-sm" onClick={() => setConvertOpen(false)}>
-          <div className="w-full max-w-md overflow-hidden rounded-2xl border border-border bg-surface-1 shadow-elevated" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between border-b border-border p-4">
-              <h3 className="text-sm font-semibold">Converter em cliente</h3>
-              <button onClick={() => setConvertOpen(false)} className="grid h-7 w-7 place-items-center rounded text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
-            </div>
+        <AlignPanel open onClose={() => setConvertOpen(false)} eyebrow={lead.nome} title="Converter em cliente" widthClass="md:max-w-[480px]">
             <div className="space-y-3 p-4">
               <p className="text-xs text-muted-foreground">
                 Vamos criar o cliente <strong className="text-foreground">{lead.nome}</strong>
@@ -318,8 +313,7 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+        </AlignPanel>
       )}
     </>
   );
