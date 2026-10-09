@@ -1,3 +1,4 @@
+import { AlignPanel } from "@/components/align-panel";
 import { useState } from "react";
 import { X, Sparkles, FolderPlus, Plus, Loader2, Calendar, Clock, ListChecks } from "lucide-react";
 import {
@@ -28,21 +29,9 @@ export function ProjectTemplatesGallery({ onClose, onApplied }: { onClose: () =>
   if (selected) return <ApplyTemplate template={selected} onCancel={() => setSelected(null)} onClose={onClose} onApplied={onApplied} leads={leads} clients={clients} apply={apply} />;
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-sm p-4" onClick={onClose}>
-      <div className="w-full max-w-4xl max-h-[85vh] overflow-hidden rounded-2xl border border-border bg-surface-1 shadow-elevated flex flex-col" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-border p-5">
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
-              <Sparkles className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h2 className="font-display text-lg font-semibold tracking-tight">Templates de Projeto</h2>
-              <p className="text-xs text-muted-foreground">Aplique um modelo pré-pronto e ganhe etapas, entregas e tarefas em segundos.</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="grid h-9 w-9 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
-        </div>
-
+    <AlignPanel open onClose={onClose} eyebrow="Projetos" title="Templates de Projeto"
+      subtitle="Aplique um modelo pré-pronto e ganhe etapas, entregas e tarefas em segundos." widthClass="md:max-w-[880px]">
+      <>
         <div className="overflow-y-auto p-5 space-y-4">
           {templates.length === 0 && seedOpen && !isLoading && (
             <div className="rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-5 text-center">
@@ -88,8 +77,8 @@ export function ProjectTemplatesGallery({ onClose, onApplied }: { onClose: () =>
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </>
+    </AlignPanel>
   );
 }
 
@@ -105,12 +94,14 @@ function ApplyTemplate({ template, onCancel, onClose, onApplied, leads, clients,
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-sm p-4" onClick={onCancel}>
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-surface-1 shadow-elevated" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-border p-5">
-          <h2 className="font-display text-lg font-semibold tracking-tight">Aplicar: {template.nome}</h2>
-          <button onClick={onCancel} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
-        </div>
+    <AlignPanel open onClose={onCancel} eyebrow="Aplicar template" title={template.nome}
+      footer={<div className="flex justify-end gap-2">
+          <button onClick={onCancel} className="rounded-lg border border-border bg-surface-2 px-4 py-2 text-xs font-medium">Cancelar</button>
+          <button onClick={go} disabled={apply.isPending}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-50">
+            {apply.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FolderPlus className="h-3.5 w-3.5" />} Criar projeto
+          </button>
+      </div>}>
         <div className="space-y-3 p-5">
           <label className="block">
             <div className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Título do projeto</div>
@@ -140,14 +131,6 @@ function ApplyTemplate({ template, onCancel, onClose, onApplied, leads, clients,
             </ul>
           </div>
         </div>
-        <div className="flex justify-end gap-2 border-t border-border p-4">
-          <button onClick={onCancel} className="rounded-lg border border-border bg-surface-2 px-4 py-2 text-xs font-medium">Cancelar</button>
-          <button onClick={go} disabled={apply.isPending}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-50">
-            {apply.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FolderPlus className="h-3.5 w-3.5" />} Criar projeto
-          </button>
-        </div>
-      </div>
-    </div>
+    </AlignPanel>
   );
 }
