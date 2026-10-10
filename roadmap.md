@@ -1,5 +1,10 @@
 # Roadmap
 
+## UX/UI — ícones e conexão entre telas
+- [ ] Aplicar ícones preenchidos e padronizar ações nos botões existentes.
+- [ ] Compactar cabeçalhos e facilitar acesso à busca e navegação relacionada.
+- [ ] Validar navegação, painéis e aparência no navegador.
+
 - [x] Expandir a navegação desktop para toda a lateral.
 - [x] Estabilizar AppShell e remover a transição sequencial que desmontava o conteúdo.
 - [ ] Padronizar loaders, cache, skeletons, vazios e erros. (leads, clientes, oportunidades e pipeline pré-carregados)
