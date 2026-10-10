@@ -1,5 +1,5 @@
-import type { LucideIcon } from "lucide-react";
-import { Clock3, ShieldCheck } from "lucide-react";
+import type { LucideIcon } from "@/components/ui/icons";
+import { Clock3, ShieldCheck } from "@/components/ui/icons";
 import { AppShell, StatusPill } from "@/components/app-shell";
 import { Link } from "@tanstack/react-router";
 

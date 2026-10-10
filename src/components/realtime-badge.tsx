@@ -1,4 +1,4 @@
-import { Radio } from "lucide-react";
+import { Radio } from "@/components/ui/icons";
 
 export type RealtimeStatus = "connecting" | "live" | "reconnecting" | "offline";
 

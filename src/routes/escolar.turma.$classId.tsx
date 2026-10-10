@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -11,7 +12,7 @@ import {
   Check, X, Clock, FileWarning, ArrowLeft, Plus, CheckCheck, Save,
   CalendarDays, ListChecks, Layers, GraduationCap, ChevronRight, Lock, CircleDot,
   Search, Filter, Download, Sparkles, Loader2, AlertTriangle,
-} from "lucide-react";
+} from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,8 @@ import {
 import { useSchoolSettings } from "@/hooks/use-school-settings";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/escolar/turma/$classId")({ component: ClassConsole });
+export const Route = createFileRoute("/escolar/turma/$classId")({
+  head: () => pageHead("Detalhes da turma"), component: ClassConsole });
 
 const STATUSES = [
   { v: "presente", short: "P", icon: Check, dotCls: "bg-success", btn: "bg-success/15 text-success border-success/40", title: "Presente" },
@@ -83,10 +85,10 @@ function ClassConsole() {
           const Icon = t.icon;
           const active = tab === t.v;
           return (
-            <button key={t.v} onClick={() => setTab(t.v as any)}
+            <Button variant="unstyled" size="unstyled" key={t.v} onClick={() => setTab(t.v as any)}
               className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${active ? "bg-surface-3 text-foreground shadow-card" : "text-muted-foreground hover:text-foreground hover:bg-surface-2"}`}>
               <Icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />{t.label}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -360,7 +362,7 @@ function RollCallBoard({ classId, enrollments, lessons }: any) {
                 </div>
                 <div className="flex gap-1">
                   {STATUSES.map((s) => (
-                    <button
+                    <Button variant="unstyled" size="unstyled"
                       key={s.v}
                       title={s.title}
                       disabled={finalizado}
@@ -368,7 +370,7 @@ function RollCallBoard({ classId, enrollments, lessons }: any) {
                       className={`grid h-9 w-9 place-items-center rounded-lg border text-xs font-bold transition disabled:opacity-50 ${cur === s.v ? s.btn : "border-border text-muted-foreground hover:bg-surface-3"}`}
                     >
                       {s.short}
-                    </button>
+                    </Button>
                   ))}
                 </div>
                 <div className="flex items-center gap-1 justify-end">

@@ -1,6 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useProspectingSettings, useSaveProspectingSettings } from "@/hooks/use-prospecting";
-import { Settings2 } from "lucide-react";
+import { Settings2 } from "@/components/ui/icons";
 
 const DEFAULT_WEIGHTS = {
   telefone: 12,
@@ -72,7 +73,7 @@ export function ProspectingSettings() {
         />
         <NumberField label="Retenção em dias" value={retentionDays} onChange={setRetentionDays} />
       </div>
-      <button
+      <Button variant="unstyled" size="unstyled"
         onClick={() =>
           save.mutate({
             source: {
@@ -93,7 +94,7 @@ export function ProspectingSettings() {
         className="h-10 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-50"
       >
         Salvar configurações
-      </button>
+      </Button>
     </div>
   );
 }

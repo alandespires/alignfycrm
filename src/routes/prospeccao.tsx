@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
@@ -25,7 +26,7 @@ import {
   Target,
   Trash2,
   TrendingUp,
-} from "lucide-react";
+} from "@/components/ui/icons";
 import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, staggerItem } from "@/lib/motion";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
@@ -142,7 +143,7 @@ function ProspeccaoPage() {
       subtitle="Encontre, qualifique e organize oportunidades B2B com score inteligente"
       action={
         <div className="flex flex-wrap gap-2">
-          <button
+          <Button variant="unstyled" size="unstyled"
             onClick={() =>
               exportProspectingCsv(
                 selectedRealResults.length ? selectedRealResults : realActiveResults,
@@ -153,8 +154,8 @@ function ProspeccaoPage() {
             className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border px-3 text-sm disabled:opacity-50"
           >
             <Download className="h-3.5 w-3.5" /> CSV
-          </button>
-          <button
+          </Button>
+          <Button variant="unstyled" size="unstyled"
             onClick={() =>
               exportProspectingXlsx(
                 selectedRealResults.length ? selectedRealResults : realActiveResults,
@@ -165,15 +166,15 @@ function ProspeccaoPage() {
             className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border px-3 text-sm disabled:opacity-50"
           >
             <FileSpreadsheet className="h-3.5 w-3.5" /> XLSX
-          </button>
-          <button
+          </Button>
+          <Button variant="unstyled" size="unstyled"
             onClick={() => setImportOpen(true)}
             disabled={!selected.size || !canEdit}
             className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 disabled:opacity-50"
           >
             <Download className="h-3.5 w-3.5" />
             Importar {selected.size > 0 && `(${selected.size})`}
-          </button>
+          </Button>
         </div>
       }
     >
@@ -279,7 +280,7 @@ function ProspeccaoPage() {
               Buscas recentes:
             </span>
             {searches.slice(0, 6).map((search) => (
-              <button
+              <Button variant="unstyled" size="unstyled"
                 key={search.id}
                 onClick={() => openSearch(search.id)}
                 className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[11px] font-medium transition ${
@@ -289,7 +290,7 @@ function ProspeccaoPage() {
                 }`}
               >
                 {search.nome ?? "(sem nome)"} · {search.qualificados}/{search.encontrados}{search.is_demo ? " · Demo" : ""}
-              </button>
+              </Button>
             ))}
           </motion.div>
         )}
@@ -307,12 +308,12 @@ function ProspeccaoPage() {
                 ? resultsErrorDetails.message
                 : "A consulta de resultados falhou."}
             </div>
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => void refetchResults()}
               className="mt-4 rounded-lg border border-border bg-surface-1 px-4 py-2 text-sm"
             >
               Tentar novamente
-            </button>
+            </Button>
           </div>
         ) : (
           <ProspectingResultsTable

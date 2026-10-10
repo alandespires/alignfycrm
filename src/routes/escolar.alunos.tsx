@@ -1,14 +1,16 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useStudents, useUpsertStudent, useDeleteStudent, type Student } from "@/hooks/use-school";
-import { Plus, Pencil, Trash2, Search, GraduationCap } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, GraduationCap } from "@/components/ui/icons";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/escolar/alunos")({ component: Page });
+export const Route = createFileRoute("/escolar/alunos")({
+  head: () => pageHead("Escolar · Alunos"), component: Page });
 
 function Page() {
   const [search, setSearch] = useState("");

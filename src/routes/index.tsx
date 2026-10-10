@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, StatusPill } from "@/components/app-shell";
@@ -5,7 +7,7 @@ import { LeadFormDialog } from "@/components/lead-form-dialog";
 import {
   ArrowUpRight, TrendingUp, TrendingDown, Users, Target, DollarSign,
   CheckCircle2, Sparkles, Plus, ArrowRight, Phone, Mail, Zap, ChevronDown, LayoutGrid,
-} from "lucide-react";
+} from "@/components/ui/icons";
 import { useDashboardWidgets, WIDGET_LABELS, type WidgetId } from "@/hooks/use-dashboard-widgets";
 import {
   AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -21,7 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ListSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/")({
-  head: () => ({ meta: [{ title: "Dashboard — Align CRM" }] }),
+  head: () => pageHead("Dashboard"),
   component: DashboardPage,
 });
 
@@ -181,13 +183,13 @@ export function DashboardPage() {
       action={
         <div className="flex flex-wrap gap-2">
           <div className="relative">
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => setWidgetsOpen((v) => !v)}
               className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground"
               title="Personalizar widgets"
             >
               <LayoutGrid className="h-3.5 w-3.5" /> Personalizar
-            </button>
+            </Button>
             {widgetsOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setWidgetsOpen(false)} />
@@ -206,36 +208,36 @@ export function DashboardPage() {
                       />
                     </label>
                   ))}
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => { reset(); setWidgetsOpen(false); }}
                     className="w-full border-t border-border px-3 py-2 text-left text-xs text-muted-foreground transition hover:bg-surface-3 hover:text-foreground"
                   >
                     Restaurar padrão
-                  </button>
+                  </Button>
                 </div>
               </>
             )}
           </div>
           <div className="relative">
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => setPeriodoOpen((v) => !v)}
               className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground"
             >
               {PERIODO_LABEL[periodo]} <ChevronDown className="h-3.5 w-3.5" />
-            </button>
+            </Button>
             {periodoOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setPeriodoOpen(false)} />
                 <div className="absolute right-0 top-11 z-20 w-44 overflow-hidden rounded-lg border border-border bg-surface-2 shadow-elevated">
                   {(Object.keys(PERIODO_LABEL) as Periodo[]).map((p) => (
-                    <button
+                    <Button variant="unstyled" size="unstyled"
                       key={p}
                       onClick={() => { setPeriodo(p); setPeriodoOpen(false); }}
                       className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm transition hover:bg-surface-3 ${periodo === p ? "text-primary" : "text-foreground"}`}
                     >
                       {PERIODO_LABEL[p]}
                       {periodo === p && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </>
@@ -243,9 +245,9 @@ export function DashboardPage() {
           </div>
           <LeadFormDialog
             trigger={
-              <button className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110">
+              <Button variant="unstyled" size="unstyled" className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110">
                 <Plus className="h-4 w-4" /> Novo lead
-              </button>
+              </Button>
             }
           />
         </div>

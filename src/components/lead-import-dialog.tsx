@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useMemo, useRef, useState } from "react";
-import { AlertCircle, CheckCircle2, Download, FileSpreadsheet, Upload, Users } from "lucide-react";
+import { AlertCircle, CheckCircle2, Download, FileSpreadsheet, Upload, Users } from "@/components/ui/icons";
 import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/align-panel";
 import { useImportLeads, type LeadRow } from "@/hooks/use-leads";
 import {
@@ -72,12 +73,12 @@ export function LeadImportDialog({ leads }: { leads: LeadRow[] }) {
 
   return (
     <>
-      <button
+      <Button variant="unstyled" size="unstyled"
         onClick={() => setOpen(true)}
         className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground"
       >
         <Upload className="h-3.5 w-3.5" /> Importar
-      </button>
+      </Button>
 
       <AlignPanel
         open={open}
@@ -103,13 +104,13 @@ export function LeadImportDialog({ leads }: { leads: LeadRow[] }) {
             title="Arquivo"
             icon={FileSpreadsheet}
             action={
-              <button
+              <Button variant="unstyled" size="unstyled"
                 type="button"
                 onClick={downloadLeadCsvTemplate}
                 className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
               >
                 <Download className="h-3 w-3" /> Baixar modelo
-              </button>
+              </Button>
             }
           >
             <input
@@ -119,7 +120,7 @@ export function LeadImportDialog({ leads }: { leads: LeadRow[] }) {
               className="hidden"
               onChange={(event) => loadFile(event.target.files?.[0])}
             />
-            <button
+            <Button variant="unstyled" size="unstyled"
               type="button"
               onClick={() => inputRef.current?.click()}
               onDragOver={(event) => event.preventDefault()}
@@ -136,7 +137,7 @@ export function LeadImportDialog({ leads }: { leads: LeadRow[] }) {
               <span className="mt-1 text-xs text-muted-foreground">
                 Separadores vírgula ou ponto e vírgula · máximo 5 MB e 2.000 linhas
               </span>
-            </button>
+            </Button>
             {parseError && (
               <div className="flex gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {parseError}

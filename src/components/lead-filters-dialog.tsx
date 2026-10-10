@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useMemo, useState } from "react";
-import { Filter, RotateCcw, Search, Tag, Layers, Sparkles } from "lucide-react";
+import { Filter, RotateCcw, Search, Tag, Layers, Sparkles } from "@/components/ui/icons";
 import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/align-panel";
 import type { LeadRow, LeadStatus } from "@/hooks/use-leads";
 
@@ -115,7 +116,7 @@ export function LeadFiltersDialog({
 
   return (
     <>
-      <button
+      <Button variant="unstyled" size="unstyled"
         onClick={openPanel}
         className={[
           "relative inline-flex h-10 items-center gap-1.5 rounded-lg border px-3 text-sm transition",
@@ -130,7 +131,7 @@ export function LeadFiltersDialog({
             {activeCount}
           </span>
         )}
-      </button>
+      </Button>
 
       <AlignPanel
         open={open}
@@ -165,7 +166,7 @@ export function LeadFiltersDialog({
               {STATUS_OPTS.map((s) => {
                 const on = draft.statuses.includes(s.v);
                 return (
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     key={s.v}
                     type="button"
                     onClick={() => setDraft({ ...draft, statuses: toggle(draft.statuses, s.v) })}
@@ -177,7 +178,7 @@ export function LeadFiltersDialog({
                     ].join(" ")}
                   >
                     {s.l}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -201,7 +202,7 @@ export function LeadFiltersDialog({
                 {nichoOptions.map((n) => {
                   const on = draft.nichos.includes(n);
                   return (
-                    <button
+                    <Button variant="unstyled" size="unstyled"
                       key={n}
                       type="button"
                       onClick={() => setDraft({ ...draft, nichos: toggle(draft.nichos, n) })}
@@ -213,7 +214,7 @@ export function LeadFiltersDialog({
                       ].join(" ")}
                     >
                       {n}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -226,7 +227,7 @@ export function LeadFiltersDialog({
                 {origemOptions.map((o) => {
                   const on = draft.origens.includes(o);
                   return (
-                    <button
+                    <Button variant="unstyled" size="unstyled"
                       key={o}
                       type="button"
                       onClick={() => setDraft({ ...draft, origens: toggle(draft.origens, o) })}
@@ -238,7 +239,7 @@ export function LeadFiltersDialog({
                       ].join(" ")}
                     >
                       {o}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -282,13 +283,13 @@ export function LeadFiltersDialog({
           </AlignPanelSection>
 
           {activeCount > 0 && (
-            <button
+            <Button variant="unstyled" size="unstyled"
               type="button"
               onClick={clearAll}
               className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
             >
               <RotateCcw className="h-3 w-3" /> Limpar filtros
-            </button>
+            </Button>
           )}
         </div>
       </AlignPanel>

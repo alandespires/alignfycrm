@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Download, FileText, FileSpreadsheet } from "lucide-react";
+import { Download, FileText, FileSpreadsheet } from "@/components/ui/icons";
 import { exportCSV, exportPDF, filterByPeriod, type Column } from "@/lib/consultor-exports";
 
 type Props<T> = {
@@ -42,20 +43,20 @@ export function ConsultorExportBar<T extends Record<string, any>>({
             className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs" />
         </label>
         {(since || until) && (
-          <button onClick={() => { setSince(""); setUntil(""); }}
+          <Button variant="unstyled" size="unstyled" onClick={() => { setSince(""); setUntil(""); }}
             className="rounded-lg border border-border bg-background px-2.5 py-1.5 text-[11px] text-muted-foreground hover:text-foreground">
             limpar
-          </button>
+          </Button>
         )}
       </div>
       <div className="ml-auto flex items-center gap-2">
         <span className="text-xs text-muted-foreground">{filtered.length} registro(s)</span>
-        <button
+        <Button variant="unstyled" size="unstyled"
           onClick={() => exportCSV(filtered, columns, `${filenameBase}${fileSuffix}`)}
           className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-semibold hover:bg-surface-2">
           <FileSpreadsheet className="h-3.5 w-3.5" /> CSV
-        </button>
-        <button
+        </Button>
+        <Button variant="unstyled" size="unstyled"
           onClick={() => exportPDF(title, filtered, columns, {
             periodo: periodoLabel,
             resumo: `${filtered.length} registro(s) no período ${periodoLabel}.`,
@@ -63,7 +64,7 @@ export function ConsultorExportBar<T extends Record<string, any>>({
           })}
           className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20">
           <FileText className="h-3.5 w-3.5" /> PDF
-        </button>
+        </Button>
       </div>
       <Download className="hidden" />
     </div>

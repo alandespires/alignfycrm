@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useState, type FormEvent } from "react";
-import { Plus } from "lucide-react";
+import { Plus } from "@/components/ui/icons";
 import { useCreateLead, type LeadStatus } from "@/hooks/use-leads";
 import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/align-panel";
 
@@ -47,9 +48,9 @@ export function LeadFormDialog({ defaultStatus = "novo", trigger }: { defaultSta
     <>
       <span onClick={() => setOpen(true)}>
         {trigger ?? (
-          <button className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110">
+          <Button variant="unstyled" size="unstyled" className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110">
             <Plus className="h-4 w-4" /> Novo lead
-          </button>
+          </Button>
         )}
       </span>
 
@@ -108,7 +109,7 @@ export function LeadFormDialog({ defaultStatus = "novo", trigger }: { defaultSta
             <textarea value={obs} onChange={(e) => setObs(e.target.value)} rows={4} className={inputCls + " resize-none py-2 h-auto"} placeholder="Contexto, dor, próximo passo..." />
           </AlignPanelSection>
 
-          <button type="submit" className="sr-only" />
+          <Button variant="unstyled" size="unstyled" type="submit" className="sr-only" />
         </form>
       </AlignPanel>
     </>

@@ -1,10 +1,12 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/align-panel";
 import {
   Users, Building2, Briefcase, Plus, Pencil, Trash2, Search, DollarSign, Mail, Phone, IdCard,
-} from "lucide-react";
+} from "@/components/ui/icons";
 import {
   useDepartments, useSaveDepartment, useDeleteDepartment,
   useTeamMembers, useSaveTeamMember, useDeleteTeamMember,
@@ -14,7 +16,7 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/equipe")({
-  head: () => ({ meta: [{ title: "Equipe — Align CRM" }] }),
+  head: () => pageHead("Equipe"),
   component: EquipePage,
 });
 
@@ -144,14 +146,14 @@ function EquipePage() {
 
 function TabBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button
+    <Button variant="unstyled" size="unstyled"
       onClick={onClick}
       className={`flex-1 rounded-xl px-3 py-2 text-xs font-semibold tracking-tight transition ${
         active ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
       }`}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -232,10 +234,10 @@ function MembersView({
                   <td className="px-4 py-3"><StatusPill tone={memberTone(m.status)}>{m.status}</StatusPill></td>
                   <td className="px-4 py-3 text-right tabular-nums">{m.salario ? brl(m.salario) : "—"}</td>
                   <td className="px-4 py-3 text-right">
-                    <button
+                    <Button variant="unstyled" size="unstyled"
                       onClick={(e) => { e.stopPropagation(); if (confirm("Remover colaborador?")) del.mutate(m.id); }}
                       className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
-                    ><Trash2 className="h-3.5 w-3.5" /></button>
+                    ><Trash2 className="h-3.5 w-3.5" /></Button>
                   </td>
                 </tr>
               ))}
@@ -356,10 +358,10 @@ function MemberPanel({
 
         {f.id && (
           <div className="pt-2">
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => { if (confirm("Remover colaborador permanentemente?")) del.mutate(f.id!, { onSuccess: onClose }); }}
               className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive hover:bg-destructive/20"
-            ><Trash2 className="h-3.5 w-3.5" /> Excluir colaborador</button>
+            ><Trash2 className="h-3.5 w-3.5" /> Excluir colaborador</Button>
           </div>
         )}
       </div>
@@ -379,7 +381,7 @@ function DepartmentsView({
       {deps.map((d) => {
         const count = members.filter((m) => m.department_id === d.id && m.status === "ativo").length;
         return (
-          <button
+          <Button variant="unstyled" size="unstyled"
             key={d.id}
             onClick={() => onEdit(d)}
             className="group rounded-2xl border border-border bg-surface-2 p-4 text-left shadow-card transition hover:-translate-y-px hover:border-primary/30"
@@ -389,15 +391,15 @@ function DepartmentsView({
                 <div className="truncate font-display text-[15px] font-semibold tracking-tight">{d.nome}</div>
                 <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{d.descricao ?? "Sem descrição"}</div>
               </div>
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={(e) => { e.stopPropagation(); if (confirm("Remover departamento?")) del.mutate(d.id); }}
                 className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground opacity-0 transition group-hover:opacity-100 hover:bg-destructive/15 hover:text-destructive"
-              ><Trash2 className="h-3.5 w-3.5" /></button>
+              ><Trash2 className="h-3.5 w-3.5" /></Button>
             </div>
             <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
               <Users className="h-3 w-3" /> {count} colaborador{count === 1 ? "" : "es"} ativo{count === 1 ? "" : "s"}
             </div>
-          </button>
+          </Button>
         );
       })}
     </div>
@@ -458,10 +460,10 @@ function DepartmentPanel({
         </AlignPanelSection>
         {f.id && (
           <div className="pt-2">
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => { if (confirm("Remover departamento?")) del.mutate(f.id!, { onSuccess: onClose }); }}
               className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive hover:bg-destructive/20"
-            ><Trash2 className="h-3.5 w-3.5" /> Excluir departamento</button>
+            ><Trash2 className="h-3.5 w-3.5" /> Excluir departamento</Button>
           </div>
         )}
       </div>
@@ -480,7 +482,7 @@ function JobsView({
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
       {jobs.map((j) => (
-        <button
+        <Button variant="unstyled" size="unstyled"
           key={j.id}
           onClick={() => onEdit(j)}
           className="group rounded-2xl border border-border bg-surface-2 p-4 text-left shadow-card transition hover:-translate-y-px hover:border-primary/30"
@@ -492,10 +494,10 @@ function JobsView({
                 {j.department_id ? depMap[j.department_id] ?? "—" : "Sem departamento"} · {j.senioridade ?? "—"} · {j.regime ?? "—"}
               </div>
             </div>
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={(e) => { e.stopPropagation(); if (confirm("Remover vaga?")) del.mutate(j.id); }}
               className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground opacity-0 transition group-hover:opacity-100 hover:bg-destructive/15 hover:text-destructive"
-            ><Trash2 className="h-3.5 w-3.5" /></button>
+            ><Trash2 className="h-3.5 w-3.5" /></Button>
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
             <StatusPill tone={jobTone(j.status)}>{j.status}</StatusPill>
@@ -511,7 +513,7 @@ function JobsView({
               </span>
             )}
           </div>
-        </button>
+        </Button>
       ))}
     </div>
   );
@@ -602,10 +604,10 @@ function JobPanel({
 
         {f.id && (
           <div className="pt-2">
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => { if (confirm("Remover vaga?")) del.mutate(f.id!, { onSuccess: onClose }); }}
               className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive hover:bg-destructive/20"
-            ><Trash2 className="h-3.5 w-3.5" /> Excluir vaga</button>
+            ><Trash2 className="h-3.5 w-3.5" /> Excluir vaga</Button>
           </div>
         )}
       </div>

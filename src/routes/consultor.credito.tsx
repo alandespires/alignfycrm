@@ -1,11 +1,14 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useCreditProducts, useCreateCreditSimulation, useCreditSimulations, calcularCreditoPrice, CREDIT_TYPE_LABEL } from "@/hooks/use-credit";
 import { useLeads } from "@/hooks/use-leads";
 import { ConsultorExportBar } from "@/components/consultor-export-bar";
-import { Landmark, Send } from "lucide-react";
+import { Landmark, Send } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/consultor/credito")({
+  head: () => pageHead("Consultor · Credito"),
   component: CreditoPage,
 });
 
@@ -72,9 +75,9 @@ function CreditoPage() {
           <Field label="Prazo (meses)"><input type="number" value={prazo} onChange={e => setPrazo(+e.target.value)} className="i" /></Field>
           <Field label="Taxa mensal (%)"><input type="number" step="0.01" value={taxa} onChange={e => setTaxa(+e.target.value)} className="i" /></Field>
         </div>
-        <button onClick={salvar} disabled={create.isPending} className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60">
+        <Button variant="unstyled" size="unstyled" onClick={salvar} disabled={create.isPending} className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60">
           <Send className="h-4 w-4" /> Salvar simulação
-        </button>
+        </Button>
       </div>
 
       <div className="space-y-3">

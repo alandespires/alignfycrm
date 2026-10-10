@@ -1,10 +1,12 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/align-panel";
 import {
   BookOpen, Plus, Pencil, Trash2, Star, StarOff, Eye, Search, History, FileText, Tags, Filter,
-} from "lucide-react";
+} from "@/components/ui/icons";
 import {
   useArticles, useSaveArticle, useDeleteArticle,
   useFavorites, useToggleFavorite, useIncrementView, useArticleVersions,
@@ -14,7 +16,7 @@ import { useDepartments, type Department } from "@/hooks/use-team";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/base-conhecimento")({
-  head: () => ({ meta: [{ title: "Base de Conhecimento — Align CRM" }] }),
+  head: () => pageHead("Base de Conhecimento"),
   component: KBPage,
 });
 
@@ -139,9 +141,9 @@ function KBPage() {
           <p className="mt-1 max-w-sm text-sm text-muted-foreground">
             Documente processos, tutoriais e políticas para a equipe.
           </p>
-          <button onClick={openNew} className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-glow">
+          <Button variant="unstyled" size="unstyled" onClick={openNew} className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-glow">
             <Plus className="h-3.5 w-3.5" /> Criar primeiro artigo
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -153,19 +155,19 @@ function KBPage() {
                 className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface-2 p-4 shadow-card transition hover:-translate-y-px hover:border-primary/30"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <button onClick={() => openView(a)} className="min-w-0 flex-1 text-left">
+                  <Button variant="unstyled" size="unstyled" onClick={() => openView(a)} className="min-w-0 flex-1 text-left">
                     <div className="line-clamp-2 font-display text-[15px] font-semibold tracking-tight">{a.titulo}</div>
                     <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                       {(a.conteudo ?? "").slice(0, 140) || "Sem conteúdo ainda."}
                     </div>
-                  </button>
-                  <button
+                  </Button>
+                  <Button variant="unstyled" size="unstyled"
                     onClick={(e) => { e.stopPropagation(); toggleFav.mutate({ articleId: a.id, on: !isFav }); }}
                     className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-surface-3"
                     aria-label={isFav ? "Remover favorito" : "Favoritar"}
                   >
                     {isFav ? <Star className="h-4 w-4 fill-primary text-primary" /> : <StarOff className="h-4 w-4" />}
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-1.5">
@@ -186,14 +188,14 @@ function KBPage() {
                 </div>
 
                 <div className="mt-3 flex items-center justify-end gap-1 opacity-0 transition group-hover:opacity-100">
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => openEdit(a)}
                     className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-muted-foreground hover:bg-surface-3 hover:text-foreground"
-                  ><Pencil className="h-3 w-3" /> Editar</button>
-                  <button
+                  ><Pencil className="h-3 w-3" /> Editar</Button>
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => confirm("Remover artigo?") && del.mutate(a.id)}
                     className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
-                  ><Trash2 className="h-3.5 w-3.5" /></button>
+                  ><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>
               </article>
             );
@@ -213,14 +215,14 @@ function KBPage() {
 
 function TabBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button
+    <Button variant="unstyled" size="unstyled"
       onClick={onClick}
       className={`rounded-xl px-3 py-2 text-xs font-semibold tracking-tight transition ${
         active ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"
       }`}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -250,18 +252,18 @@ function ArticleViewPanel({ article, onClose, onEdit }: { article: Article; onCl
       onTabChange={(id) => setTab(id as any)}
       headerActions={
         <>
-          <button
+          <Button variant="unstyled" size="unstyled"
             onClick={() => toggleFav.mutate({ articleId: article.id, on: !isFav })}
             className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface-2 text-muted-foreground hover:bg-surface-3 hover:text-foreground"
             aria-label={isFav ? "Remover favorito" : "Favoritar"}
           >
             {isFav ? <Star className="h-4 w-4 fill-primary text-primary" /> : <StarOff className="h-4 w-4" />}
-          </button>
-          <button
+          </Button>
+          <Button variant="unstyled" size="unstyled"
             onClick={onEdit}
             className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface-2 text-muted-foreground hover:bg-surface-3 hover:text-foreground"
             aria-label="Editar"
-          ><Pencil className="h-4 w-4" /></button>
+          ><Pencil className="h-4 w-4" /></Button>
         </>
       }
       footer={
@@ -393,10 +395,10 @@ function ArticleEditPanel({
 
         {f.id && (
           <div className="pt-2">
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => { if (confirm("Remover artigo?")) del.mutate(f.id!, { onSuccess: onClose }); }}
               className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive hover:bg-destructive/20"
-            ><Trash2 className="h-3.5 w-3.5" /> Excluir artigo</button>
+            ><Trash2 className="h-3.5 w-3.5" /> Excluir artigo</Button>
           </div>
         )}
       </div>

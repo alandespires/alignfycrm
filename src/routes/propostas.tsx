@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
@@ -6,11 +8,11 @@ import { useProposals, useUpsertProposal, useDeleteProposal, type ProposalRow, t
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import { formatBRL } from "@/lib/mock-data";
-import { FileText, Plus, Pencil, Trash2, Search, X, Send, CheckCircle2 } from "lucide-react";
+import { FileText, Plus, Pencil, Trash2, Search, X, Send, CheckCircle2 } from "@/components/ui/icons";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/propostas")({
-  head: () => ({ meta: [{ title: "Propostas — Align CRM" }] }),
+  head: () => pageHead("Propostas"),
   component: PropostasPage,
 });
 
@@ -101,8 +103,8 @@ function PropostasPage() {
                   <td className="px-5 py-3 text-right font-semibold tabular-nums">{formatBRL(Number(p.valor || 0))}</td>
                   <td className="px-5 py-3">
                     <div className="flex justify-end gap-1">
-                      {canEdit && <button onClick={() => setEditing(p)} className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-3 hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>}
-                      {canDelete && <button onClick={() => { if (confirm(`Excluir "${p.titulo}"?`)) del.mutate(p.id); }} className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>}
+                      {canEdit && <Button variant="unstyled" size="unstyled" onClick={() => setEditing(p)} className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-3 hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></Button>}
+                      {canDelete && <Button variant="unstyled" size="unstyled" onClick={() => { if (confirm(`Excluir "${p.titulo}"?`)) del.mutate(p.id); }} className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>}
                     </div>
                   </td>
                 </tr>
@@ -147,7 +149,7 @@ function EmptyState({ icon: Icon, label, cta }: { icon: any; label: string; cta?
     <div className="flex flex-col items-center justify-center gap-2 px-6 py-16 text-center">
       <div className="grid h-12 w-12 place-items-center rounded-2xl bg-muted text-muted-foreground"><Icon className="h-6 w-6" /></div>
       <p className="text-sm font-medium">{label}</p>
-      {cta && <button onClick={cta.onClick} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:opacity-90"><Plus className="h-3.5 w-3.5" /> {cta.label}</button>}
+      {cta && <Button variant="unstyled" size="unstyled" onClick={cta.onClick} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:opacity-90"><Plus className="h-3.5 w-3.5" /> {cta.label}</Button>}
     </div>
   );
 }

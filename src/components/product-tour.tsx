@@ -1,7 +1,8 @@
+import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
-import { Users, Kanban, Zap, BarChart3, X, ArrowRight, ArrowLeft, Sparkles, Check, Circle } from "lucide-react";
+import { Users, Kanban, Zap, BarChart3, X, ArrowRight, ArrowLeft, Sparkles, Check, Circle } from "@/components/ui/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { getActiveTenantId } from "@/contexts/tenant-context";
 
@@ -178,13 +179,13 @@ export function ProductTour() {
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-elevated"
           >
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => close()}
               className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"
               aria-label="Fechar tour"
             >
               <X className="h-4 w-4" />
-            </button>
+            </Button>
 
             <div className="p-6">
               <div className="mb-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-primary">
@@ -212,7 +213,7 @@ export function ProductTour() {
                   const active = i === state.step;
                   return (
                     <li key={s.id}>
-                      <button
+                      <Button variant="unstyled" size="unstyled"
                         onClick={() => persist({ ...state, step: i, done: doneMap })}
                         className={[
                           "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition",
@@ -226,7 +227,7 @@ export function ProductTour() {
                           {done && <Check className="h-2.5 w-2.5" />}
                         </span>
                         <span className={done ? "line-through opacity-60" : ""}>{i + 1}. {s.title}</span>
-                      </button>
+                      </Button>
                     </li>
                   );
                 })}
@@ -234,30 +235,30 @@ export function ProductTour() {
             </div>
 
             <div className="flex items-center justify-between gap-2 border-t border-border bg-surface-1/50 px-5 py-3">
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={() => (state.step === 0 ? close() : persist({ ...state, step: state.step - 1, done: doneMap }))}
                 className="inline-flex h-9 items-center gap-1 rounded-md px-3 text-xs font-medium text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 {state.step === 0 ? "Depois" : "Voltar"}
-              </button>
+              </Button>
 
               <div className="flex items-center gap-2">
                 {current.to && (
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => goTo(current.to, current.id)}
                     className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-surface-2 px-3 text-xs font-semibold text-foreground hover:border-primary/40"
                   >
                     {current.cta ?? "Abrir"}
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button variant="unstyled" size="unstyled"
                   onClick={next}
                   className="inline-flex h-9 items-center gap-1 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground shadow-glow"
                 >
                   {completed === STEPS.length ? "Concluir" : "Próximo"}
                   <ArrowRight className="h-3.5 w-3.5" />
-                </button>
+                </Button>
               </div>
             </div>
           </motion.div>

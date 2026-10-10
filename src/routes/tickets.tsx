@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
@@ -5,11 +7,11 @@ import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import { useTickets, useUpsertTicket, useDeleteTicket, type TicketRow, type TicketStatus, type TicketPriority } from "@/hooks/use-tickets";
 import { useCompanies } from "@/hooks/use-companies";
 import { useRealtimeSync } from "@/hooks/use-realtime";
-import { LifeBuoy, Plus, Pencil, Trash2, Search, X, AlertTriangle, Clock, CheckCircle2 } from "lucide-react";
+import { LifeBuoy, Plus, Pencil, Trash2, Search, X, AlertTriangle, Clock, CheckCircle2 } from "@/components/ui/icons";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/tickets")({
-  head: () => ({ meta: [{ title: "Suporte / Tickets — Align CRM" }] }),
+  head: () => pageHead("Suporte / Tickets"),
   component: TicketsPage,
 });
 
@@ -113,8 +115,8 @@ function TicketsPage() {
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex justify-end gap-1">
-                        <button onClick={() => setEditing(t)} className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-3 hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
-                        <button onClick={() => { if (confirm(`Excluir ticket #${t.numero}?`)) del.mutate(t.id); }} className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+                        <Button variant="unstyled" size="unstyled" onClick={() => setEditing(t)} className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-3 hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></Button>
+                        <Button variant="unstyled" size="unstyled" onClick={() => { if (confirm(`Excluir ticket #${t.numero}?`)) del.mutate(t.id); }} className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
                       </div>
                     </td>
                   </tr>
@@ -158,7 +160,7 @@ function EmptyState({ icon: Icon, label, cta }: { icon: any; label: string; cta?
     <div className="flex flex-col items-center justify-center gap-2 px-6 py-16 text-center">
       <div className="grid h-12 w-12 place-items-center rounded-2xl bg-muted text-muted-foreground"><Icon className="h-6 w-6" /></div>
       <p className="text-sm font-medium">{label}</p>
-      {cta && <button onClick={cta.onClick} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:opacity-90"><Plus className="h-3.5 w-3.5" /> {cta.label}</button>}
+      {cta && <Button variant="unstyled" size="unstyled" onClick={cta.onClick} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:opacity-90"><Plus className="h-3.5 w-3.5" /> {cta.label}</Button>}
     </div>
   );
 }

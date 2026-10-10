@@ -1,9 +1,10 @@
+import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, ShoppingBag, Briefcase, Wallet, MoreHorizontal,
-  ChevronDown, PanelLeftClose, PanelLeftOpen, LogOut, Shield,
-} from "lucide-react";
+  Search, Sparkles, ChevronDown, PanelLeftClose, PanelLeftOpen, LogOut, Shield,
+} from "@/components/ui/icons";
 import { LaunchIcon } from "@/components/launch-icon";
 
 type Item = { to: string; label: string; icon: any; availability?: string };
@@ -26,13 +27,13 @@ export function useSidebarCollapsed() {
 
 export function DesktopSidebar({
   collapsed, onToggle, pathname, comercial, operacional, mais, active,
-  operacionalBadge, onLaunch, launchOpen, isSuperAdmin, onSignOut,
+  operacionalBadge, onLaunch, launchOpen, isSuperAdmin, onSignOut, onSearch,
 }: {
   collapsed: boolean; onToggle: (v: boolean) => void; pathname: string;
   comercial: Group[]; operacional: Group[]; mais: Group[];
   active: { home: boolean; comercial: boolean; operacional: boolean; financeiro: boolean };
   operacionalBadge?: number; onLaunch: () => void; launchOpen: boolean;
-  isSuperAdmin: boolean; onSignOut: () => void;
+  isSuperAdmin: boolean; onSignOut: () => void; onSearch: () => void;
 }) {
   const [open, setOpen] = useState<Record<string, boolean>>({});
   useEffect(() => {
@@ -67,16 +68,17 @@ export function DesktopSidebar({
       ].join(" ")}
     >
       <div className={["flex h-16 items-center border-b border-border px-3", collapsed ? "justify-center" : "justify-end"].join(" ")}>
-        <button
+        <Button variant="unstyled" size="unstyled"
           onClick={() => onToggle(!collapsed)}
           aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
           className="grid h-9 w-9 place-items-center rounded-xl text-muted-foreground transition hover:bg-muted hover:text-foreground"
         >
           {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-        </button>
+        </Button>
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3 [scrollbar-width:thin]">
+        <Button variant="unstyled" size="unstyled" onClick={onSearch} aria-label="Buscar registros" className={rowClass(false, collapsed)}><Search className="h-[18px] w-[18px] shrink-0" />{!collapsed && <span>Buscar</span>}</Button>
         <NavLink to="/" label="Dashboard" icon={LayoutDashboard} active={active.home} collapsed={collapsed} />
         <Section id="comercial" label="Comercial" icon={ShoppingBag} groups={comercial} open={!!open.comercial} active={active.comercial} collapsed={collapsed} onToggle={toggle} isActive={isActive} />
         <Section id="operacional" label="Operacional" icon={Briefcase} groups={operacional} open={!!open.operacional} active={active.operacional} collapsed={collapsed} onToggle={toggle} isActive={isActive} badge={operacionalBadge} />
@@ -89,16 +91,16 @@ export function DesktopSidebar({
                   <Shield className="h-4 w-4" /> Super Admin
                 </Link>
               )}
-              <button onClick={onSignOut} className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] text-muted-foreground hover:bg-muted hover:text-foreground">
-                <LogOut className="h-4 w-4" /> Sair da conta
-              </button>
+              <Button variant="unstyled" size="unstyled" onClick={onSignOut} className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] text-muted-foreground hover:bg-muted hover:text-foreground">
+                <LogOut className="h-4 w-4" /> Sair
+              </Button>
             </div>
           }
         />
       </nav>
 
       <div className="border-t border-border p-3">
-        <button
+        <Button variant="unstyled" size="unstyled"
           onClick={onLaunch}
           aria-label="Launch — Inteligência"
           className={[
@@ -109,8 +111,8 @@ export function DesktopSidebar({
         >
           <LaunchIcon className="h-4 w-4 shrink-0" />
           {!collapsed && <span>Launch</span>}
-          {!collapsed && <kbd className="ml-auto rounded-md border border-border px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">⌘K</kbd>}
-        </button>
+          {!collapsed && <Sparkles className="ml-auto h-4 w-4 text-primary" />}
+        </Button>
       </div>
     </aside>
   );
@@ -126,7 +128,7 @@ function rowClass(active: boolean, collapsed: boolean) {
 
 function NavLink({ to, label, icon: Icon, active, collapsed }: { to: string; label: string; icon: any; active: boolean; collapsed: boolean }) {
   return (
-    <Link to={to as any} title={collapsed ? label : undefined} aria-label={label} className={rowClass(active, collapsed)}>
+    <Link to={to as any} title={collapsed ? label : undefined} aria-label={label} aria-current={active ? "page" : undefined} className={rowClass(active, collapsed)}>
       {active && <span aria-hidden className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />}
       <Icon className={["h-[18px] w-[18px] shrink-0", active ? "text-primary" : ""].join(" ")} />
       {!collapsed && <span className="truncate">{label}</span>}
@@ -143,7 +145,7 @@ function Section({
   const expanded = open && !collapsed;
   return (
     <div>
-      <button onClick={() => onToggle(id)} aria-expanded={expanded} title={collapsed ? label : undefined} className={rowClass(active && !expanded, collapsed)}>
+      <Button variant="unstyled" size="unstyled" onClick={() => onToggle(id)} aria-expanded={expanded} title={collapsed ? label : undefined} className={rowClass(active && !expanded, collapsed)}>
         {active && !expanded && <span aria-hidden className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-primary" />}
         <Icon className={["h-[18px] w-[18px] shrink-0", active ? "text-primary" : ""].join(" ")} />
         {!collapsed && <span className="truncate">{label}</span>}
@@ -153,7 +155,7 @@ function Section({
           </span>
         )}
         {!collapsed && <ChevronDown className={["h-3.5 w-3.5 shrink-0 transition-transform", badge ? "" : "ml-auto", expanded ? "rotate-180" : ""].join(" ")} />}
-      </button>
+      </Button>
       {expanded && (
         <div className="mb-2 ml-[22px] mt-1 space-y-3 border-l border-border pl-3 animate-in fade-in slide-in-from-top-1 duration-150">
           {groups.map((g) => (
@@ -164,7 +166,7 @@ function Section({
               {g.items.map(({ to, label: l, icon: I, availability }) => {
                 const a = isActive(to);
                 return (
-                  <Link key={to} to={to as any} className={[
+                  <Link key={to} to={to as any} aria-current={a ? "page" : undefined} className={[
                     "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors",
                     a ? "bg-primary/10 font-medium text-foreground" : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
                   ].join(" ")}>

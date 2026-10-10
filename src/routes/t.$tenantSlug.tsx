@@ -1,10 +1,12 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Outlet, useParams, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Loader2, AlertTriangle } from "lucide-react";
+import { Loader2, AlertTriangle } from "@/components/ui/icons";
 import { useTenant } from "@/contexts/tenant-context";
 import { useAuth } from "@/contexts/auth-context";
 
 export const Route = createFileRoute("/t/$tenantSlug")({
+  head: () => pageHead("Workspace"),
   component: TenantLayout,
 });
 

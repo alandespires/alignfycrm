@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
-import { Bell, Check, CheckCheck, Trash2, Sparkles, Users, Wallet, ListChecks, Building2, Flame, Snowflake, Zap, AlertTriangle, ArrowRightLeft } from "lucide-react";
+import { Bell, Check, CheckCheck, Trash2, Sparkles, Users, Wallet, ListChecks, Building2, Flame, Snowflake, Zap, AlertTriangle, ArrowRightLeft } from "@/components/ui/icons";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useNotifications, type Notification } from "@/hooks/use-notifications";
 import { formatDistanceToNow } from "date-fns";
@@ -74,7 +75,7 @@ export function NotificationsPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button
+        <Button variant="unstyled" size="unstyled"
           aria-label="Notificações"
           className="relative grid h-9 w-9 place-items-center rounded-lg border border-border bg-surface-1 text-muted-foreground transition hover:text-foreground"
         >
@@ -84,7 +85,7 @@ export function NotificationsPopover() {
               {unread >= 50 ? "50+" : unread}
             </span>
           )}
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent align="end" sideOffset={8} className="w-[380px] p-0">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
@@ -96,22 +97,22 @@ export function NotificationsPopover() {
           </div>
           <div className="flex gap-1">
             {unread > 0 && (
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={() => markAllRead.mutate()}
                 title="Marcar todas como lidas"
                 className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground transition hover:bg-surface-2 hover:text-foreground"
               >
                 <CheckCheck className="h-3.5 w-3.5" />
-              </button>
+              </Button>
             )}
             {list.length > 0 && (
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={() => clearAll.mutate()}
                 title="Limpar tudo"
                 className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
               >
                 <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -139,7 +140,7 @@ export function NotificationsPopover() {
                     isUnread ? "bg-primary/[0.04]" : "",
                   ].join(" ")}
                 >
-                  <button onClick={() => handleGroupClick(group)} className="flex flex-1 gap-3 text-left">
+                  <Button variant="unstyled" size="unstyled" onClick={() => handleGroupClick(group)} className="flex flex-1 gap-3 text-left">
                     <div className={["mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-surface-2", tone].join(" ")}>
                       <Icon className="h-4 w-4" />
                     </div>
@@ -155,14 +156,14 @@ export function NotificationsPopover() {
                         {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: ptBR })}
                       </div>
                     </div>
-                  </button>
-                  <button
+                  </Button>
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => group.items.length > 1 ? removeMany.mutate(group.items.map((item) => item.id)) : remove.mutate(n.id)}
                     aria-label={group.items.length > 1 ? `Remover grupo ${group.title}` : `Remover notificação ${group.title}`}
                     className="self-start opacity-0 transition group-hover:opacity-100"
                   >
                     <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                  </button>
+                  </Button>
                 </div>
               );
             })

@@ -1,6 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { AlignPanel } from "@/components/align-panel";
 import { useState } from "react";
-import { X, Sparkles, FolderPlus, Plus, Loader2, Calendar, Clock, ListChecks } from "lucide-react";
+import { X, Sparkles, FolderPlus, Plus, Loader2, Calendar, Clock, ListChecks } from "@/components/ui/icons";
 import {
   useProjectTemplates, useCreateProjectTemplate, useDeleteProjectTemplate, useApplyProjectTemplate,
   SEED_TEMPLATES, type ProjectTemplate,
@@ -38,10 +39,10 @@ export function ProjectTemplatesGallery({ onClose, onApplied }: { onClose: () =>
               <Sparkles className="mx-auto mb-2 h-6 w-6 text-primary" />
               <h3 className="text-sm font-semibold">Comece com templates prontos</h3>
               <p className="mx-auto mt-1 max-w-md text-xs text-muted-foreground">Adicionamos 4 modelos clássicos: Onboarding, Implantação SaaS, Campanha e Sprint de Dev.</p>
-              <button onClick={seedAll} disabled={createT.isPending}
+              <Button variant="unstyled" size="unstyled" onClick={seedAll} disabled={createT.isPending}
                 className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-60">
                 {createT.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />} Importar templates iniciais
-              </button>
+              </Button>
             </div>
           )}
 
@@ -50,10 +51,10 @@ export function ProjectTemplatesGallery({ onClose, onApplied }: { onClose: () =>
               <article key={t.id} className="group rounded-xl border border-border bg-surface-2 p-4 transition hover:border-primary/40 hover:shadow-card">
                 <div className="mb-2 flex items-start justify-between">
                   <h4 className="font-semibold tracking-tight">{t.nome}</h4>
-                  <button onClick={() => { if (confirm(`Remover "${t.nome}"?`)) delT.mutate(t.id); }}
+                  <Button variant="unstyled" size="unstyled" onClick={() => { if (confirm(`Remover "${t.nome}"?`)) delT.mutate(t.id); }}
                     className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
                     <X className="h-3.5 w-3.5" />
-                  </button>
+                  </Button>
                 </div>
                 {t.descricao && <p className="mb-3 text-xs text-muted-foreground">{t.descricao}</p>}
                 <div className="mb-3 flex flex-wrap gap-1.5 text-[10px]">
@@ -63,10 +64,10 @@ export function ProjectTemplatesGallery({ onClose, onApplied }: { onClose: () =>
                   <span className="inline-flex items-center gap-1 rounded bg-surface-3 px-1.5 py-0.5 text-muted-foreground"><Calendar className="h-2.5 w-2.5" />{t.entregas.length} entregas</span>
                   {t.auto_on_lead_won && <span className="rounded bg-success/15 px-1.5 py-0.5 font-semibold text-success">auto: lead fechado</span>}
                 </div>
-                <button onClick={() => setSelected(t)}
+                <Button variant="unstyled" size="unstyled" onClick={() => setSelected(t)}
                   className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-glow">
                   <FolderPlus className="h-3.5 w-3.5" /> Aplicar template
-                </button>
+                </Button>
               </article>
             ))}
           </div>
@@ -96,11 +97,11 @@ function ApplyTemplate({ template, onCancel, onClose, onApplied, leads, clients,
   return (
     <AlignPanel open onClose={onCancel} eyebrow="Aplicar template" title={template.nome}
       footer={<div className="flex justify-end gap-2">
-          <button onClick={onCancel} className="rounded-lg border border-border bg-surface-2 px-4 py-2 text-xs font-medium">Cancelar</button>
-          <button onClick={go} disabled={apply.isPending}
+          <Button variant="unstyled" size="unstyled" onClick={onCancel} className="rounded-lg border border-border bg-surface-2 px-4 py-2 text-xs font-medium">Cancelar</Button>
+          <Button variant="unstyled" size="unstyled" onClick={go} disabled={apply.isPending}
             className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-50">
             {apply.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FolderPlus className="h-3.5 w-3.5" />} Criar projeto
-          </button>
+          </Button>
       </div>}>
         <div className="space-y-3 p-5">
           <label className="block">

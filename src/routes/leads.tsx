@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { leadsQueryOptions } from "@/hooks/use-leads";
 import { getActiveTenantId } from "@/contexts/tenant-context";
 import { createFileRoute } from "@tanstack/react-router";
@@ -16,12 +18,12 @@ import {
 import { useLeads, useDeleteLead, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
 import { useScoreLead } from "@/hooks/use-score-lead";
 import { useRealtimeSync } from "@/hooks/use-realtime";
-import { Trash2, Mail, Phone, Loader2, Inbox, Sparkles, Search, X } from "lucide-react";
+import { Trash2, Mail, Phone, Loader2, Inbox, Sparkles, Search, X } from "@/components/ui/icons";
 import { TableRowsSkeleton } from "@/components/skeletons";
 import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 
 export const Route = createFileRoute("/leads")({
-  head: () => ({ meta: [{ title: "Leads — Align CRM" }] }),
+  head: () => pageHead("Leads"),
   loader: ({ context }) => {
     const tenantId = typeof window === "undefined" ? null : getActiveTenantId();
     if (!tenantId) return;
@@ -123,18 +125,18 @@ function LeadsPage() {
           <input
             value={filters.q}
             onChange={(event) => setFilters({ ...filters, q: event.target.value })}
-            placeholder="Buscar por nome, empresa ou contato"
+            placeholder="Buscar leads…"
             className="h-10 w-full rounded-lg border border-border bg-surface-1 pl-9 pr-10 text-sm focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
           {filters.q && (
-            <button
+            <Button variant="unstyled" size="unstyled"
               type="button"
               aria-label="Limpar busca"
               onClick={() => setFilters({ ...filters, q: "" })}
               className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground"
             >
               <X className="h-3.5 w-3.5" />
-            </button>
+            </Button>
           )}
         </label>
         <div className="self-center text-xs text-muted-foreground">
@@ -165,7 +167,7 @@ function LeadsPage() {
           <Inbox className="mb-3 h-10 w-10 text-muted-foreground" />
           <h3 className="text-lg font-semibold">Nenhum lead ainda</h3>
           <p className="mb-5 mt-1 max-w-sm text-sm text-muted-foreground">
-            Comece criando seu primeiro lead — ele aparece aqui e no Pipeline.
+            Sua lista está vazia.
           </p>
           <LeadFormDialog />
         </div>
@@ -177,12 +179,12 @@ function LeadsPage() {
                 <span className="font-semibold text-primary">{filteredLeads.length}</span>
                 <span className="text-muted-foreground"> de {leads.length} leads · {activeFilterCount} filtro{activeFilterCount === 1 ? "" : "s"} ativo{activeFilterCount === 1 ? "" : "s"}</span>
               </span>
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={() => setFilters(EMPTY_FILTERS)}
                 className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
               >
                 <X className="h-3 w-3" /> Limpar
-              </button>
+              </Button>
             </div>
           )}
           {filteredLeads.length === 0 ? (
@@ -192,12 +194,12 @@ function LeadsPage() {
               <p className="mb-4 mt-1 max-w-sm text-sm text-muted-foreground">
                 Ajuste ou limpe os filtros para ver mais resultados.
               </p>
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={() => setFilters(EMPTY_FILTERS)}
                 className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm hover:text-foreground"
               >
                 <X className="h-3.5 w-3.5" /> Limpar filtros
-              </button>
+              </Button>
             </div>
           ) : (
         <div className="overflow-hidden rounded-2xl border border-border bg-surface-2 shadow-card">
@@ -293,7 +295,7 @@ function LeadsPage() {
                       </td>
                       <td className="px-5 py-3.5" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-1">
-                          <button
+                          <Button variant="unstyled" size="unstyled"
                             onClick={() => score.mutate(l.id)}
                             disabled={isScoring}
                             title="Analisar com IA"
@@ -305,8 +307,8 @@ function LeadsPage() {
                               <Sparkles className="h-3 w-3" />
                             )}
                             IA
-                          </button>
-                          <button
+                          </Button>
+                          <Button variant="unstyled" size="unstyled"
                             onClick={() => {
                               if (confirm(`Remover ${l.nome}?`)) del.mutate(l.id);
                             }}
@@ -314,7 +316,7 @@ function LeadsPage() {
                             aria-label={`Remover lead ${l.nome}`}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>

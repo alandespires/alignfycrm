@@ -1,13 +1,15 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAnnouncements, useCreateAnnouncement, useClasses } from "@/hooks/use-school";
-import { Bell, Send } from "lucide-react";
+import { Bell, Send } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/escolar/comunicacao")({ component: Page });
+export const Route = createFileRoute("/escolar/comunicacao")({
+  head: () => pageHead("Escolar · Comunicacao"), component: Page });
 
 function Page() {
   const { data: announcements = [] } = useAnnouncements();

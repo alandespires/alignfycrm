@@ -1,13 +1,15 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useClasses, useCourses, useTeachers, useUpsertClass, useDeleteClass, useEnrollments, useStudents, useEnrollStudent, useUnenrollStudent, type Klass } from "@/hooks/use-school";
-import { Plus, Pencil, Trash2, Users, UserPlus, X, Clock, MapPin, ArrowRight, GraduationCap } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, UserPlus, X, Clock, MapPin, ArrowRight, GraduationCap } from "@/components/ui/icons";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/escolar/turmas")({ component: Page });
+export const Route = createFileRoute("/escolar/turmas")({
+  head: () => pageHead("Escolar · Turmas"), component: Page });
 
 const DAYS = [
   { key: "seg", label: "Seg" },
@@ -210,14 +212,14 @@ function ClassFormDialog({ open, onOpenChange, editing, setEditing, courses, tea
               {DAYS.map((d) => {
                 const active = days.includes(d.key);
                 return (
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     key={d.key}
                     type="button"
                     onClick={() => toggleDay(d.key)}
                     className={`h-9 min-w-[44px] rounded-lg border px-2 text-xs font-semibold transition ${active ? "border-primary bg-primary text-primary-foreground shadow-glow" : "border-border bg-surface-1 text-muted-foreground hover:border-primary/50"}`}
                   >
                     {d.label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -267,7 +269,7 @@ function EnrollDialog({ classId, onClose }: { classId: string | null; onClose: (
               {enrollments.map((e) => (
                 <li key={e.id} className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm">
                   <span>{e.student?.nome}</span>
-                  <button onClick={() => unenroll.mutate(e.id)}><X className="h-3.5 w-3.5 text-muted-foreground" /></button>
+                  <Button variant="unstyled" size="unstyled" onClick={() => unenroll.mutate(e.id)}><X className="h-3.5 w-3.5 text-muted-foreground" /></Button>
                 </li>
               ))}
               {enrollments.length === 0 && <li className="text-xs text-muted-foreground">Nenhum aluno.</li>}
@@ -280,7 +282,7 @@ function EnrollDialog({ classId, onClose }: { classId: string | null; onClose: (
               {filtered.slice(0, 30).map((s) => (
                 <li key={s.id} className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm">
                   <span>{s.nome}</span>
-                  <button onClick={() => enroll.mutate({ class_id: classId!, student_id: s.id })}><UserPlus className="h-3.5 w-3.5 text-primary" /></button>
+                  <Button variant="unstyled" size="unstyled" onClick={() => enroll.mutate({ class_id: classId!, student_id: s.id })}><UserPlus className="h-3.5 w-3.5 text-primary" /></Button>
                 </li>
               ))}
             </ul>

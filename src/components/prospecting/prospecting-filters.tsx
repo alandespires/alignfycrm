@@ -1,7 +1,8 @@
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import type { ProspectingFilters } from "@/lib/prospecting/types";
-import { Search, MapPin, Sparkles, Zap } from "lucide-react";
+import { Search, MapPin, Sparkles, Zap } from "@/components/ui/icons";
 import { fadeUp } from "@/lib/motion";
 
 const NICHOS_SUGERIDOS = [
@@ -105,14 +106,14 @@ export function ProspectingFiltersBar({
         </label>
 
         <div className="flex items-end">
-          <button
+          <Button variant="unstyled" size="unstyled"
             onClick={onRun}
             disabled={running}
             className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 disabled:opacity-60"
           >
             <Sparkles className="h-3.5 w-3.5" />
             {running ? "Buscando..." : "Buscar"}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -141,12 +142,12 @@ export function ProspectingFiltersBar({
         >
           Excluir já cadastrados
         </Chip>
-        <button
+        <Button variant="unstyled" size="unstyled"
           onClick={() => setShowAdv((s) => !s)}
           className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
         >
           <Zap className="h-3 w-3" /> {showAdv ? "Menos filtros" : "Mais filtros"}
-        </button>
+        </Button>
       </div>
 
       {showAdv && (
@@ -194,7 +195,7 @@ function Chip({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button variant="unstyled" size="unstyled"
       onClick={onClick}
       className={`inline-flex h-7 items-center gap-1 rounded-full border px-3 text-[11px] font-medium transition ${
         active
@@ -203,7 +204,7 @@ function Chip({
       }`}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 

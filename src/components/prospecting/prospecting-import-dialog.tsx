@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -9,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { useImportResults, type ProspectingImportOptions } from "@/hooks/use-prospecting";
 import { useTeam } from "@/hooks/use-commercial-role";
-import { CheckCircle2, Download, Loader2 } from "lucide-react";
+import { CheckCircle2, Download, Loader2 } from "@/components/ui/icons";
 
 type ImportSummary = {
   total: number;
@@ -89,12 +90,12 @@ export function ProspectingImportDialog({
               </div>
             </div>
             <DialogFooter>
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={() => onOpenChange(false)}
                 className="h-10 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground"
               >
                 Fechar
-              </button>
+              </Button>
             </DialogFooter>
           </div>
         ) : (
@@ -201,13 +202,13 @@ export function ProspectingImportDialog({
               Importar somente contatos com telefone ou WhatsApp em formato válido
             </label>
             <DialogFooter>
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={() => onOpenChange(false)}
                 className="h-10 rounded-lg border border-border px-4 text-sm"
               >
                 Cancelar
-              </button>
-              <button
+              </Button>
+              <Button variant="unstyled" size="unstyled"
                 onClick={submit}
                 disabled={!resultIds.length || mutation.isPending}
                 className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-50"
@@ -218,7 +219,7 @@ export function ProspectingImportDialog({
                   <Download className="h-4 w-4" />
                 )}
                 Adicionar ao CRM
-              </button>
+              </Button>
             </DialogFooter>
           </>
         )}

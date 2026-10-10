@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -7,12 +9,13 @@ import { useTenant } from "@/contexts/tenant-context";
 import {
   Loader2, Shield, Building2, Users, DollarSign, TrendingUp, Search, Plus,
   CheckCircle2, XCircle, PauseCircle, Sparkles, ArrowLeft, Trash2, Edit3,
-} from "lucide-react";
+} from "@/components/ui/icons";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 
 export const Route = createFileRoute("/super-admin")({
+  head: () => pageHead("Super Admin"),
   component: SuperAdminPage,
 });
 
@@ -180,9 +183,9 @@ function SuperAdminPage() {
             <Link to="/onboarding" className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-xs font-medium text-muted-foreground transition hover:text-foreground">
               <ArrowLeft className="h-3.5 w-3.5" /> Onboarding
             </Link>
-            <button onClick={() => signOut()} className="inline-flex h-9 items-center rounded-lg border border-border bg-surface-1 px-3 text-xs font-medium text-muted-foreground transition hover:text-foreground">
+            <Button variant="unstyled" size="unstyled" onClick={() => signOut()} className="inline-flex h-9 items-center rounded-lg border border-border bg-surface-1 px-3 text-xs font-medium text-muted-foreground transition hover:text-foreground">
               Sair
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -261,12 +264,12 @@ function SuperAdminPage() {
                 <option value="suspenso">Suspenso</option>
                 <option value="cancelado">Cancelado</option>
               </select>
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={() => setCreating(true)}
                 className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground shadow-glow transition hover:brightness-110"
               >
                 <Plus className="h-3.5 w-3.5" /> Nova empresa
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -322,27 +325,27 @@ function SuperAdminPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
                           {t.status !== "ativo" && (
-                            <button onClick={() => updateStatus.mutate({ id: t.id, status: "ativo" })} title="Ativar"
+                            <Button variant="unstyled" size="unstyled" onClick={() => updateStatus.mutate({ id: t.id, status: "ativo" })} title="Ativar"
                               className="rounded-md p-1.5 text-muted-foreground hover:bg-success/10 hover:text-success">
                               <CheckCircle2 className="h-4 w-4" />
-                            </button>
+                            </Button>
                           )}
                           {t.status !== "suspenso" && (
-                            <button onClick={() => updateStatus.mutate({ id: t.id, status: "suspenso" })} title="Suspender"
+                            <Button variant="unstyled" size="unstyled" onClick={() => updateStatus.mutate({ id: t.id, status: "suspenso" })} title="Suspender"
                               className="rounded-md p-1.5 text-muted-foreground hover:bg-warning/10 hover:text-warning">
                               <PauseCircle className="h-4 w-4" />
-                            </button>
+                            </Button>
                           )}
-                          <button onClick={() => setEditing(t)} title="Editar"
+                          <Button variant="unstyled" size="unstyled" onClick={() => setEditing(t)} title="Editar"
                             className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-3 hover:text-foreground">
                             <Edit3 className="h-4 w-4" />
-                          </button>
-                          <button onClick={() => {
+                          </Button>
+                          <Button variant="unstyled" size="unstyled" onClick={() => {
                             if (confirm(`Excluir "${t.nome}"? Todos os dados desta empresa serão removidos.`)) deleteTenant.mutate(t.id);
                           }} title="Excluir"
                             className="rounded-md p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
                             <Trash2 className="h-4 w-4" />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>

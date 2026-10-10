@@ -1,6 +1,8 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Loader2, Building2, ArrowRight, LogOut } from "lucide-react";
+import { Loader2, Building2, ArrowRight, LogOut } from "@/components/ui/icons";
 import alignIcon from "@/assets/align-icon.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/auth-context";
@@ -8,7 +10,7 @@ import { useTenant } from "@/contexts/tenant-context";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/onboarding")({
-  head: () => ({ meta: [{ title: "Onboarding — Align CRM" }] }),
+  head: () => pageHead("Onboarding"),
   component: OnboardingPage,
 });
 
@@ -101,20 +103,20 @@ function OnboardingPage() {
               <p className="mt-1.5 text-[11px] text-muted-foreground">URL: <span className="font-mono text-foreground/80">/t/{slugify(nome)}</span></p>
             )}
           </div>
-          <button type="submit" disabled={busy || !nome.trim()}
+          <Button variant="unstyled" size="unstyled" type="submit" disabled={busy || !nome.trim()}
             className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 disabled:opacity-60">
             {busy && <Loader2 className="h-4 w-4 animate-spin" />}
             Criar empresa <ArrowRight className="h-4 w-4" />
-          </button>
+          </Button>
         </form>
 
         <div className="mt-8 flex items-center justify-between text-xs text-muted-foreground">
           {isSuperAdmin && (
             <Link to="/super-admin" className="font-semibold text-primary hover:underline">Painel Super Admin →</Link>
           )}
-          <button onClick={() => signOut()} className="ml-auto inline-flex items-center gap-1 hover:text-foreground">
+          <Button variant="unstyled" size="unstyled" onClick={() => signOut()} className="ml-auto inline-flex items-center gap-1 hover:text-foreground">
             <LogOut className="h-3 w-3" /> Sair
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -1,7 +1,8 @@
+import { Button } from "@/components/ui/button";
 import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/align-panel";
 import type { ProspectingResultRow } from "@/lib/prospecting/types";
 import { ScorePill } from "./score-pill";
-import { CheckCircle2, AlertTriangle, Mail, Phone, Globe, Instagram, Linkedin, MapPin, Sparkles } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Mail, Phone, Globe, Instagram, Linkedin, MapPin, Sparkles } from "@/components/ui/icons";
 import { useToggleFavorite, useUpdateResultStatus } from "@/hooks/use-prospecting";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { canImportProspectingResult } from "@/lib/prospecting/demo";
@@ -114,8 +115,8 @@ export function ProspectingResultDrawer({
 
         <AlignPanelSection title="Ações">
           <div className="flex flex-wrap gap-2">
-            <button onClick={() => statusMut.mutate({ id: result.id, status: "ignorado" })} className="rounded-lg border border-border bg-surface-1 px-3 py-1.5 text-xs hover:border-destructive/40 hover:text-destructive">Ignorar</button>
-            <button onClick={() => statusMut.mutate({ id: result.id, status: "invalido" })} className="rounded-lg border border-border bg-surface-1 px-3 py-1.5 text-xs hover:border-destructive/40 hover:text-destructive">Marcar inválido</button>
+            <Button variant="unstyled" size="unstyled" onClick={() => statusMut.mutate({ id: result.id, status: "ignorado" })} className="rounded-lg border border-border bg-surface-1 px-3 py-1.5 text-xs hover:border-destructive/40 hover:text-destructive">Ignorar</Button>
+            <Button variant="unstyled" size="unstyled" onClick={() => statusMut.mutate({ id: result.id, status: "invalido" })} className="rounded-lg border border-border bg-surface-1 px-3 py-1.5 text-xs hover:border-destructive/40 hover:text-destructive">Marcar inválido</Button>
           </div>
         </AlignPanelSection>
       </div>

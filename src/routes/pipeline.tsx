@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { dealsQueryOptions } from "@/hooks/use-deals";
 import { leadsQueryOptions } from "@/hooks/use-leads";
 import { getActiveTenantId } from "@/contexts/tenant-context";
@@ -14,7 +16,7 @@ import { formatBRL } from "@/lib/mock-data";
 import { useLeads, useUpdateLeadStatus, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
 import { useScoreLead } from "@/hooks/use-score-lead";
 import { useRealtimeSync } from "@/hooks/use-realtime";
-import { Plus, Filter, Sparkles, Loader2, Search, Rows3, X } from "lucide-react";
+import { Plus, Filter, Sparkles, Loader2, Search, Rows3, X } from "@/components/ui/icons";
 import { KanbanSkeleton } from "@/components/skeletons";
 
 const STAGES: { id: LeadStatus; label: string; color: string }[] = [
@@ -28,7 +30,7 @@ const STAGES: { id: LeadStatus; label: string; color: string }[] = [
 ];
 
 export const Route = createFileRoute("/pipeline")({
-  head: () => ({ meta: [{ title: "Pipeline — Align CRM" }] }),
+  head: () => pageHead("Pipeline"),
   loader: ({ context }) => {
     const tenantId = typeof window === "undefined" ? null : getActiveTenantId();
     if (!tenantId) return;
@@ -79,7 +81,7 @@ function LeadCard({ lead, dragging, compact = false }: { lead: LeadRow; dragging
           {lead.valor_estimado && lead.valor_estimado > 0 ? formatBRL(Number(lead.valor_estimado)) : "—"}
         </span>
         <div className="flex items-center gap-1.5">
-          <button
+          <Button variant="unstyled" size="unstyled"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => { e.stopPropagation(); score.mutate(lead.id); }}
             disabled={isScoring}
@@ -88,7 +90,7 @@ function LeadCard({ lead, dragging, compact = false }: { lead: LeadRow; dragging
             className="grid h-6 w-6 place-items-center rounded-md border border-border bg-surface-1 text-muted-foreground transition hover:border-primary/50 hover:text-primary disabled:opacity-50"
           >
             {isScoring ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-          </button>
+          </Button>
           <div className="grid h-6 w-6 place-items-center rounded-md bg-gradient-to-br from-primary/80 to-[oklch(0.55_0.16_35)] text-[10px] font-bold text-primary-foreground">
             {initialsOf(lead.nome)}
           </div>
@@ -136,9 +138,9 @@ function Column({ stage, leads, compact }: { stage: typeof STAGES[number]; leads
         <LeadFormDialog
           defaultStatus={stage.id}
           trigger={
-            <button aria-label={`Adicionar lead em ${stage.label}`} className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground">
+            <Button variant="unstyled" size="unstyled" aria-label={`Adicionar lead em ${stage.label}`} className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground">
               <Plus className="h-3.5 w-3.5" />
-            </button>
+            </Button>
           }
         />
       </div>
@@ -146,9 +148,9 @@ function Column({ stage, leads, compact }: { stage: typeof STAGES[number]; leads
       <div className="flex max-h-[62vh] min-h-[200px] flex-1 flex-col gap-2 overflow-y-auto p-2.5">
         {visibleLeads.map((l) => <DraggableLead key={l.id} lead={l} compact={compact} />)}
         {visibleCount < leads.length && (
-          <button type="button" onClick={() => setVisibleCount((count) => count + 30)} className="rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/10">
+          <Button variant="unstyled" size="unstyled" type="button" onClick={() => setVisibleCount((count) => count + 30)} className="rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/10">
             Mostrar mais 30 · {leads.length - visibleCount} restantes
-          </button>
+          </Button>
         )}
         {leads.length === 0 && (
           <div className="grid place-items-center rounded-lg border border-dashed border-border/50 p-4 text-center text-[11px] text-muted-foreground">
@@ -203,13 +205,13 @@ function PipelinePage() {
       action={
         <div className="flex items-center gap-2">
           <RealtimeBadge status={realtimeStatus} />
-          <button type="button" aria-pressed={compact} onClick={() => setCompact((value) => !value)} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground">
+          <Button variant="unstyled" size="unstyled" type="button" aria-pressed={compact} onClick={() => setCompact((value) => !value)} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground">
             <Rows3 className="h-3.5 w-3.5" /> {compact ? "Compacto" : "Detalhado"}
-          </button>
-          <button type="button" aria-expanded={filtersOpen} onClick={() => setFiltersOpen((value) => !value)} className="relative inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground">
+          </Button>
+          <Button variant="unstyled" size="unstyled" type="button" aria-expanded={filtersOpen} onClick={() => setFiltersOpen((value) => !value)} className="relative inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground">
             <Filter className="h-3.5 w-3.5" /> Filtros
             {hasActiveFilters && <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-label="Há filtros ativos" />}
-          </button>
+          </Button>
           <LeadFormDialog />
         </div>
       }
@@ -219,7 +221,7 @@ function PipelinePage() {
           <span className="sr-only">Buscar no pipeline</span>
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar lead ou empresa" className="h-10 w-full rounded-lg border border-border bg-surface-1 pl-9 pr-10 text-sm focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20" />
-          {query && <button type="button" aria-label="Limpar busca" onClick={() => setQuery("")} className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground"><X className="h-3.5 w-3.5" /></button>}
+          {query && <Button variant="unstyled" size="unstyled" type="button" aria-label="Limpar busca" onClick={() => setQuery("")} className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground"><X className="h-3.5 w-3.5" /></Button>}
         </label>
         {filtersOpen && <label className="flex items-center gap-2 text-xs text-muted-foreground">Score mínimo
             <select value={minimumScore} onChange={(event) => setMinimumScore(Number(event.target.value))} className="h-10 rounded-lg border border-border bg-surface-1 px-3 text-sm text-foreground">
@@ -227,7 +229,7 @@ function PipelinePage() {
             </select>
           </label>}
         <div className="self-center text-xs text-muted-foreground">{displayedLeads.length} resultado{displayedLeads.length === 1 ? "" : "s"}</div>
-        {hasActiveFilters && <button type="button" onClick={() => { setQuery(""); setMinimumScore(0); }} className="inline-flex h-10 items-center gap-1 rounded-lg px-3 text-xs font-semibold text-primary hover:bg-primary/10"><X className="h-3.5 w-3.5" /> Limpar</button>}
+        {hasActiveFilters && <Button variant="unstyled" size="unstyled" type="button" onClick={() => { setQuery(""); setMinimumScore(0); }} className="inline-flex h-10 items-center gap-1 rounded-lg px-3 text-xs font-semibold text-primary hover:bg-primary/10"><X className="h-3.5 w-3.5" /> Limpar</Button>}
       </div>
       {isLoading ? (
         <KanbanSkeleton columns={6} />

@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
@@ -10,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Megaphone, Target, TrendingUp, Calendar } from "lucide-react";
+import { Plus, Pencil, Trash2, Megaphone, Target, TrendingUp, Calendar } from "@/components/ui/icons";
 import {
   useCampaigns, useSaveCampaign, useDeleteCampaign,
   useCalendarItems, useSaveCalendarItem, useDeleteCalendarItem,
@@ -19,7 +20,7 @@ import {
 import { AppShell } from "@/components/app-shell";
 
 export const Route = createFileRoute("/campanhas")({
-  head: () => ({ meta: [{ title: "Campanhas — Align CRM" }] }),
+  head: () => pageHead("Campanhas"),
   component: CampanhasPage,
 });
 

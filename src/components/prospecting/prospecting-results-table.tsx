@@ -1,7 +1,8 @@
+import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ProspectingResultRow } from "@/lib/prospecting/types";
 import { ScorePill } from "./score-pill";
-import { Star, Mail, Phone, Globe, Instagram, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
+import { Star, Mail, Phone, Globe, Instagram, MapPin, Sparkles, CheckCircle2 } from "@/components/ui/icons";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 import { canImportProspectingResult } from "@/lib/prospecting/demo";
 import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
@@ -114,14 +115,14 @@ export function ProspectingResultsTable({
                   <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-1">
                       {r.status === "importado" && <CheckCircle2 className="h-4 w-4 text-success" />}
-                      <button
+                      <Button variant="unstyled" size="unstyled"
                         onClick={() => onToggleFav(r)}
                         title={r.favorito ? "Remover favorito" : "Favoritar"}
                         aria-label={`${r.favorito ? "Remover dos favoritos" : "Favoritar"} ${r.nome}`}
                         className={`grid h-7 w-7 place-items-center rounded-md transition ${r.favorito ? "text-warning" : "text-muted-foreground hover:text-warning"}`}
                       >
                         <Star className={`h-3.5 w-3.5 ${r.favorito ? "fill-current" : ""}`} />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </motion.tr>

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { featureFlags } from "@/lib/feature-flags";
@@ -28,7 +29,7 @@ export function WhatsAppContactLink({
 
   if (allowed) {
     return (
-      <button
+      <Button variant="unstyled" size="unstyled"
         type="button"
         disabled={authorizing}
         className={className}
@@ -56,14 +57,14 @@ export function WhatsAppContactLink({
         }}
       >
         {children}
-      </button>
+      </Button>
     );
   }
 
   const reason = blockReason ?? "Contato bloqueado pelas regras de WhatsApp.";
 
   return (
-    <button
+    <Button variant="unstyled" size="unstyled"
       type="button"
       className={`${className ?? ""} cursor-not-allowed opacity-50`}
       title={reason}
@@ -74,6 +75,6 @@ export function WhatsAppContactLink({
       }}
     >
       {children}
-    </button>
+    </Button>
   );
 }

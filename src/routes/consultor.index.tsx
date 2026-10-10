@@ -1,11 +1,13 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useQuotas } from "@/hooks/use-consortium-quotas";
 import { useCommissions } from "@/hooks/use-consultor-commissions";
 import { useSimulations } from "@/hooks/use-consortium-simulations";
-import { Award, ListChecks, Wallet, Calculator, TrendingUp, AlertTriangle } from "lucide-react";
+import { Award, ListChecks, Wallet, Calculator, TrendingUp, AlertTriangle } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/consultor/")({
+  head: () => pageHead("Consultor · Index"),
   component: ConsultorIndex,
 });
 

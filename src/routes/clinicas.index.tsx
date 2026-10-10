@@ -1,9 +1,11 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useClinicDashboard } from "@/hooks/use-clinic";
-import { Users, CalendarCheck2, AlertTriangle, DollarSign, Activity, UserCheck } from "lucide-react";
+import { Users, CalendarCheck2, AlertTriangle, DollarSign, Activity, UserCheck } from "@/components/ui/icons";
 import { StatusPill } from "@/components/app-shell";
 
 export const Route = createFileRoute("/clinicas/")({
+  head: () => pageHead("Clinicas · Index"),
   component: ClinicDashboardPage,
 });
 
