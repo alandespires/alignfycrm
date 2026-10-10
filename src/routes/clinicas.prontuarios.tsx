@@ -1,10 +1,13 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, FileText, Plus, Loader2, User } from "lucide-react";
+import { Search, FileText, Plus, Loader2, User } from "@/components/ui/icons";
 import { usePatients, useClinicalRecords, useCreateRecord } from "@/hooks/use-clinic";
 import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 
 export const Route = createFileRoute("/clinicas/prontuarios")({
+  head: () => pageHead("Clinicas · Prontuarios"),
   component: ProntuariosPage,
 });
 
@@ -48,7 +51,7 @@ function ProntuariosPage() {
             <div className="px-4 py-8 text-center text-xs text-muted-foreground">Nenhum paciente encontrado</div>
           ) : (
             patients.map((p) => (
-              <button
+              <Button variant="unstyled" size="unstyled"
                 key={p.id}
                 onClick={() => setSelected(p.id)}
                 className={["flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition", selected === p.id ? "bg-surface-3" : "hover:bg-surface-2"].join(" ")}
@@ -60,7 +63,7 @@ function ProntuariosPage() {
                   <div className="truncate font-medium">{p.nome}</div>
                   {p.ultimo_atendimento_em && <div className="text-[10px] text-muted-foreground">Último: {new Date(p.ultimo_atendimento_em).toLocaleDateString("pt-BR")}</div>}
                 </div>
-              </button>
+              </Button>
             ))
           )}
         </div>
@@ -87,9 +90,9 @@ function ProntuariosPage() {
                   </p>
                 </div>
               </div>
-              <button onClick={() => setCreating(true)} className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground shadow-glow hover:brightness-110">
+              <Button variant="unstyled" size="unstyled" onClick={() => setCreating(true)} className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground shadow-glow hover:brightness-110">
                 <Plus className="h-4 w-4" /> Novo registro
-              </button>
+              </Button>
             </div>
 
             {(selectedPatient.alergias || selectedPatient.medicamentos_uso || selectedPatient.doencas_preexistentes) && (

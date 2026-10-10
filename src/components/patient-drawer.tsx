@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2 } from "@/components/ui/icons";
 import { useDeletePatient, type Patient } from "@/hooks/use-clinic";
 import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/align-panel";
 
@@ -38,14 +39,14 @@ export function PatientDrawer({ patient, onClose, onSave }: {
       status={{ label: data.status ?? "ativo", tone: statusTone }}
       headerActions={
         patient && (
-          <button
+          <Button variant="unstyled" size="unstyled"
             type="button"
             onClick={async () => { if (confirm(`Remover ${patient.nome}?`)) { await del.mutateAsync(patient.id); onClose(); } }}
             className="grid h-9 w-9 place-items-center rounded-full border border-destructive/30 bg-destructive/10 text-destructive transition hover:bg-destructive/20"
             title="Remover paciente"
           >
             <Trash2 className="h-4 w-4" />
-          </button>
+          </Button>
         )
       }
       footer={
@@ -101,7 +102,7 @@ export function PatientDrawer({ patient, onClose, onSave }: {
           </Grid>
         </AlignPanelSection>
 
-        <button type="submit" className="sr-only" />
+        <Button variant="unstyled" size="unstyled" type="submit" className="sr-only" />
       </form>
     </AlignPanel>
   );

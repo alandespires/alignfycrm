@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
@@ -21,10 +23,10 @@ import {
   Wallet, TrendingUp, TrendingDown, Repeat, AlertTriangle, Award, FileBarChart,
   Plus, Trash2, X, Loader2, Sparkles, ArrowUpRight, ArrowDownRight, Clock,
   CheckCircle2, XCircle, CalendarClock, DollarSign, Activity, Receipt, Layers,
-} from "lucide-react";
+} from "@/components/ui/icons";
 
 export const Route = createFileRoute("/financeiro")({
-  head: () => ({ meta: [{ title: "Financeiro — Align CRM" }] }),
+  head: () => pageHead("Financeiro"),
   validateSearch: (search: Record<string, unknown>) => ({
     tab: (search.tab as Tab | undefined) ?? undefined,
   }),
@@ -35,9 +37,9 @@ type Tab = "dashboard" | "receber" | "pagar" | "fluxo" | "parcelas" | "assinatur
 
 const TABS: { id: Tab; label: string; icon: any }[] = [
   { id: "dashboard", label: "Dashboard", icon: Wallet },
-  { id: "receber", label: "Contas a Receber", icon: TrendingUp },
-  { id: "pagar", label: "Contas a Pagar", icon: TrendingDown },
-  { id: "fluxo", label: "Fluxo de Caixa", icon: Activity },
+  { id: "receber", label: "A receber", icon: TrendingUp },
+  { id: "pagar", label: "A pagar", icon: TrendingDown },
+  { id: "fluxo", label: "Fluxo", icon: Activity },
   { id: "parcelas", label: "Parcelas", icon: Layers },
   { id: "assinaturas", label: "Assinaturas", icon: Repeat },
   { id: "inadimplencia", label: "Inadimplência", icon: AlertTriangle },
@@ -51,22 +53,23 @@ function FinanceiroPage() {
   useEffect(() => { if (search.tab && search.tab !== tab) setTab(search.tab); }, [search.tab]);
 
   return (
-    <AppShell title="Financeiro" subtitle="Centro de controle financeiro do seu CRM">
-      <div className="mb-6 flex flex-wrap gap-1.5 rounded-xl border border-border bg-surface-1 p-1.5 shadow-card">
+    <AppShell title="Financeiro" subtitle="Receitas, despesas e cobranças">
+      <div role="tablist" aria-label="Visões financeiras" className="mb-6 flex gap-1 overflow-x-auto border-b border-border pb-2">
         {TABS.map(({ id, label, icon: Icon }) => {
           const active = tab === id;
           return (
-            <button
+            <Button variant="unstyled" size="unstyled"
               key={id}
+              role="tab" aria-selected={active}
               onClick={() => setTab(id)}
               className={[
-                "inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all",
-                active ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+                "inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors",
+                active ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
               ].join(" ")}
             >
               <Icon className="h-4 w-4" />
               {label}
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -283,7 +286,7 @@ function FinanceAI({ entries, expenses, subs, comms }: { entries: EntryRow[]; ex
     <div className="rounded-2xl border border-border bg-gradient-to-br from-surface-2 to-surface-1 p-6 shadow-card">
       <div className="mb-4 flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-primary" />
-        <h3 className="text-sm font-semibold">IA Financeira — análise em tempo real</h3>
+        <h3 className="text-sm font-semibold">Insights financeiros</h3>
       </div>
       <div className="grid gap-3 md:grid-cols-2">
         {insights.map((i, idx) => (
@@ -357,12 +360,12 @@ function EntradasTab() {
             </span>,
             <StatusSelect value={e.status} onChange={(s) => upd.mutate({ id: e.id, status: s })} />,
             <div className="flex items-center gap-1">
-              <button onClick={() => setReconciling(e)} title="Reconciliar pagamentos" className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-primary/10 hover:text-primary">
+              <Button variant="unstyled" size="unstyled" onClick={() => setReconciling(e)} title="Reconciliar pagamentos" className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-primary/10 hover:text-primary">
                 <Receipt className="h-3.5 w-3.5" />
-              </button>
-              <button onClick={() => { if (confirm("Remover entrada?")) del.mutate(e.id); }} className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+              </Button>
+              <Button variant="unstyled" size="unstyled" onClick={() => { if (confirm("Remover entrada?")) del.mutate(e.id); }} className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
                 <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              </Button>
             </div>,
           ];
         })}
@@ -451,7 +454,7 @@ function SaidasTab() {
           e.vencimento ? new Date(e.vencimento).toLocaleDateString("pt-BR") : "—",
           <span className="font-semibold tabular-nums text-destructive">{brl(Number(e.valor))}</span>,
           <StatusSelect value={e.status} onChange={(s) => upd.mutate({ id: e.id, status: s, pago_em: s === "pago" ? new Date().toISOString().slice(0, 10) : null })} />,
-          <button onClick={() => del.mutate(e.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>,
+          <Button variant="unstyled" size="unstyled" onClick={() => del.mutate(e.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>,
         ])}
       />
 
@@ -532,7 +535,7 @@ function AssinaturasTab() {
             new Date(s.inicio).toLocaleDateString("pt-BR"),
             s.proximo_vencimento ? new Date(s.proximo_vencimento).toLocaleDateString("pt-BR") : "—",
             <SubStatusSelect value={s.status} onChange={(v) => upd.mutate({ id: s.id, status: v })} />,
-            <button onClick={() => del.mutate(s.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>,
+            <Button variant="unstyled" size="unstyled" onClick={() => del.mutate(s.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>,
           ];
         })}
       />
@@ -611,10 +614,10 @@ function InadimplenciaTab() {
                   <div className="text-right">
                     <div className="text-sm font-bold tabular-nums text-destructive">{brl(Number(e.valor))}</div>
                   </div>
-                  <button onClick={() => upd.mutate({ id: e.id, status: "pago", recebido_em: new Date().toISOString().slice(0, 10) })}
+                  <Button variant="unstyled" size="unstyled" onClick={() => upd.mutate({ id: e.id, status: "pago", recebido_em: new Date().toISOString().slice(0, 10) })}
                     className="inline-flex h-8 items-center gap-1.5 rounded-md bg-success/15 px-3 text-xs font-semibold text-success hover:bg-success/25">
                     <CheckCircle2 className="h-3.5 w-3.5" /> Marcar como pago
-                  </button>
+                  </Button>
                 </li>
               );
             })}
@@ -661,7 +664,7 @@ function ComissoesTab() {
           <span className="font-semibold tabular-nums">{brl(Number(c.valor))}</span>,
           c.competencia ? new Date(c.competencia).toLocaleDateString("pt-BR") : "—",
           <CommStatusSelect value={c.status} onChange={(v) => upd.mutate({ id: c.id, status: v, paga_em: v === "paga" ? new Date().toISOString().slice(0, 10) : null })} />,
-          <button onClick={() => del.mutate(c.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>,
+          <Button variant="unstyled" size="unstyled" onClick={() => del.mutate(c.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>,
         ])}
       />
 
@@ -954,10 +957,10 @@ function FilterChips({ value, onChange }: { value: FinStatus | "todos"; onChange
   return (
     <div className="flex flex-wrap gap-1.5">
       {opts.map((o) => (
-        <button key={o.v} onClick={() => onChange(o.v)} className={[
+        <Button variant="unstyled" size="unstyled" key={o.v} onClick={() => onChange(o.v)} className={[
           "h-9 rounded-lg border px-3 text-xs font-medium transition",
           value === o.v ? "border-primary bg-primary/10 text-primary" : "border-border bg-surface-1 text-muted-foreground hover:text-foreground",
-        ].join(" ")}>{o.l}</button>
+        ].join(" ")}>{o.l}</Button>
       ))}
     </div>
   );

@@ -1,11 +1,14 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Plus, Loader2, CalendarDays, User, CheckCircle2, XCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Loader2, CalendarDays, User, CheckCircle2, XCircle } from "@/components/ui/icons";
 import { useAppointments, useUpsertAppointment, useUpdateAppointmentStatus, useProfessionals, usePatients } from "@/hooks/use-clinic";
 import { PrimaryButton } from "@/components/app-shell";
 import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 
 export const Route = createFileRoute("/clinicas/agenda")({
+  head: () => pageHead("Clinicas · Agenda"),
   component: AgendaPage,
 });
 
@@ -63,14 +66,14 @@ function AgendaPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-1 rounded-lg border border-border bg-surface-1 p-1">
-          <button onClick={() => { const d = new Date(anchor); d.setDate(d.getDate() - (view === "day" ? 1 : 7)); setAnchor(d); }} className="grid h-8 w-8 place-items-center rounded text-muted-foreground hover:text-foreground"><ChevronLeft className="h-4 w-4" /></button>
-          <button onClick={() => setAnchor(new Date())} className="rounded px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground">Hoje</button>
-          <button onClick={() => { const d = new Date(anchor); d.setDate(d.getDate() + (view === "day" ? 1 : 7)); setAnchor(d); }} className="grid h-8 w-8 place-items-center rounded text-muted-foreground hover:text-foreground"><ChevronRight className="h-4 w-4" /></button>
+          <Button variant="unstyled" size="unstyled" onClick={() => { const d = new Date(anchor); d.setDate(d.getDate() - (view === "day" ? 1 : 7)); setAnchor(d); }} className="grid h-8 w-8 place-items-center rounded text-muted-foreground hover:text-foreground"><ChevronLeft className="h-4 w-4" /></Button>
+          <Button variant="unstyled" size="unstyled" onClick={() => setAnchor(new Date())} className="rounded px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground">Hoje</Button>
+          <Button variant="unstyled" size="unstyled" onClick={() => { const d = new Date(anchor); d.setDate(d.getDate() + (view === "day" ? 1 : 7)); setAnchor(d); }} className="grid h-8 w-8 place-items-center rounded text-muted-foreground hover:text-foreground"><ChevronRight className="h-4 w-4" /></Button>
         </div>
 
         <div className="flex items-center gap-1 rounded-lg border border-border bg-surface-1 p-1">
           {(["day", "week"] as const).map((v) => (
-            <button key={v} onClick={() => setView(v)} className={["rounded px-3 py-1 text-xs font-medium transition", view === v ? "bg-surface-3 text-foreground" : "text-muted-foreground hover:text-foreground"].join(" ")}>{v === "day" ? "Dia" : "Semana"}</button>
+            <Button variant="unstyled" size="unstyled" key={v} onClick={() => setView(v)} className={["rounded px-3 py-1 text-xs font-medium transition", view === v ? "bg-surface-3 text-foreground" : "text-muted-foreground hover:text-foreground"].join(" ")}>{v === "day" ? "Dia" : "Semana"}</Button>
           ))}
         </div>
 
@@ -117,9 +120,9 @@ function AgendaPage() {
                               {new Date(a.inicio).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                             </span>
                             <div className="flex items-center gap-0.5 opacity-0 transition group-hover:opacity-100">
-                              <button onClick={() => updStatus.mutate({ id: a.id, status: "confirmado" })} title="Confirmar" className="rounded p-0.5 hover:bg-surface-3"><CheckCircle2 className="h-3 w-3" /></button>
-                              <button onClick={() => updStatus.mutate({ id: a.id, status: "realizado" })} title="Marcar realizado" className="rounded p-0.5 hover:bg-surface-3"><CheckCircle2 className="h-3 w-3" /></button>
-                              <button onClick={() => updStatus.mutate({ id: a.id, status: "faltou" })} title="Faltou" className="rounded p-0.5 hover:bg-surface-3"><XCircle className="h-3 w-3" /></button>
+                              <Button variant="unstyled" size="unstyled" onClick={() => updStatus.mutate({ id: a.id, status: "confirmado" })} title="Confirmar" className="rounded p-0.5 hover:bg-surface-3"><CheckCircle2 className="h-3 w-3" /></Button>
+                              <Button variant="unstyled" size="unstyled" onClick={() => updStatus.mutate({ id: a.id, status: "realizado" })} title="Marcar realizado" className="rounded p-0.5 hover:bg-surface-3"><CheckCircle2 className="h-3 w-3" /></Button>
+                              <Button variant="unstyled" size="unstyled" onClick={() => updStatus.mutate({ id: a.id, status: "faltou" })} title="Faltou" className="rounded p-0.5 hover:bg-surface-3"><XCircle className="h-3 w-3" /></Button>
                             </div>
                           </div>
                           <div className="mt-1 flex items-center gap-1 truncate font-medium">

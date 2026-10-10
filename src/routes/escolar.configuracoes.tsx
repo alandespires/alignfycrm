@@ -1,5 +1,6 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
-import { Cog, Save, RotateCcw, Bell, Wand2 } from "lucide-react";
+import { Cog, Save, RotateCcw, Bell, Wand2 } from "@/components/ui/icons";
 import { useSchoolSettings } from "@/hooks/use-school-settings";
 import { useTeacherAlerts } from "@/hooks/use-school";
 import { useCreateTask } from "@/hooks/use-tasks";
@@ -9,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/escolar/configuracoes")({ component: Page });
+export const Route = createFileRoute("/escolar/configuracoes")({
+  head: () => pageHead("Escolar · Configuracoes"), component: Page });
 
 function Page() {
   const { settings, update, reset } = useSchoolSettings();

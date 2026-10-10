@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { clientsQueryOptions } from "@/hooks/use-clients";
 import { getActiveTenantId } from "@/contexts/tenant-context";
 import { createFileRoute } from "@tanstack/react-router";
@@ -8,12 +10,12 @@ import { RealtimeBadge } from "@/components/realtime-badge";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import { ClientDetailDrawer } from "@/components/client-detail-drawer";
 import { useClients, useCreateClient, useDeleteClient, type ClientRow } from "@/hooks/use-clients";
-import { Plus, Building2, Mail, Phone, Loader2, Inbox, Trash2, X, Search } from "lucide-react";
+import { Plus, Building2, Mail, Phone, Loader2, Inbox, Trash2, X, Search } from "@/components/ui/icons";
 import { CardGridSkeleton } from "@/components/skeletons";
 import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 
 export const Route = createFileRoute("/clientes")({
-  head: () => ({ meta: [{ title: "Clientes — Align CRM" }] }),
+  head: () => pageHead("Clientes"),
   loader: ({ context }) => {
     const tenantId = typeof window === "undefined" ? null : getActiveTenantId();
     if (!tenantId) return;
@@ -96,10 +98,10 @@ function ClientesPage() {
             { v: "com_contrato", l: "Com contrato" },
             { v: "sem_contrato", l: "Sem contrato" },
           ] as { v: ClientFilter; l: string }[]).map((opt) => (
-            <button key={opt.v} onClick={() => setFilter(opt.v)}
+            <Button variant="unstyled" size="unstyled" key={opt.v} onClick={() => setFilter(opt.v)}
               className={`h-9 rounded-md px-3 text-xs font-medium transition ${filter === opt.v ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground"}`}>
               {opt.l}
-            </button>
+            </Button>
           ))}
         </div>
         <span className="ml-auto text-xs text-muted-foreground tabular-nums">{filtered.length} de {clients.length}</span>
@@ -125,9 +127,9 @@ function ClientesPage() {
                 <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-primary/20 to-surface-3 text-primary">
                   <Building2 className="h-5 w-5" />
                 </div>
-                <button onClick={(e) => { e.stopPropagation(); if (confirm(`Remover ${c.nome}?`)) del.mutate(c.id); }} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-destructive">
+                <Button variant="unstyled" size="unstyled" onClick={(e) => { e.stopPropagation(); if (confirm(`Remover ${c.nome}?`)) del.mutate(c.id); }} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-destructive">
                   <Trash2 className="h-4 w-4" />
-                </button>
+                </Button>
               </div>
               <h3 className="mt-4 text-base font-semibold">{c.empresa || c.nome}</h3>
               <p className="text-xs text-muted-foreground">{c.nome}{c.email ? ` · ${c.email}` : ""}</p>

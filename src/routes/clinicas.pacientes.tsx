@@ -1,11 +1,14 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Search, Phone, Mail, Calendar, Loader2, Stethoscope } from "lucide-react";
+import { Plus, Search, Phone, Mail, Calendar, Loader2, Stethoscope } from "@/components/ui/icons";
 import { usePatients, useUpsertPatient, type Patient } from "@/hooks/use-clinic";
 import { PrimaryButton, StatusPill } from "@/components/app-shell";
 import { PatientDrawer } from "@/components/patient-drawer";
 
 export const Route = createFileRoute("/clinicas/pacientes")({
+  head: () => pageHead("Clinicas · Pacientes"),
   component: PacientesPage,
 });
 
@@ -45,7 +48,7 @@ function PacientesPage() {
         ) : (
           <div className="divide-y divide-border">
             {patients.map((p) => (
-              <button
+              <Button variant="unstyled" size="unstyled"
                 key={p.id}
                 onClick={() => setEditing(p)}
                 className="flex w-full items-center gap-4 px-5 py-3.5 text-left transition hover:bg-surface-2"
@@ -67,7 +70,7 @@ function PacientesPage() {
                   </div>
                 </div>
                 <StatusPill tone={p.status === "ativo" ? "success" : p.status === "bloqueado" ? "danger" : "neutral"}>{p.status}</StatusPill>
-              </button>
+              </Button>
             ))}
           </div>
         )}

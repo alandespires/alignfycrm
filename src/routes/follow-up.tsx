@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
@@ -5,11 +7,11 @@ import {
   usePipelineStageAutomations, useCreatePipelineAutomation, useUpdatePipelineAutomation, useDeletePipelineAutomation,
   type StageTaskTemplate, type PipelineStageAutomation,
 } from "@/hooks/use-pipeline-stage-automations";
-import { Plus, Trash2, Bell, Power, ListChecks, Sparkles, Clock, Loader2 } from "lucide-react";
+import { Plus, Trash2, Bell, Power, ListChecks, Sparkles, Clock, Loader2 } from "@/components/ui/icons";
 import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 
 export const Route = createFileRoute("/follow-up")({
-  head: () => ({ meta: [{ title: "Follow-up & Cadências — Align CRM" }] }),
+  head: () => pageHead("Follow-up & Cadências"),
   component: FollowUpPage,
 });
 
@@ -94,7 +96,7 @@ function FollowUpPage() {
         </div>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {TEMPLATES.map((t) => (
-            <button
+            <Button variant="unstyled" size="unstyled"
               key={t.id}
               onClick={() => applyTemplate(t)}
               disabled={create.isPending}
@@ -108,7 +110,7 @@ function FollowUpPage() {
               <div className="mt-3 flex items-center gap-2 text-[10px] uppercase tracking-widest text-primary">
                 <Clock className="h-3 w-3" /> {t.tarefas.length} tarefas · {STAGES.find((s) => s.id === t.stage)?.label}
               </div>
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -127,13 +129,13 @@ function FollowUpPage() {
                     <h3 className="text-sm font-semibold">{s.label}</h3>
                     <p className="text-[11px] text-muted-foreground">{items.length} cadência{items.length === 1 ? "" : "s"} ativa{items.length === 1 ? "" : "s"}</p>
                   </div>
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => setEditing({ stage: s.id })}
                     className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground"
                     aria-label="Adicionar cadência"
                   >
                     <Plus className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
 
                 {items.length === 0 ? (
@@ -156,19 +158,19 @@ function FollowUpPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
-                            <button
+                            <Button variant="unstyled" size="unstyled"
                               onClick={() => update.mutate({ id: c.id, ativo: !c.ativo })}
                               title={c.ativo ? "Pausar" : "Ativar"}
                               className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground"
                             >
                               <Power className="h-3.5 w-3.5" />
-                            </button>
-                            <button
+                            </Button>
+                            <Button variant="unstyled" size="unstyled"
                               onClick={() => { if (confirm(`Excluir "${c.nome}"?`)) del.mutate(c.id); }}
                               className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-destructive"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
-                            </button>
+                            </Button>
                           </div>
                         </div>
                         {c.tarefas && c.tarefas.length > 0 && (
@@ -258,8 +260,8 @@ function CadenceForm({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="text-[11px] font-semibold text-muted-foreground">Tarefas</label>
-            <button onClick={() => setTarefas((p) => [...p, { titulo: "Nova tarefa", prioridade: "media", prazo_dias: 1 }])}
-              className="text-[11px] font-semibold text-primary hover:underline">+ Adicionar</button>
+            <Button variant="unstyled" size="unstyled" onClick={() => setTarefas((p) => [...p, { titulo: "Nova tarefa", prioridade: "media", prazo_dias: 1 }])}
+              className="text-[11px] font-semibold text-primary hover:underline">+ Adicionar</Button>
           </div>
           {tarefas.map((t, i) => (
             <div key={i} className="rounded-lg border border-border bg-surface-1 p-2">
@@ -269,7 +271,7 @@ function CadenceForm({
                 <input type="number" min={0} value={t.prazo_dias ?? 1} onChange={(e) => patch(i, { prazo_dias: parseInt(e.target.value || "0", 10) })}
                   className="w-16 rounded-md border border-border bg-surface-2 px-2 py-1 text-xs tabular-nums" />
                 <span className="text-[10px] text-muted-foreground">dias</span>
-                <button onClick={() => setTarefas((p) => p.filter((_, idx) => idx !== i))} className="grid h-6 w-6 place-items-center rounded text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
+                <Button variant="unstyled" size="unstyled" onClick={() => setTarefas((p) => p.filter((_, idx) => idx !== i))} className="grid h-6 w-6 place-items-center rounded text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></Button>
               </div>
             </div>
           ))}

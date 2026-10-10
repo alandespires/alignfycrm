@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -6,8 +7,8 @@ import {
   Stethoscope, Target, FileText, UserCircle, Building, History, Megaphone, Mail,
   Globe, LifeBuoy, BookOpen, MessageCircle, LineChart, Briefcase, GraduationCap,
   BookMarked, ClipboardList, CalendarCheck, Bell, IdCard, MoreHorizontal, X,
-  ShoppingBag, ChevronRight, Calculator, Landmark, Award,
-} from "lucide-react";
+  Search, ShoppingBag, ChevronRight, Calculator, Landmark, Award,
+} from "@/components/ui/icons";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import alignIcon from "@/assets/align-icon.png";
 import { useAuth } from "@/contexts/auth-context";
@@ -44,6 +45,7 @@ const COMERCIAL_GROUPS: SubGroup[] = [
       { to: "/pipeline", label: "Pipeline", icon: Kanban },
       { to: "/oportunidades", label: "Oportunidades", icon: Target },
       { to: "/propostas", label: "Propostas", icon: FileText },
+      { to: "/follow-up", label: "Follow-up", icon: CalendarCheck },
     ],
   },
   {
@@ -132,7 +134,7 @@ const MAIS_GROUPS: SubGroup[] = [
   },
 ];
 
-const COMERCIAL_PATHS = ["/leads", "/prospeccao", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas"];
+const COMERCIAL_PATHS = ["/leads", "/prospeccao", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas", "/follow-up"];
 const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/metas", "/equipe", "/campanhas", "/email-marketing", "/landing-pages", "/automacao", "/tickets", "/base-conhecimento", "/chat", "/consultor"];
 
 
@@ -274,21 +276,16 @@ export function AppShell({ children, title, subtitle, action }: {
         launchOpen={launchOpen}
         isSuperAdmin={isSuperAdmin}
         onSignOut={() => signOut()}
+        onSearch={() => setSearchOpen(true)}
       />
-      {/* Ambient backdrop — barely-there glow, sets the premium mood */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-[var(--gradient-glow)] opacity-70 blur-3xl" />
-        <div className="absolute bottom-[-20%] right-[-10%] h-[420px] w-[420px] rounded-full bg-primary/[0.05] blur-3xl" />
-      </div>
-
       {/* ===== Top bar (glass, minimal) ===== */}
       <header
-        className="sticky top-0 z-30 border-b border-white/[0.04] bg-background/60 backdrop-blur-2xl"
+        className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-xl"
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-3 px-4 md:h-16 md:px-8">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="grid h-9 w-9 place-items-center overflow-hidden rounded-2xl bg-black ring-1 ring-primary/30 shadow-glow">
+            <div className="grid h-9 w-9 place-items-center overflow-hidden rounded-lg bg-surface-2 ring-1 ring-border">
               <img src={alignIcon} alt="Align" className="h-9 w-9 object-contain" />
             </div>
             <div className="hidden leading-tight sm:block">
@@ -300,26 +297,27 @@ export function AppShell({ children, title, subtitle, action }: {
           <div className="flex-1" />
 
           <div className="ml-auto flex items-center gap-1.5">
+            <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} aria-label="Buscar registros"><Search /></Button>
             {showGlobalLeadAction && <LeadFormDialog trigger={(
-              <button aria-label="Novo lead" className="hidden h-10 items-center gap-2 rounded-2xl bg-primary px-3.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 sm:inline-flex">
+              <Button variant="unstyled" size="unstyled" aria-label="Novo lead" className="hidden h-10 items-center gap-2 rounded-2xl bg-primary px-3.5 text-xs font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 sm:inline-flex">
                 <Plus className="h-3.5 w-3.5" /> Novo lead
-              </button>
+              </Button>
             )} />}
             {showGlobalLeadAction && <LeadFormDialog trigger={(
-              <button aria-label="Novo lead" className="grid h-10 w-10 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-glow sm:hidden">
+              <Button variant="unstyled" size="unstyled" aria-label="Novo lead" className="grid h-10 w-10 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-glow sm:hidden">
                 <Plus className="h-4 w-4" />
-              </button>
+              </Button>
             )} />}
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={toggleTheme}
               aria-label="Alternar tema"
-              className="grid h-10 w-10 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground"
+              className="grid h-10 w-10 place-items-center rounded-2xl border border-border bg-surface-1 text-muted-foreground transition hover:text-foreground"
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
+            </Button>
             <NotificationsPopover />
-            <div className="hidden items-center gap-2.5 rounded-2xl border border-white/[0.06] bg-white/[0.03] py-1 pl-1 pr-3 md:flex">
-              <div className="grid h-7 w-7 place-items-center rounded-xl bg-gradient-to-br from-primary to-[oklch(0.65_0.18_145)] text-xs font-bold text-primary-foreground">
+            <div className="hidden items-center gap-2.5 rounded-2xl border border-border bg-surface-1 py-1 pl-1 pr-3 md:flex">
+              <div className="grid h-7 w-7 place-items-center rounded-xl bg-primary text-xs font-bold text-primary-foreground">
                 {initials}
               </div>
               <div className="hidden leading-tight lg:block">
@@ -327,13 +325,13 @@ export function AppShell({ children, title, subtitle, action }: {
                 <div className="text-[10px] capitalize text-muted-foreground">{commercialRole}</div>
               </div>
             </div>
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => signOut()}
               aria-label="Sair"
-              className="hidden h-10 w-10 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground md:grid"
+              className="hidden h-10 w-10 place-items-center rounded-2xl border border-border bg-surface-1 text-muted-foreground transition hover:text-foreground md:grid"
             >
               <LogOut className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -341,15 +339,15 @@ export function AppShell({ children, title, subtitle, action }: {
 
       {/* ===== Main ===== */}
       <main
-        className="mx-auto max-w-[1600px] px-4 pt-6 md:px-8 md:pt-10"
+        className="mx-auto max-w-[1600px] px-4 pt-5 md:px-8 md:pt-6"
         style={{ paddingBottom: "calc(7rem + env(safe-area-inset-bottom))" }}
       >
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3 md:mb-8">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 md:mb-6">
           <div className="min-w-0">
-            <h1 className="truncate font-display text-3xl font-semibold tracking-tight md:text-[2.5rem] md:leading-[1.05]">{title}</h1>
-            {subtitle && <p className="mt-1.5 text-sm text-muted-foreground md:text-[15px]">{subtitle}</p>}
+            <h1 className="break-words font-display text-2xl font-semibold leading-tight">{title}</h1>
+            {subtitle && <p className="mt-1 max-w-2xl text-xs text-muted-foreground">{subtitle}</p>}
           </div>
-          {action && <div className="w-full sm:w-auto">{action}</div>}
+          {action && <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">{action}</div>}
         </div>
         <motion.div
           key={pathname}
@@ -400,9 +398,9 @@ export function AppShell({ children, title, subtitle, action }: {
                   <Shield className="h-4 w-4" /> Painel Super Admin
                 </Link>
               )}
-              <button onClick={() => signOut()} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
+              <Button variant="unstyled" size="unstyled" onClick={() => signOut()} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-surface-1 px-4 py-3 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
                 <LogOut className="h-4 w-4" /> Sair da conta
-              </button>
+              </Button>
             </div>
           }
         />
@@ -454,7 +452,7 @@ function LiquidDock({
 function LaunchDockButton({ active, onClick }: { active: boolean; onClick: () => void }) {
   return (
     <li>
-      <button
+      <Button variant="unstyled" size="unstyled"
         onClick={onClick}
         aria-label="Launch — Inteligência"
         className={[
@@ -473,7 +471,7 @@ function LaunchDockButton({ active, onClick }: { active: boolean; onClick: () =>
           <LaunchIcon className="h-4 w-4" />
         </span>
         <span className="relative hidden text-[12.5px] font-semibold tracking-tight text-foreground md:inline">Launch</span>
-      </button>
+      </Button>
     </li>
   );
 }
@@ -509,7 +507,7 @@ function DockItem({ to, label, icon: Icon, active }: { to: string; label: string
 function DockButton({ label, icon: Icon, active, onClick, badge }: { label: string; icon: any; active: boolean; onClick: () => void; badge?: number }) {
   return (
     <li>
-      <button
+      <Button variant="unstyled" size="unstyled"
         onClick={onClick}
         aria-label={badge ? `${label} (${badge} item${badge === 1 ? "" : "s"} pendente${badge === 1 ? "" : "s"})` : label}
         className={[
@@ -540,7 +538,7 @@ function DockButton({ label, icon: Icon, active, onClick, badge }: { label: stri
             {badge > 99 ? "99+" : badge}
           </motion.span>
         )}
-      </button>
+      </Button>
     </li>
   );
 }
@@ -588,7 +586,7 @@ function DockSheet({
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={title}>
       {/* dimmer */}
-      <button
+      <Button variant="unstyled" size="unstyled"
         aria-label={`Dispensar menu ${title}`}
         onClick={onClose}
         className="absolute inset-0 bg-black/40 backdrop-blur-[6px] animate-in fade-in duration-200"
@@ -604,9 +602,9 @@ function DockSheet({
             <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">Menu</div>
             <h2 className="font-display text-xl font-semibold tracking-tight">{title}</h2>
           </div>
-          <button onClick={onClose} aria-label={`Fechar menu ${title}`} className="grid h-10 w-10 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground">
+          <Button variant="unstyled" size="unstyled" onClick={onClose} aria-label={`Fechar menu ${title}`} className="grid h-10 w-10 place-items-center rounded-2xl border border-border bg-surface-1 text-muted-foreground transition hover:text-foreground">
             <X className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
 
         <div className="max-h-[min(70vh,calc(100dvh-12rem))] space-y-5 overflow-y-auto overscroll-contain pr-1">
@@ -666,13 +664,13 @@ function DockSheet({
 /* -------------------- Shared UI primitives (kept exports) -------------------- */
 export function PrimaryButton({ children, icon: Icon, ...rest }: { children: ReactNode; icon?: any } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button
+    <Button variant="unstyled" size="unstyled"
       {...rest}
-      className="inline-flex h-10 items-center gap-2 rounded-2xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 active:scale-[0.98]"
+      className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:brightness-110 active:scale-[0.98]"
     >
       {Icon && <Icon className="h-4 w-4" />}
       {children}
-    </button>
+    </Button>
   );
 }
 

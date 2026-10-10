@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
@@ -8,11 +10,11 @@ import {
   useAutomations, useCreateAutomation, useToggleAutomation, useDeleteAutomation, useAutomationRuns,
   type AutomationAction, type AutomationTrigger,
 } from "@/hooks/use-automations";
-import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSquare, Inbox, Bolt, Sparkles, CheckCircle2, AlertTriangle, History } from "lucide-react";
+import { Plus, Zap, ArrowRight, Loader2, Trash2, X, Power, ListChecks, MessageSquare, Inbox, Bolt, Sparkles, CheckCircle2, AlertTriangle, History } from "@/components/ui/icons";
 import { AutomationListSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/automacao")({
-  head: () => ({ meta: [{ title: "Automação — Align CRM" }] }),
+  head: () => pageHead("Automação"),
   component: AutomacaoPage,
 });
 
@@ -146,7 +148,7 @@ function AutomacaoPage() {
         </div>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {TEMPLATES.map((t) => (
-            <button
+            <Button variant="unstyled" size="unstyled"
               key={t.id}
               onClick={() => applyTemplate(t.input)}
               className="group relative overflow-hidden rounded-2xl border border-border bg-surface-2 p-4 text-left shadow-card transition hover:border-primary/40 hover:-translate-y-0.5"
@@ -161,7 +163,7 @@ function AutomacaoPage() {
               <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
                 Usar template <ArrowRight className="h-3 w-3" />
               </div>
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -195,19 +197,19 @@ function AutomacaoPage() {
                 </div>
                 <StatusPill tone={f.ativo ? "success" : "neutral"}>{f.ativo ? "Ativo" : "Pausado"}</StatusPill>
                 <div className="flex items-center gap-1">
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => toggle.mutate({ id: f.id, ativo: !f.ativo })}
                     title={f.ativo ? "Pausar" : "Ativar"}
                     className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-surface-3 hover:text-foreground"
                   >
                     <Power className="h-4 w-4" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => { if (confirm(`Excluir "${f.nome}"?`)) del.mutate(f.id); }}
                     className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground transition hover:bg-surface-3 hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -346,12 +348,12 @@ function AutomationForm({
                 <span className="grid h-5 w-5 place-items-center rounded-md bg-success/20 font-bold">FAZ</span> Ações
               </h4>
               <div className="flex gap-1">
-                <button type="button" onClick={() => addAction("criar_tarefa")} className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-surface-2 px-2 text-[11px] hover:border-primary/40">
+                <Button variant="unstyled" size="unstyled" type="button" onClick={() => addAction("criar_tarefa")} className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-surface-2 px-2 text-[11px] hover:border-primary/40">
                   <Plus className="h-3 w-3" /> Tarefa
-                </button>
-                <button type="button" onClick={() => addAction("registrar_atividade")} className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-surface-2 px-2 text-[11px] hover:border-primary/40">
+                </Button>
+                <Button variant="unstyled" size="unstyled" type="button" onClick={() => addAction("registrar_atividade")} className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-surface-2 px-2 text-[11px] hover:border-primary/40">
                   <Plus className="h-3 w-3" /> Atividade
-                </button>
+                </Button>
               </div>
             </div>
             <div className="space-y-2">
@@ -362,9 +364,9 @@ function AutomationForm({
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                       {a.tipo === "criar_tarefa" ? "Criar tarefa" : "Registrar atividade"}
                     </span>
-                    <button type="button" onClick={() => removeAction(i)} className="text-muted-foreground hover:text-destructive">
+                    <Button variant="unstyled" size="unstyled" type="button" onClick={() => removeAction(i)} className="text-muted-foreground hover:text-destructive">
                       <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    </Button>
                   </div>
                   {a.tipo === "criar_tarefa" ? (
                     <div className="grid gap-2 md:grid-cols-3">

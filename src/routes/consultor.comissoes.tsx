@@ -1,12 +1,15 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useCommissions, useCreateCommission, useUpdateCommissionStatus, COMMISSION_STATUS_LABEL, type CommissionStatus } from "@/hooks/use-consultor-commissions";
 import { useLeads } from "@/hooks/use-leads";
 import { ConsultorExportBar } from "@/components/consultor-export-bar";
 import { AlignPanel } from "@/components/align-panel";
-import { Plus, Check, DollarSign } from "lucide-react";
+import { Plus, Check, DollarSign } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/consultor/comissoes")({
+  head: () => pageHead("Consultor · Comissoes"),
   component: ComissoesPage,
 });
 
@@ -77,9 +80,9 @@ function ComissoesPage() {
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{commissions.length} comissão(ões)</p>
-        <button onClick={() => setOpen(true)} className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-glow">
+        <Button variant="unstyled" size="unstyled" onClick={() => setOpen(true)} className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-glow">
           <Plus className="h-4 w-4" /> Nova comissão
-        </button>
+        </Button>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-border bg-surface-1">
@@ -106,16 +109,16 @@ function ComissoesPage() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   {c.status === "pendente" && (
-                    <button onClick={() => update.mutate({ id: c.id, status: "aprovada" })}
+                    <Button variant="unstyled" size="unstyled" onClick={() => update.mutate({ id: c.id, status: "aprovada" })}
                       className="inline-flex items-center gap-1 rounded-lg border border-blue-500/30 bg-blue-500/10 px-2.5 py-1.5 text-xs font-semibold text-blue-500">
                       <DollarSign className="h-3.5 w-3.5" /> Aprovar
-                    </button>
+                    </Button>
                   )}
                   {c.status === "aprovada" && (
-                    <button onClick={() => update.mutate({ id: c.id, status: "paga" })}
+                    <Button variant="unstyled" size="unstyled" onClick={() => update.mutate({ id: c.id, status: "paga" })}
                       className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-500">
                       <Check className="h-3.5 w-3.5" /> Marcar paga
-                    </button>
+                    </Button>
                   )}
                 </td>
               </tr>
@@ -144,7 +147,7 @@ function ComissoesPage() {
             </select></label>
           <label className="block"><span className="mb-1 block text-xs text-muted-foreground">Pagar em</span>
             <input name="pagar_em" type="date" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" /></label>
-          <button className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Salvar</button>
+          <Button variant="unstyled" size="unstyled" className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Salvar</Button>
         </form>
       </AlignPanel>
     </div>

@@ -1,8 +1,10 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Stethoscope, LayoutDashboard, Users, CalendarDays, FileText, Settings2 } from "lucide-react";
+import { Stethoscope, LayoutDashboard, Users, CalendarDays, FileText, Settings2 } from "@/components/ui/icons";
 import { AppShell } from "@/components/app-shell";
 
 export const Route = createFileRoute("/clinicas")({
+  head: () => pageHead("Align Clínicas"),
   component: ClinicasLayout,
 });
 

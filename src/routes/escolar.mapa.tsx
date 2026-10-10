@@ -1,9 +1,11 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useWeekMap, useClasses } from "@/hooks/use-school";
 import { useMemo, useState } from "react";
-import { Clock, Users } from "lucide-react";
+import { Clock, Users } from "@/components/ui/icons";
 
-export const Route = createFileRoute("/escolar/mapa")({ component: WeekMap });
+export const Route = createFileRoute("/escolar/mapa")({
+  head: () => pageHead("Escolar · Mapa"), component: WeekMap });
 
 const FULL_DAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 

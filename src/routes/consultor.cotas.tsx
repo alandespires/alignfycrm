@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useQuotas, useCreateQuota, useRegisterContemplation, QUOTA_STATUS_LABEL, type QuotaStatus, type ContemplationType } from "@/hooks/use-consortium-quotas";
@@ -5,9 +7,10 @@ import { useLeads } from "@/hooks/use-leads";
 import { SEGMENT_LABEL, type ConsortiumSegment } from "@/hooks/use-consortium";
 import { ConsultorExportBar } from "@/components/consultor-export-bar";
 import { AlignPanel } from "@/components/align-panel";
-import { Plus, Award } from "lucide-react";
+import { Plus, Award } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/consultor/cotas")({
+  head: () => pageHead("Consultor · Cotas"),
   component: CotasPage,
 });
 
@@ -83,9 +86,9 @@ function CotasPage() {
       />
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{quotas.length} cota(s) na carteira</p>
-        <button onClick={() => setShowCreate(true)} className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-glow">
+        <Button variant="unstyled" size="unstyled" onClick={() => setShowCreate(true)} className="inline-flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-glow">
           <Plus className="h-4 w-4" /> Nova cota
-        </button>
+        </Button>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-border bg-surface-1">
@@ -116,9 +119,9 @@ function CotasPage() {
                 </td>
                 <td className="px-4 py-3 text-right">
                   {q.status === "ativa" && (
-                    <button onClick={() => setContemplateId(q.id)} className="inline-flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1.5 text-xs font-semibold text-primary">
+                    <Button variant="unstyled" size="unstyled" onClick={() => setContemplateId(q.id)} className="inline-flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1.5 text-xs font-semibold text-primary">
                       <Award className="h-3.5 w-3.5" /> Contemplar
-                    </button>
+                    </Button>
                   )}
                 </td>
               </tr>
@@ -142,7 +145,7 @@ function CotasPage() {
               <FieldNumber name="parcela_total" label="Parcela total" required />
               <FieldSelect name="lead_id" label="Lead vinculado" options={leads.map(l => ({ v: l.id, l: l.nome }))} />
             </div>
-            <button className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Salvar</button>
+            <Button variant="unstyled" size="unstyled" className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Salvar</Button>
           </form>
         </Modal>
       )}
@@ -156,7 +159,7 @@ function CotasPage() {
             ]} />
             <FieldNumber name="valor_lance" label="Valor do lance (R$)" />
             <FieldText name="obs" label="Observação" />
-            <button className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Confirmar contemplação</button>
+            <Button variant="unstyled" size="unstyled" className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Confirmar contemplação</Button>
           </form>
         </Modal>
       )}

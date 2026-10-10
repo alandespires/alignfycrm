@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AppShell } from "@/components/app-shell";
@@ -5,10 +6,10 @@ import { useQuotas, useContemplations } from "@/hooks/use-consortium-quotas";
 import { useCommissions } from "@/hooks/use-consultor-commissions";
 import { useSimulations } from "@/hooks/use-consortium-simulations";
 import { useCreditSimulations } from "@/hooks/use-credit";
-import { LineChart, Award, Wallet, Calculator, TrendingUp, AlertTriangle, Landmark, ArrowRight } from "lucide-react";
+import { LineChart, Award, Wallet, Calculator, TrendingUp, AlertTriangle, Landmark, ArrowRight } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/dashboards")({
-  head: () => ({ meta: [{ title: "Dashboards — Align CRM" }] }),
+  head: () => pageHead("Dashboards"),
   component: DashboardsPage,
 });
 

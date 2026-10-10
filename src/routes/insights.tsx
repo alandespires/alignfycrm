@@ -1,14 +1,16 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell, StatusPill } from "@/components/app-shell";
 import { useInsights, useMarkInsightRead, type Priority } from "@/hooks/use-insights";
 import { useLeads } from "@/hooks/use-leads";
 import { formatBRL } from "@/lib/mock-data";
-import { Sparkles, ArrowRight, TrendingUp, TrendingDown, Flame, Check, Loader2, Inbox } from "lucide-react";
+import { Sparkles, ArrowRight, TrendingUp, TrendingDown, Flame, Check, Loader2, Inbox } from "@/components/ui/icons";
 import { FeatureCardsSkeleton } from "@/components/skeletons";
 
 export const Route = createFileRoute("/insights")({
-  head: () => ({ meta: [{ title: "IA Insights — Align CRM" }] }),
+  head: () => pageHead("IA Insights"),
   component: InsightsPage,
 });
 
@@ -50,7 +52,7 @@ function InsightsPage() {
     >
       <div className="mb-5 flex flex-wrap items-center gap-2">
         {FILTERS.map((f) => (
-          <button
+          <Button variant="unstyled" size="unstyled"
             key={f.id}
             onClick={() => setFilter(f.id)}
             className={[
@@ -61,7 +63,7 @@ function InsightsPage() {
             ].join(" ")}
           >
             {f.label}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -102,7 +104,7 @@ function InsightsPage() {
                   <span className="text-[11px] text-muted-foreground">
                     {new Date(i.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
                   </span>
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => mark.mutate({ id: i.id, lido: !i.lido })}
                     disabled={isMarking}
                     className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-foreground disabled:opacity-50"
@@ -113,7 +115,7 @@ function InsightsPage() {
                       <Check className="h-3 w-3" />
                     )}
                     {i.lido ? "Marcar não lido" : "Marcar como lido"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             );

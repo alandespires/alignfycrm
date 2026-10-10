@@ -1,9 +1,10 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Calculator, ListChecks, Wallet, TrendingUp, Briefcase, Landmark, Award, History } from "lucide-react";
+import { Calculator, ListChecks, Wallet, TrendingUp, Briefcase, Landmark, Award, History } from "@/components/ui/icons";
 import { AppShell } from "@/components/app-shell";
 
 export const Route = createFileRoute("/consultor")({
-  head: () => ({ meta: [{ title: "Consultor — Align CRM" }] }),
+  head: () => pageHead("Consultor"),
   component: ConsultorLayout,
 });
 

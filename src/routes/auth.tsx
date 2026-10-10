@@ -1,6 +1,8 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "@/components/ui/icons";
 import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
 import { toast } from "sonner";
@@ -8,7 +10,7 @@ import alignIcon from "@/assets/align-icon.png";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Entrar — Align CRM" }] }),
+  head: () => pageHead("Entrar"),
   component: AuthPage,
 });
 
@@ -139,31 +141,31 @@ function AuthPage() {
                 className="h-11 w-full rounded-lg border border-border bg-surface-1 px-3 pr-11 text-sm focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="••••••••"
               />
-              <button type="button" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"} onClick={() => setShowPassword((value) => !value)} className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded-md text-muted-foreground hover:text-foreground">
+              <Button variant="unstyled" size="unstyled" type="button" aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"} onClick={() => setShowPassword((value) => !value)} className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded-md text-muted-foreground hover:text-foreground">
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+              </Button>
               </div>
             </div>}
-            {mode === "signin" && <button type="button" onClick={() => setMode("forgot")} className="text-xs font-semibold text-primary hover:underline">Esqueci minha senha</button>}
-            <button
+            {mode === "signin" && <Button variant="unstyled" size="unstyled" type="button" onClick={() => setMode("forgot")} className="text-xs font-semibold text-primary hover:underline">Esqueci minha senha</Button>}
+            <Button variant="unstyled" size="unstyled"
               type="submit" disabled={busy}
               className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-glow transition hover:brightness-110 disabled:opacity-60"
             >
               {busy && <Loader2 className="h-4 w-4 animate-spin" />}
               {mode === "signin" ? "Entrar" : mode === "signup" ? "Criar conta" : mode === "forgot" ? "Enviar link de recuperação" : "Atualizar senha"}
-            </button>
+            </Button>
           </form>
 
           {mode !== "forgot" && mode !== "recovery" && <div className="mt-6 text-center text-sm text-muted-foreground">
             {mode === "signin" ? "Ainda não tem conta?" : "Já tem conta?"}{" "}
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
               className="font-semibold text-primary hover:underline"
             >
               {mode === "signin" ? "Criar agora" : "Entrar"}
-            </button>
+            </Button>
           </div>}
-          {(mode === "forgot" || mode === "recovery") && <button type="button" onClick={() => setMode("signin")} className="mt-6 w-full text-center text-sm font-semibold text-primary hover:underline">Voltar ao login</button>}
+          {(mode === "forgot" || mode === "recovery") && <Button variant="unstyled" size="unstyled" type="button" onClick={() => setMode("signin")} className="mt-6 w-full text-center text-sm font-semibold text-primary hover:underline">Voltar ao login</Button>}
         </div>
       </div>
     </div>

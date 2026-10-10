@@ -1,13 +1,14 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { useAllActivities, type ActivityType } from "@/hooks/use-activities";
 import { useLeads } from "@/hooks/use-leads";
 import { useRealtimeSync } from "@/hooks/use-realtime";
-import { MessageSquare, Phone, Mail, Calendar, FileText, ArrowRightLeft, CheckSquare, Search } from "lucide-react";
+import { MessageSquare, Phone, Mail, Calendar, FileText, ArrowRightLeft, CheckSquare, Search } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/interacoes")({
-  head: () => ({ meta: [{ title: "Interações — Align CRM" }] }),
+  head: () => pageHead("Interações"),
   component: InteracoesPage,
 });
 

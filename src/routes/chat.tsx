@@ -1,9 +1,10 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { UnavailableModule } from "@/components/unavailable-module";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/chat")({
-  head: () => ({ meta: [{ title: "Chat ao Vivo — Align CRM" }] }),
+  head: () => pageHead("Chat ao Vivo"),
   component: () => (
     <UnavailableModule
       title="Chat ao Vivo"

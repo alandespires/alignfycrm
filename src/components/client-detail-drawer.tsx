@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Mail, Phone, Sparkles, Loader2, CheckCircle2, MessageSquare, Calendar, RefreshCw, ArrowRightLeft } from "lucide-react";
+import { Mail, Phone, Sparkles, Loader2, CheckCircle2, MessageSquare, Calendar, RefreshCw, ArrowRightLeft } from "@/components/ui/icons";
 import type { ClientRow } from "@/hooks/use-clients";
 import { formatBRL } from "@/lib/mock-data";
 import { AlignPanel, AlignPanelSection } from "@/components/align-panel";

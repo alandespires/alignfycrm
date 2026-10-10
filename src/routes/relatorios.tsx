@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
@@ -5,7 +7,7 @@ import {
   BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid,
   AreaChart, Area, LineChart, Line,
 } from "recharts";
-import { Loader2, TrendingUp, Target, DollarSign, Trophy } from "lucide-react";
+import { Loader2, TrendingUp, Target, DollarSign, Trophy } from "@/components/ui/icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { KpiSkeleton } from "@/components/skeletons";
 import { useLeads } from "@/hooks/use-leads";
@@ -15,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatBRL } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/relatorios")({
-  head: () => ({ meta: [{ title: "Relatórios — Align CRM" }] }),
+  head: () => pageHead("Relatórios"),
   component: RelatoriosPage,
 });
 
@@ -157,7 +159,7 @@ function RelatoriosPage() {
       action={
         <div className="flex flex-wrap items-center gap-1 rounded-lg border border-border bg-surface-2 p-1">
           {PERIODS.map((p) => (
-            <button
+            <Button variant="unstyled" size="unstyled"
               key={p.id}
               onClick={() => setPeriod(p.id)}
               className={[
@@ -166,7 +168,7 @@ function RelatoriosPage() {
               ].join(" ")}
             >
               {p.label}
-            </button>
+            </Button>
           ))}
         </div>
       }

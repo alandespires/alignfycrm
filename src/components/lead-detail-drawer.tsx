@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useState, type FormEvent } from "react";
-import { Sparkles, Loader2, Mail, Phone, MessageSquare, Calendar, Plus, Building2, RefreshCw, Trash2, UserCheck, X } from "lucide-react";
+import { Sparkles, Loader2, Mail, Phone, MessageSquare, Calendar, Plus, Building2, RefreshCw, Trash2, UserCheck, X } from "@/components/ui/icons";
 import { useScoreLead } from "@/hooks/use-score-lead";
 import { useDeleteLead, useSetWhatsAppConsent, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
 import { useLeadActivities, useCreateActivity, type ActivityType } from "@/hooks/use-activities";
@@ -87,24 +88,24 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
         }
         status={{ label: STATUS_LABEL[lead.status], tone: STATUS_TONE[lead.status] }}
         headerActions={
-          <button
+          <Button variant="unstyled" size="unstyled"
             onClick={() => score.mutate(lead.id)}
             disabled={isScoring}
             className="inline-flex h-9 items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-semibold text-primary transition hover:bg-primary/20 disabled:opacity-60"
           >
             {isScoring ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
             {lead.ai_score ? "Regenerar" : "IA"}
-          </button>
+          </Button>
         }
         footer={
           <AlignPanelFooter
             extra={
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={() => { if (confirm(`Remover ${lead.nome}?`)) { del.mutate(lead.id); onClose(); } }}
                 className="inline-flex h-11 items-center gap-1.5 rounded-xl border border-border bg-surface-2 px-3 text-xs text-muted-foreground hover:border-destructive/40 hover:text-destructive"
               >
                 <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              </Button>
             }
             primary={{
               label: lead.status === "fechado" ? "Já convertido" : "Converter em cliente",
@@ -146,12 +147,12 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
                   <div className="mt-0.5 text-[11px] text-muted-foreground">{lead.whatsapp_consent_source ? `Origem: ${lead.whatsapp_consent_source}` : "É obrigatório registrar a origem antes do primeiro contato."}</div>
                 </div>
                 {lead.whatsapp_consent_status === "granted" ? (
-                  <button type="button" disabled={consentMutation.isPending} onClick={() => consentMutation.mutate({ id: lead.id, status: "revoked" })} className="rounded-lg border border-destructive/30 px-3 py-2 text-xs text-destructive">Registrar opt-out</button>
+                  <Button variant="unstyled" size="unstyled" type="button" disabled={consentMutation.isPending} onClick={() => consentMutation.mutate({ id: lead.id, status: "revoked" })} className="rounded-lg border border-destructive/30 px-3 py-2 text-xs text-destructive">Registrar opt-out</Button>
                 ) : (
-                  <button type="button" disabled={consentMutation.isPending} onClick={() => {
+                  <Button variant="unstyled" size="unstyled" type="button" disabled={consentMutation.isPending} onClick={() => {
                     const source = window.prompt("Informe a origem do consentimento (ex.: formulário do site, contrato, solicitação do cliente):");
                     if (source?.trim()) consentMutation.mutate({ id: lead.id, status: "granted", source });
-                  }} className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary">Registrar consentimento</button>
+                  }} className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary">Registrar consentimento</Button>
                 )}
               </div>
             </AlignPanelSection>
@@ -191,9 +192,9 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
           <AlignPanelSection title={`Tarefas · ${tasks.length}`}>
             <form onSubmit={submitTask} className="mb-3 flex gap-2">
               <input value={taskTitle} onChange={(e) => setTaskTitle(e.target.value)} placeholder="Nova tarefa..." className="h-9 flex-1 rounded-lg border border-border bg-surface-2 px-3 text-sm focus:border-primary/60 focus:outline-none" />
-              <button type="submit" disabled={createTask.isPending || !taskTitle.trim()} className="inline-flex h-9 items-center gap-1 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50">
+              <Button variant="unstyled" size="unstyled" type="submit" disabled={createTask.isPending || !taskTitle.trim()} className="inline-flex h-9 items-center gap-1 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50">
                 <Plus className="h-3.5 w-3.5" /> Criar
-              </button>
+              </Button>
             </form>
             <ul className="space-y-1.5">
               {tasks.map((t) => {
@@ -221,9 +222,9 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
                   <option value="reuniao">Reunião</option>
                 </select>
                 <input value={actDesc} onChange={(e) => setActDesc(e.target.value)} placeholder="Descrição..." className="h-9 flex-1 rounded-lg border border-border bg-surface-1 px-3 text-sm focus:border-primary/60 focus:outline-none" />
-                <button type="submit" disabled={createAct.isPending || !actDesc.trim()} className="inline-flex h-9 items-center rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50">
+                <Button variant="unstyled" size="unstyled" type="submit" disabled={createAct.isPending || !actDesc.trim()} className="inline-flex h-9 items-center rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50">
                   Registrar
-                </button>
+                </Button>
               </div>
             </form>
             <ol className="relative space-y-3 border-l border-border pl-5">
@@ -289,8 +290,8 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
               )}
 
               <div className="flex items-center justify-end gap-2 pt-1">
-                <button onClick={() => setConvertOpen(false)} className="h-9 rounded-lg border border-border bg-surface-2 px-3 text-xs hover:border-primary/40">Cancelar</button>
-                <button
+                <Button variant="unstyled" size="unstyled" onClick={() => setConvertOpen(false)} className="h-9 rounded-lg border border-border bg-surface-2 px-3 text-xs hover:border-primary/40">Cancelar</Button>
+                <Button variant="unstyled" size="unstyled"
                   onClick={async () => {
                     if (!lead) return;
                     await convert.mutateAsync({
@@ -310,7 +311,7 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
                 >
                   {convert.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UserCheck className="h-3.5 w-3.5" />}
                   Confirmar conversão
-                </button>
+                </Button>
               </div>
             </div>
         </AlignPanel>

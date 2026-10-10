@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut } from "@/components/ui/icons";
 import alignIcon from "@/assets/align-icon.png";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -12,7 +13,7 @@ export function StudentPortalShell({ children }: { children: ReactNode }) {
           <img src={alignIcon} alt="Align" className="h-9 w-9 rounded-xl bg-black object-contain" />
           <div><div className="text-sm font-semibold">Portal do Aluno</div><div className="text-[11px] text-muted-foreground">Align Escolar</div></div>
           <div className="ml-auto hidden text-xs text-muted-foreground sm:block">{user?.email}</div>
-          <button type="button" onClick={() => signOut()} aria-label="Sair do Portal do Aluno" className="grid h-10 w-10 place-items-center rounded-xl border border-border text-muted-foreground hover:text-foreground"><LogOut className="h-4 w-4" /></button>
+          <Button variant="unstyled" size="unstyled" type="button" onClick={() => signOut()} aria-label="Sair do Portal do Aluno" className="grid h-10 w-10 place-items-center rounded-xl border border-border text-muted-foreground hover:text-foreground"><LogOut className="h-4 w-4" /></Button>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6 md:px-6 md:py-10">

@@ -1,6 +1,7 @@
+import { Button } from "@/components/ui/button";
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { X, Maximize2, Minimize2 } from "lucide-react";
+import { X, Maximize2, Minimize2, Save, Loader2 } from "@/components/ui/icons";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { DUR, EASE_OUT } from "@/lib/motion";
@@ -82,13 +83,14 @@ export function AlignPanel({
 }: AlignPanelProps) {
   const [expanded, setExpanded] = React.useState(false);
   const [isDesktop, setIsDesktop] = React.useState(() =>
-    typeof window !== "undefined" ? window.matchMedia("(min-width: 768px)").matches : true
+    true
   );
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(min-width: 768px)");
     const onChange = () => setIsDesktop(mq.matches);
+    onChange();
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
@@ -174,13 +176,17 @@ export function AlignPanel({
           transition={{ duration: DUR.base, ease: EASE_OUT }}
           className={cn(
             "fixed inset-0 z-[60] flex items-end md:items-stretch md:justify-end",
-            "bg-black/55 backdrop-blur-md"
+            "bg-overlay backdrop-blur-sm"
           )}
           onClick={onClose}
           aria-modal
+          aria-labelledby={titleId}
+          aria-describedby={subtitle ? descId : undefined}
           role="dialog"
         >
           <motion.div
+            ref={panelRef}
+            tabIndex={-1}
             onClick={(e) => e.stopPropagation()}
             initial={panelInitial}
             animate={panelAnimate}
@@ -188,7 +194,7 @@ export function AlignPanel({
             transition={{ duration: DUR.panel, ease: EASE_OUT }}
             className={cn(
               "relative flex w-full flex-col overflow-hidden bg-surface-1 text-foreground",
-              "border border-border/60 shadow-[0_-20px_60px_-12px_rgba(0,0,0,0.6),0_20px_60px_-12px_rgba(0,0,0,0.4)]",
+              "border border-border/60 shadow-elevated",
               "max-h-[92vh] rounded-t-[28px] border-b-0",
               "md:h-full md:max-h-none md:rounded-l-[24px] md:rounded-tr-none md:border-r-0",
               expanded ? "md:max-w-none md:w-full" : widthClass
@@ -232,32 +238,32 @@ export function AlignPanel({
                   )}
                 </div>
               )}
-              <h2 className="truncate font-display text-[22px] font-bold leading-tight tracking-tight text-foreground">
+              <h2 id={titleId} className="break-words font-display text-[22px] font-bold leading-tight tracking-tight text-foreground">
                 {title}
               </h2>
               {subtitle && (
-                <p className="line-clamp-2 text-sm text-muted-foreground">{subtitle}</p>
+                <p id={descId} className="line-clamp-2 text-sm text-muted-foreground">{subtitle}</p>
               )}
             </div>
 
             <div className="flex shrink-0 items-center gap-1.5">
               {headerActions}
               {expandable && (
-                <button
+                <Button variant="unstyled" size="unstyled"
                   onClick={() => setExpanded((v) => !v)}
                   className="hidden md:grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface-2 text-muted-foreground transition hover:bg-surface-3 hover:text-foreground"
                   aria-label={expanded ? "Recolher" : "Expandir"}
                 >
                   {expanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-                </button>
+                </Button>
               )}
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={onClose}
                 className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface-2 text-muted-foreground transition hover:bg-surface-3 hover:text-foreground"
                 aria-label="Fechar"
               >
                 <X className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -267,7 +273,7 @@ export function AlignPanel({
               {tabs.map((t) => {
                 const active = t.id === activeTab;
                 return (
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     key={t.id}
                     disabled={t.disabled}
                     onClick={() => onTabChange?.(t.id)}
@@ -295,7 +301,7 @@ export function AlignPanel({
                         transition={{ type: "spring", stiffness: 380, damping: 32 }}
                       />
                     )}
-                  </button>
+                  </Button>
                 );
               })}
             </nav>
@@ -338,26 +344,26 @@ export function AlignPanelFooter({
     <div className="flex items-center gap-3">
       {extra}
       {secondary && (
-        <button
+        <Button variant="unstyled" size="unstyled"
           onClick={secondary.onClick}
-          className="h-11 flex-1 rounded-xl border border-border bg-surface-2 px-4 text-sm font-semibold text-foreground transition hover:bg-surface-3 active:scale-[0.98]"
+          className="h-11 flex-1 rounded-lg border border-border bg-surface-2 px-4 text-sm font-semibold text-foreground transition hover:bg-surface-3 active:scale-[0.98]"
         >
           {secondary.label}
-        </button>
+        </Button>
       )}
       {primary && (
-        <button
+        <Button variant="unstyled" size="unstyled"
           onClick={primary.onClick}
           disabled={primary.disabled || primary.loading}
           className={cn(
-            "h-11 rounded-xl bg-primary px-5 text-sm font-bold text-primary-foreground transition",
+            "inline-flex items-center justify-center gap-2 h-11 rounded-lg bg-primary px-5 text-sm font-bold text-primary-foreground transition",
             "shadow-[0_8px_20px_-4px_color-mix(in_oklab,var(--primary)_45%,transparent)]",
             "hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed",
             secondary ? "flex-[2]" : "flex-1"
           )}
         >
-          {primary.loading ? "Aguarde…" : primary.label}
-        </button>
+          {primary.loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Aguarde…</> : primary.label}
+        </Button>
       )}
     </div>
   );

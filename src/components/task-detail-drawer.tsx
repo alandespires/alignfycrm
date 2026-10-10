@@ -1,8 +1,9 @@
+import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   X, Loader2, Trash2, Plus, MessageSquare, Paperclip, Clock, ListChecks,
   Play, Square, CheckCircle2, Circle, GitBranch, AlertTriangle, Calendar, Flag,
-} from "lucide-react";
+} from "@/components/ui/icons";
 import { useUpdateTask, useDeleteTask, useToggleTask, useCreateTask, useSubtasks, type TaskRow, type ChecklistItem, type TaskPriority, type TaskStatus, TASK_PRIORITY_LABEL } from "@/hooks/use-tasks";
 import { useTaskComments, useCreateTaskComment, useDeleteTaskComment } from "@/hooks/use-task-comments";
 import { useTaskAttachments, useUploadAttachment, useDeleteAttachment } from "@/hooks/use-task-attachments";
@@ -78,13 +79,13 @@ export function TaskDetailDrawer({ task, allTasks, onClose }: { task: TaskRow; a
       activeTab={tab}
       onTabChange={(id) => setTab(id as Tab)}
       headerActions={
-        <button
+        <Button variant="unstyled" size="unstyled"
           onClick={() => { if (confirm("Excluir esta tarefa?")) { del.mutate(task.id); onClose(); } }}
           className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface-2 text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive"
           title="Excluir tarefa"
         >
           <Trash2 className="h-4 w-4" />
-        </button>
+        </Button>
       }
       expandable
     >
@@ -165,10 +166,10 @@ export function TaskDetailDrawer({ task, allTasks, onClose }: { task: TaskRow; a
             </div>
           )}
 
-          <button onClick={() => toggle.mutate({ id: task.id, done: task.status !== "concluida" })}
+          <Button variant="unstyled" size="unstyled" onClick={() => toggle.mutate({ id: task.id, done: task.status !== "concluida" })}
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs font-semibold hover:border-primary/50">
             {task.status === "concluida" ? <><CheckCircle2 className="h-4 w-4 text-success" /> Reabrir</> : <><Circle className="h-4 w-4" /> Marcar como concluída</>}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -200,16 +201,16 @@ function ChecklistEditor({ checklist, onChange }: { checklist: ChecklistItem[]; 
       <ul className="space-y-1.5">
         {checklist.map((c) => (
           <li key={c.id} className="group flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2">
-            <button onClick={() => onChange(checklist.map((x) => x.id === c.id ? { ...x, feito: !x.feito } : x))}>
+            <Button variant="unstyled" size="unstyled" onClick={() => onChange(checklist.map((x) => x.id === c.id ? { ...x, feito: !x.feito } : x))}>
               {c.feito ? <CheckCircle2 className="h-4 w-4 text-success" /> : <Circle className="h-4 w-4 text-muted-foreground" />}
-            </button>
+            </Button>
             <input value={c.texto}
               onChange={(e) => onChange(checklist.map((x) => x.id === c.id ? { ...x, texto: e.target.value } : x))}
               className={["flex-1 bg-transparent text-sm focus:outline-none", c.feito && "line-through text-muted-foreground"].filter(Boolean).join(" ")} />
-            <button onClick={() => onChange(checklist.filter((x) => x.id !== c.id))}
+            <Button variant="unstyled" size="unstyled" onClick={() => onChange(checklist.filter((x) => x.id !== c.id))}
               className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
               <Trash2 className="h-3 w-3" />
-            </button>
+            </Button>
           </li>
         ))}
       </ul>
@@ -217,7 +218,7 @@ function ChecklistEditor({ checklist, onChange }: { checklist: ChecklistItem[]; 
         className="mt-2 flex gap-2">
         <input value={novo} onChange={(e) => setNovo(e.target.value)} placeholder="Adicionar item..."
           className="h-9 flex-1 rounded-lg border border-border bg-surface-2 px-3 text-sm focus:border-primary/60 focus:outline-none" />
-        <button type="submit" disabled={!novo.trim()} className="h-9 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50"><Plus className="h-3.5 w-3.5" /></button>
+        <Button variant="unstyled" size="unstyled" type="submit" disabled={!novo.trim()} className="h-9 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50"><Plus className="h-3.5 w-3.5" /></Button>
       </form>
     </AlignPanelSection>
   );
@@ -231,9 +232,9 @@ function SubtasksSection({ subtasks, onCreate }: { parent: TaskRow; subtasks: Ta
       <ul className="space-y-1.5">
         {subtasks.map((s) => (
           <li key={s.id} className="flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2">
-            <button onClick={() => toggle.mutate({ id: s.id, done: s.status !== "concluida" })}>
+            <Button variant="unstyled" size="unstyled" onClick={() => toggle.mutate({ id: s.id, done: s.status !== "concluida" })}>
               {s.status === "concluida" ? <CheckCircle2 className="h-4 w-4 text-success" /> : <Circle className="h-4 w-4 text-muted-foreground" />}
-            </button>
+            </Button>
             <span className={["flex-1 text-sm", s.status === "concluida" && "line-through text-muted-foreground"].filter(Boolean).join(" ")}>{s.titulo}</span>
           </li>
         ))}
@@ -241,7 +242,7 @@ function SubtasksSection({ subtasks, onCreate }: { parent: TaskRow; subtasks: Ta
       <form onSubmit={(e) => { e.preventDefault(); if (novo.trim()) { onCreate(novo.trim()); setNovo(""); } }} className="mt-2 flex gap-2">
         <input value={novo} onChange={(e) => setNovo(e.target.value)} placeholder="Nova subtarefa..."
           className="h-9 flex-1 rounded-lg border border-border bg-surface-2 px-3 text-sm focus:border-primary/60 focus:outline-none" />
-        <button type="submit" disabled={!novo.trim()} className="h-9 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50"><Plus className="h-3.5 w-3.5" /></button>
+        <Button variant="unstyled" size="unstyled" type="submit" disabled={!novo.trim()} className="h-9 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50"><Plus className="h-3.5 w-3.5" /></Button>
       </form>
     </AlignPanelSection>
   );
@@ -258,7 +259,7 @@ function DependenciesEditor({ task, allTasks, onChange }: { task: TaskRow; allTa
             <li key={d.id} className="flex items-center gap-2 rounded-md border border-border bg-surface-2 px-2.5 py-1.5 text-xs">
               {d.status === "concluida" ? <CheckCircle2 className="h-3 w-3 text-success" /> : <Circle className="h-3 w-3 text-warning" />}
               <span className="flex-1 truncate">{d.titulo}</span>
-              <button onClick={() => onChange((task.dependencies ?? []).filter((x) => x !== d.id))} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button>
+              <Button variant="unstyled" size="unstyled" onClick={() => onChange((task.dependencies ?? []).filter((x) => x !== d.id))} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></Button>
             </li>
           ))}
         </ul>
@@ -289,9 +290,9 @@ function CommentsSection({ taskId }: { taskId: string }) {
                 <div className="flex items-center gap-2">
                   <span>{new Date(c.created_at).toLocaleString("pt-BR")}</span>
                   {c.user_id === user?.id && (
-                    <button onClick={() => del.mutate({ id: c.id, task_id: taskId })} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
+                    <Button variant="unstyled" size="unstyled" onClick={() => del.mutate({ id: c.id, task_id: taskId })} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
                       <Trash2 className="h-3 w-3" />
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -305,10 +306,10 @@ function CommentsSection({ taskId }: { taskId: string }) {
         <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} placeholder="Escreva um comentário..."
           className="w-full rounded-lg border border-border bg-surface-2 p-2.5 text-sm focus:border-primary/60 focus:outline-none" />
         <div className="flex justify-end">
-          <button type="submit" disabled={!text.trim() || create.isPending}
+          <Button variant="unstyled" size="unstyled" type="submit" disabled={!text.trim() || create.isPending}
             className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-50">
             {create.isPending && <Loader2 className="h-3 w-3 animate-spin" />} Comentar
-          </button>
+          </Button>
         </div>
       </form>
     </AlignPanelSection>
@@ -346,9 +347,9 @@ function AttachmentsSection({ taskId }: { taskId: string }) {
             <Paperclip className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             <a href={a.url} target="_blank" rel="noreferrer" className="flex-1 truncate hover:text-primary">{a.nome}</a>
             <span className="text-[10px] text-muted-foreground tabular-nums">{a.tamanho_bytes ? `${Math.round((a.tamanho_bytes ?? 0) / 1024)} KB` : ""}</span>
-            <button onClick={() => del.mutate(a)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
+            <Button variant="unstyled" size="unstyled" onClick={() => del.mutate(a)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
               <Trash2 className="h-3 w-3" />
-            </button>
+            </Button>
           </li>
         ))}
       </ul>
@@ -388,10 +389,10 @@ function TimeSection({ task }: { task: TaskRow }) {
               <div className="text-xs text-muted-foreground">Timer ativo</div>
               <div className="text-lg font-semibold tabular-nums">{formatDuration(elapsed)}</div>
             </div>
-            <button onClick={() => stop.mutate({ id: running.id, task_id: task.id })}
+            <Button variant="unstyled" size="unstyled" onClick={() => stop.mutate({ id: running.id, task_id: task.id })}
               className="inline-flex items-center gap-1.5 rounded-lg bg-destructive px-3 py-2 text-xs font-semibold text-destructive-foreground">
               <Square className="h-3.5 w-3.5" /> Parar
-            </button>
+            </Button>
           </>
         ) : (
           <>
@@ -400,10 +401,10 @@ function TimeSection({ task }: { task: TaskRow }) {
               <div className="text-xs text-muted-foreground">Total registrado</div>
               <div className="text-lg font-semibold tabular-nums">{formatDuration(totalMin)}</div>
             </div>
-            <button onClick={() => start.mutate({ task_id: task.id })}
+            <Button variant="unstyled" size="unstyled" onClick={() => start.mutate({ task_id: task.id })}
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground">
               <Play className="h-3.5 w-3.5" /> Iniciar
-            </button>
+            </Button>
           </>
         )}
       </div>
@@ -416,7 +417,7 @@ function TimeSection({ task }: { task: TaskRow }) {
         <Field label="Descrição">
           <input value={manualDesc} onChange={(e) => setManualDesc(e.target.value)} className={selectCls} placeholder="O que foi feito?" />
         </Field>
-        <button type="submit" disabled={!manualMin} className="h-10 rounded-lg border border-border bg-surface-2 px-3 text-xs font-semibold hover:border-primary/50 disabled:opacity-50">+ Registrar manual</button>
+        <Button variant="unstyled" size="unstyled" type="submit" disabled={!manualMin} className="h-10 rounded-lg border border-border bg-surface-2 px-3 text-xs font-semibold hover:border-primary/50 disabled:opacity-50">+ Registrar manual</Button>
       </form>
 
       <ul className="space-y-1.5">
@@ -426,9 +427,9 @@ function TimeSection({ task }: { task: TaskRow }) {
             <span className="font-semibold tabular-nums">{formatDuration(Number(e.duracao_min ?? 0))}</span>
             <span className="flex-1 truncate text-muted-foreground">{e.descricao ?? "—"}</span>
             <span className="text-[10px] text-muted-foreground">{new Date(e.started_at).toLocaleDateString("pt-BR")}</span>
-            <button onClick={() => del.mutate({ id: e.id, task_id: task.id })} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
+            <Button variant="unstyled" size="unstyled" onClick={() => del.mutate({ id: e.id, task_id: task.id })} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive">
               <Trash2 className="h-3 w-3" />
-            </button>
+            </Button>
           </li>
         ))}
       </ul>

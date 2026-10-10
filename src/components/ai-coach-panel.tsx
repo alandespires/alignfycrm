@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Sparkles, Loader2, X, Zap, AlertCircle, TrendingUp, RefreshCw, Send, MessageSquare, Lightbulb, Plus, Trash2, History, Filter, Download, FileText, ListChecks, Move, Eye } from "lucide-react";
+import { Sparkles, Loader2, X, Zap, AlertCircle, TrendingUp, RefreshCw, Send, MessageSquare, Lightbulb, Plus, Trash2, History, Filter, Download, FileText, ListChecks, Move, Eye } from "@/components/ui/icons";
 import ReactMarkdown from "react-markdown";
 import { useAiCoach, type CoachAction } from "@/hooks/use-ai-coach";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,9 +46,9 @@ export function AiCoachButton() {
   const [tab, setTab] = useState<"sugestoes" | "chat">("chat");
   return (
     <>
-      <button onClick={() => setOpen(true)} className="mt-3 w-full rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-90">
+      <Button variant="unstyled" size="unstyled" onClick={() => setOpen(true)} className="mt-3 w-full rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-90">
         Conversar com a IA
-      </button>
+      </Button>
       {open && <LaunchPanel onClose={() => setOpen(false)} tab={tab} setTab={setTab} />}
     </>
   );
@@ -69,7 +70,7 @@ function LaunchPanel({ onClose, tab, setTab }: { onClose: () => void; tab: "suge
                 <p className="text-[11px] text-muted-foreground">Sua copiloto inteligente do Align CRM</p>
               </div>
             </div>
-            <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></button>
+            <Button variant="unstyled" size="unstyled" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-surface-3"><X className="h-4 w-4" /></Button>
           </div>
           <div className="flex gap-1 px-3 pb-2">
             <TabBtn active={tab === "chat"} onClick={() => setTab("chat")} icon={MessageSquare}>Conversar</TabBtn>
@@ -84,10 +85,10 @@ function LaunchPanel({ onClose, tab, setTab }: { onClose: () => void; tab: "suge
 
 function TabBtn({ active, onClick, icon: Icon, children }: { active: boolean; onClick: () => void; icon: any; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold transition ${active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-surface-3 hover:text-foreground"}`}>
+    <Button variant="unstyled" size="unstyled" onClick={onClick} className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-xs font-semibold transition ${active ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-surface-3 hover:text-foreground"}`}>
       <Icon className="h-3.5 w-3.5" />
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -100,9 +101,9 @@ function SugestoesView() {
   return (
     <div className="flex-1 overflow-y-auto p-5">
       <div className="mb-3 flex items-center justify-end">
-        <button onClick={() => coach.mutate()} disabled={coach.isPending} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50">
+        <Button variant="unstyled" size="unstyled" onClick={() => coach.mutate()} disabled={coach.isPending} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 py-1 text-[11px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50">
           <RefreshCw className={`h-3 w-3 ${coach.isPending ? "animate-spin" : ""}`} /> Atualizar
-        </button>
+        </Button>
       </div>
       {coach.isPending && <div className="grid place-items-center py-16 text-muted-foreground"><Loader2 className="h-6 w-6 animate-spin text-primary" /><p className="mt-3 text-xs">Analisando sua operação...</p></div>}
       {coach.isError && !coach.isPending && (
@@ -349,19 +350,19 @@ function ChatView() {
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Toolbar */}
       <div className="flex items-center gap-1 border-b border-border bg-surface-1 px-3 py-2">
-        <button onClick={novaConversa} className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-2 px-2 py-1 text-[11px] font-medium hover:bg-surface-3">
+        <Button variant="unstyled" size="unstyled" onClick={novaConversa} className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-2 px-2 py-1 text-[11px] font-medium hover:bg-surface-3">
           <Plus className="h-3 w-3" /> Nova
-        </button>
-        <button onClick={() => setShowHistory((v) => !v)} className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-medium ${showHistory ? "border-primary/40 bg-primary/10 text-primary" : "border-border bg-surface-2 hover:bg-surface-3"}`}>
+        </Button>
+        <Button variant="unstyled" size="unstyled" onClick={() => setShowHistory((v) => !v)} className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-medium ${showHistory ? "border-primary/40 bg-primary/10 text-primary" : "border-border bg-surface-2 hover:bg-surface-3"}`}>
           <History className="h-3 w-3" /> Histórico
-        </button>
-        <button onClick={() => setShowFilters((v) => !v)} className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-medium ${showFilters ? "border-primary/40 bg-primary/10 text-primary" : "border-border bg-surface-2 hover:bg-surface-3"}`}>
+        </Button>
+        <Button variant="unstyled" size="unstyled" onClick={() => setShowFilters((v) => !v)} className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-medium ${showFilters ? "border-primary/40 bg-primary/10 text-primary" : "border-border bg-surface-2 hover:bg-surface-3"}`}>
           <Filter className="h-3 w-3" /> Filtros{(periodoIni || periodoFim || estagio) && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
-        </button>
+        </Button>
         <div className="flex-1" />
-        <button onClick={limparChat} disabled={!convId} className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-2 px-2 py-1 text-[11px] font-medium text-muted-foreground hover:text-destructive disabled:opacity-40">
+        <Button variant="unstyled" size="unstyled" onClick={limparChat} disabled={!convId} className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-2 px-2 py-1 text-[11px] font-medium text-muted-foreground hover:text-destructive disabled:opacity-40">
           <Trash2 className="h-3 w-3" /> Limpar
-        </button>
+        </Button>
       </div>
 
       {showFilters && (
@@ -388,9 +389,9 @@ function ChatView() {
           {(conversations.data ?? []).length === 0 && <p className="p-2 text-center text-[11px] text-muted-foreground">Sem conversas anteriores.</p>}
           {(conversations.data ?? []).map((c) => (
             <div key={c.id} className={`group flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-surface-3 ${c.id === convId ? "bg-primary/10 text-primary" : ""}`}>
-              <button onClick={() => { setConvId(c.id); setShowHistory(false); }} className="flex-1 truncate text-left">{c.titulo}</button>
-              <button onClick={() => { const t = prompt("Renomear conversa", c.titulo); if (t) renameConv.mutate({ id: c.id, titulo: t }); }} className="opacity-0 transition group-hover:opacity-100 hover:text-foreground" title="Renomear">✏️</button>
-              <button onClick={async () => { if (confirm("Apagar?")) { await deleteConv.mutateAsync(c.id); if (c.id === convId) novaConversa(); } }} className="opacity-0 transition group-hover:opacity-100 hover:text-destructive" title="Apagar"><Trash2 className="h-3 w-3" /></button>
+              <Button variant="unstyled" size="unstyled" onClick={() => { setConvId(c.id); setShowHistory(false); }} className="flex-1 truncate text-left">{c.titulo}</Button>
+              <Button variant="unstyled" size="unstyled" onClick={() => { const t = prompt("Renomear conversa", c.titulo); if (t) renameConv.mutate({ id: c.id, titulo: t }); }} className="opacity-0 transition group-hover:opacity-100 hover:text-foreground" title="Renomear">✏️</Button>
+              <Button variant="unstyled" size="unstyled" onClick={async () => { if (confirm("Apagar?")) { await deleteConv.mutateAsync(c.id); if (c.id === convId) novaConversa(); } }} className="opacity-0 transition group-hover:opacity-100 hover:text-destructive" title="Apagar"><Trash2 className="h-3 w-3" /></Button>
             </div>
           ))}
         </div>
@@ -425,21 +426,21 @@ function ChatView() {
                           ))}
                         </div>
                         <div className="mt-3 flex flex-wrap gap-1.5">
-                          <button onClick={() => setPreviewUrl(previewRelatorioPDF(m.relatorio!, tenantInfo))} className="inline-flex items-center gap-1 rounded-md bg-surface-1 px-2.5 py-1 text-[11px] font-semibold hover:bg-surface-3">
+                          <Button variant="unstyled" size="unstyled" onClick={() => setPreviewUrl(previewRelatorioPDF(m.relatorio!, tenantInfo))} className="inline-flex items-center gap-1 rounded-md bg-surface-1 px-2.5 py-1 text-[11px] font-semibold hover:bg-surface-3">
                             <Eye className="h-3 w-3" /> Visualizar
-                          </button>
-                          <button onClick={() => downloadRelatorioPDF(m.relatorio!, tenantInfo)} className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground hover:opacity-90">
+                          </Button>
+                          <Button variant="unstyled" size="unstyled" onClick={() => downloadRelatorioPDF(m.relatorio!, tenantInfo)} className="inline-flex items-center gap-1 rounded-md bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground hover:opacity-90">
                             <Download className="h-3 w-3" /> Baixar PDF
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     )}
 
                     {m.tool_calls?.map((tc) => (
-                      <button key={tc.id} onClick={() => handleAction(tc)} className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-[11px] font-semibold text-primary transition hover:bg-primary/20">
+                      <Button variant="unstyled" size="unstyled" key={tc.id} onClick={() => handleAction(tc)} className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-3 py-1.5 text-[11px] font-semibold text-primary transition hover:bg-primary/20">
                         {tc.name === "criar_tarefa" && <><ListChecks className="h-3 w-3" /> Criar tarefa: "{tc.arguments.titulo}"</>}
                         {tc.name === "mover_lead" && <><Move className="h-3 w-3" /> Mover {tc.arguments.lead_nome} → {tc.arguments.novo_status}</>}
-                      </button>
+                      </Button>
                     ))}
                   </>
                 ) : <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -454,7 +455,7 @@ function ChatView() {
           <div className="space-y-1.5 pt-2">
             <p className="px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Sugestões</p>
             {SUGESTOES_RAPIDAS.map((s) => (
-              <button key={s} onClick={() => send(s)} className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-left text-xs text-foreground transition hover:border-primary/40 hover:bg-surface-3">{s}</button>
+              <Button variant="unstyled" size="unstyled" key={s} onClick={() => send(s)} className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-left text-xs text-foreground transition hover:border-primary/40 hover:bg-surface-3">{s}</Button>
             ))}
           </div>
         )}
@@ -463,16 +464,16 @@ function ChatView() {
       <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="border-t border-border bg-surface-1 p-3">
         <div className="flex items-end gap-2 rounded-xl border border-border bg-surface-2 p-1.5 focus-within:border-primary/50">
           <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); } }} placeholder="Pergunte qualquer coisa para o Launch..." rows={1} className="max-h-32 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm placeholder:text-muted-foreground focus:outline-none" />
-          <button type="submit" disabled={!input.trim() || sending} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground transition hover:opacity-90 disabled:opacity-40">
+          <Button variant="unstyled" size="unstyled" type="submit" disabled={!input.trim() || sending} className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground transition hover:opacity-90 disabled:opacity-40">
             {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-          </button>
+          </Button>
         </div>
       </form>
 
       {previewUrl && (
         <div className="fixed inset-0 z-[60] grid place-items-center bg-black/80 p-4" onClick={() => setPreviewUrl(null)}>
           <div className="relative h-[90vh] w-full max-w-4xl overflow-hidden rounded-xl border border-border bg-surface-1 shadow-elevated" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setPreviewUrl(null)} className="absolute right-3 top-3 z-10 grid h-8 w-8 place-items-center rounded-md bg-surface-2 text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+            <Button variant="unstyled" size="unstyled" onClick={() => setPreviewUrl(null)} className="absolute right-3 top-3 z-10 grid h-8 w-8 place-items-center rounded-md bg-surface-2 text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></Button>
             <iframe src={previewUrl} className="h-full w-full" title="Preview do relatório" />
           </div>
         </div>

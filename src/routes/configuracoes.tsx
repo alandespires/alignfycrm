@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -11,7 +13,7 @@ import {
   ShoppingBag,
   UserCircle,
   Users,
-} from "lucide-react";
+} from "@/components/ui/icons";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
@@ -29,7 +31,7 @@ import {
 } from "@/hooks/use-tenant-settings";
 
 export const Route = createFileRoute("/configuracoes")({
-  head: () => ({ meta: [{ title: "Configurações — Align CRM" }] }),
+  head: () => pageHead("Configurações"),
   component: ConfigPage,
 });
 
@@ -71,7 +73,7 @@ function ConfigPage() {
       <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
         <aside className="rounded-2xl border border-border bg-surface-2 p-2 shadow-card lg:sticky lg:top-24 lg:self-start">
           {TABS.map((item) => (
-            <button
+            <Button variant="unstyled" size="unstyled"
               key={item.id}
               type="button"
               onClick={() => setTab(item.id)}
@@ -80,7 +82,7 @@ function ConfigPage() {
             >
               <item.icon className="h-4 w-4" aria-hidden="true" />
               <span className="font-medium">{item.label}</span>
-            </button>
+            </Button>
           ))}
         </aside>
 
@@ -208,7 +210,7 @@ function IntegrationsTab() {
         {items.map((name) => (
           <div key={name} className="rounded-xl border border-border bg-surface-1 p-4">
             <div className="flex items-center justify-between gap-3"><div className="text-sm font-semibold">{name}</div><StatusPill tone="neutral">Não configurado</StatusPill></div>
-            <button type="button" disabled className="mt-4 rounded-lg border border-border px-3 py-2 text-xs text-muted-foreground opacity-60">Configuração indisponível</button>
+            <Button variant="unstyled" size="unstyled" type="button" disabled className="mt-4 rounded-lg border border-border px-3 py-2 text-xs text-muted-foreground opacity-60">Configuração indisponível</Button>
           </div>
         ))}
       </div>
@@ -234,7 +236,7 @@ function Toggle({ label, description, value, onChange }: { label: string; descri
   return (
     <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-surface-1 p-3">
       <div><div className="text-sm font-medium">{label}</div>{description && <div className="mt-0.5 text-xs text-muted-foreground">{description}</div>}</div>
-      <button type="button" role="switch" aria-checked={value} aria-label={label} onClick={() => onChange(!value)} className={`relative h-6 w-11 shrink-0 rounded-full transition ${value ? "bg-primary" : "bg-surface-3"}`}><span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${value ? "left-5" : "left-0.5"}`} /></button>
+      <Button variant="unstyled" size="unstyled" type="button" role="switch" aria-checked={value} aria-label={label} onClick={() => onChange(!value)} className={`relative h-6 w-11 shrink-0 rounded-full transition ${value ? "bg-primary" : "bg-surface-3"}`}><span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${value ? "left-5" : "left-0.5"}`} /></Button>
     </div>
   );
 }

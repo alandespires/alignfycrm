@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { dealsQueryOptions } from "@/hooks/use-deals";
 import { leadsQueryOptions } from "@/hooks/use-leads";
 import { getActiveTenantId } from "@/contexts/tenant-context";
@@ -9,11 +11,11 @@ import { useDeals, useUpsertDeal, useDeleteDeal, type DealRow, type DealStage } 
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import { formatBRL } from "@/lib/mock-data";
-import { Target, Plus, Pencil, Trash2, Search, X, TrendingUp } from "lucide-react";
+import { Target, Plus, Pencil, Trash2, Search, X, TrendingUp } from "@/components/ui/icons";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/oportunidades")({
-  head: () => ({ meta: [{ title: "Oportunidades — Align CRM" }] }),
+  head: () => pageHead("Oportunidades"),
   loader: ({ context }) => {
     const tenantId = typeof window === "undefined" ? null : getActiveTenantId();
     if (!tenantId) return;
@@ -98,7 +100,7 @@ function OportunidadesPage() {
           <EmptyState
             icon={Target}
             label={deals.length === 0 ? "Nenhuma oportunidade ainda" : "Nada encontrado com esses filtros"}
-            cta={canEdit ? { label: "Criar primeira", onClick: () => setEditing({ titulo: "", valor: 0, stage: "qualificacao" }) } : undefined}
+            cta={canEdit ? { label: "Nova oportunidade", onClick: () => setEditing({ titulo: "", valor: 0, stage: "qualificacao" }) } : undefined}
           />
         ) : (
           <table className="w-full text-sm">
@@ -121,15 +123,15 @@ function OportunidadesPage() {
                   <td className="px-5 py-3">
                     <div className="flex justify-end gap-1">
                       {canEdit && (
-                        <button onClick={() => setEditing(d)} className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-3 hover:text-foreground">
+                        <Button variant="unstyled" size="unstyled" onClick={() => setEditing(d)} aria-label="Editar oportunidade" className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-3 hover:text-foreground">
                           <Pencil className="h-3.5 w-3.5" />
-                        </button>
+                        </Button>
                       )}
                       {canDelete && (
-                        <button onClick={() => { if (confirm(`Excluir "${d.titulo}"?`)) del.mutate(d.id); }}
-                          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive">
+                        <Button variant="unstyled" size="unstyled" onClick={() => { if (confirm(`Excluir "${d.titulo}"?`)) del.mutate(d.id); }}
+                          aria-label="Excluir oportunidade" className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive">
                           <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </td>
@@ -147,7 +149,7 @@ function OportunidadesPage() {
           onSave={(d) => {
             if (!d.titulo?.trim()) { toast.error("Informe um título"); return; }
             upsert.mutate({
-              id: d.id, titulo: d.titulo!, valor: Number(d.valor ?? 0),
+              id: d.id, titulo: d.titulo, valor: Number(d.valor ?? 0),
               stage: (d.stage as DealStage) ?? "qualificacao", probabilidade: Number(d.probabilidade ?? 0),
             }, { onSuccess: () => setEditing(null) });
           }}
@@ -178,9 +180,9 @@ function EmptyState({ icon: Icon, label, cta }: { icon: any; label: string; cta?
       <div className="grid h-12 w-12 place-items-center rounded-2xl bg-muted text-muted-foreground"><Icon className="h-6 w-6" /></div>
       <p className="text-sm font-medium">{label}</p>
       {cta && (
-        <button onClick={cta.onClick} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:opacity-90">
+        <Button variant="unstyled" size="unstyled" onClick={cta.onClick} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:opacity-90">
           <Plus className="h-3.5 w-3.5" /> {cta.label}
-        </button>
+        </Button>
       )}
     </div>
   );

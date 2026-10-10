@@ -1,12 +1,15 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useMyStudentProfile, useStudentGrades, useStudentAttendance, useAnnouncements } from "@/hooks/use-school";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { StudentPortalShell } from "@/components/student-portal-shell";
-import { GraduationCap, BookOpen, CalendarCheck, Bell, CalendarDays, CheckCircle2, XCircle } from "lucide-react";
+import { GraduationCap, BookOpen, CalendarCheck, Bell, CalendarDays, CheckCircle2, XCircle } from "@/components/ui/icons";
 
-export const Route = createFileRoute("/portal-aluno")({ component: Portal });
+export const Route = createFileRoute("/portal-aluno")({
+  head: () => pageHead("Portal Aluno"), component: Portal });
 
 const TABS = [
   { v: "frequencia", label: "Frequência", icon: CalendarCheck },
@@ -54,14 +57,14 @@ function Portal() {
                 const Icon = t.icon;
                 const active = tab === t.v;
                 return (
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     key={t.v}
                     onClick={() => setTab(t.v)}
                     className={`inline-flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition ${active ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     <Icon className="h-4 w-4" />
                     {t.label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

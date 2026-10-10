@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ProspectingFilters, ProspectingSearch } from "@/lib/prospecting/types";
@@ -10,7 +11,7 @@ import {
   useProspectingProfiles,
   useSaveProfile,
 } from "@/hooks/use-prospecting";
-import { History, Layers, Play, Save, Trash2 } from "lucide-react";
+import { History, Layers, Play, Save, Trash2 } from "@/components/ui/icons";
 import { ProspectingSettings } from "./prospecting-settings";
 
 export function ProspectingWorkspace({
@@ -59,28 +60,28 @@ export function ProspectingWorkspace({
             className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface-1 p-3 text-sm"
           >
             <History className="h-4 w-4 text-muted-foreground" />
-            <button onClick={() => onOpenSearch(search.id)} className="min-w-0 flex-1 text-left">
+            <Button variant="unstyled" size="unstyled" onClick={() => onOpenSearch(search.id)} className="min-w-0 flex-1 text-left">
               <div className="truncate font-medium">{search.nome ?? "Pesquisa sem nome"}</div>
               <div className="text-xs text-muted-foreground">
                 {new Date(search.created_at).toLocaleString("pt-BR")} · {search.qualificados}/
                 {search.encontrados} qualificados · {search.status}
               </div>
-            </button>
-            <button
+            </Button>
+            <Button variant="unstyled" size="unstyled"
               onClick={() => onRunFilters(search.filtros)}
               title="Executar novamente"
               className="grid h-8 w-8 place-items-center rounded-lg hover:bg-surface-3"
             >
               <Play className="h-4 w-4" />
-            </button>
+            </Button>
             {canManage && (
-              <button
+              <Button variant="unstyled" size="unstyled"
                 onClick={() => deleteSearch.mutate(search.id)}
                 title="Excluir"
                 className="grid h-8 w-8 place-items-center rounded-lg text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="h-4 w-4" />
-              </button>
+              </Button>
             )}
           </div>
         ))}
@@ -94,7 +95,7 @@ export function ProspectingWorkspace({
             placeholder="Nome do perfil"
             className="h-10 flex-1 rounded-lg border border-border bg-surface-1 px-3 text-sm"
           />
-          <button
+          <Button variant="unstyled" size="unstyled"
             onClick={() =>
               saveProfile.mutate(
                 { nome: profileName.trim(), filtros: filters },
@@ -106,7 +107,7 @@ export function ProspectingWorkspace({
           >
             <Save className="h-4 w-4" />
             Salvar filtros atuais
-          </button>
+          </Button>
         </div>
         {profiles.map((profile: any) => (
           <div
@@ -120,20 +121,20 @@ export function ProspectingWorkspace({
                 {profile.descricao ?? "Perfil salvo"}
               </div>
             </div>
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => onRunFilters(profile.filtros)}
               className="grid h-8 w-8 place-items-center rounded-lg hover:bg-surface-3"
               title="Executar"
             >
               <Play className="h-4 w-4" />
-            </button>
-            <button
+            </Button>
+            <Button variant="unstyled" size="unstyled"
               onClick={() => deleteProfile.mutate(profile.id)}
               className="grid h-8 w-8 place-items-center rounded-lg text-destructive hover:bg-destructive/10"
               title="Excluir"
             >
               <Trash2 className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         ))}
       </TabsContent>
@@ -146,7 +147,7 @@ export function ProspectingWorkspace({
             placeholder="Nome da nova lista"
             className="h-10 flex-1 rounded-lg border border-border bg-surface-1 px-3 text-sm"
           />
-          <button
+          <Button variant="unstyled" size="unstyled"
             onClick={() =>
               createList.mutate(
                 { nome: listName.trim() },
@@ -163,7 +164,7 @@ export function ProspectingWorkspace({
           >
             <Layers className="h-4 w-4" />
             Criar lista
-          </button>
+          </Button>
         </div>
         <div className="flex flex-wrap gap-2">
           <select
@@ -178,13 +179,13 @@ export function ProspectingWorkspace({
               </option>
             ))}
           </select>
-          <button
+          <Button variant="unstyled" size="unstyled"
             onClick={() => addToList.mutate({ listId: selectedList, resultIds: selectedIds })}
             disabled={!selectedList || !selectedIds.length}
             className="h-10 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground disabled:opacity-50"
           >
             Adicionar selecionados ({selectedIds.length})
-          </button>
+          </Button>
         </div>
         {lists.map((list: any) => (
           <div key={list.id} className="rounded-xl border border-border bg-surface-1 p-3 text-sm">

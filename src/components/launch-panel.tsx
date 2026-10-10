@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { X, Send, Loader2, Plus, MessageSquare, Trash2, ListTodo, ArrowRightLeft, FileBarChart, ChevronLeft, Keyboard, UserPlus, FolderPlus, CalendarClock, Wallet, Sparkles } from "lucide-react";
+import { X, Send, Loader2, Plus, MessageSquare, Trash2, ListTodo, ArrowRightLeft, FileBarChart, ChevronLeft, Keyboard, UserPlus, FolderPlus, CalendarClock, Wallet, Sparkles } from "@/components/ui/icons";
 import { useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useTenant } from "@/contexts/tenant-context";
@@ -362,7 +363,7 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
 
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Launch IA">
-      <button
+      <Button variant="unstyled" size="unstyled"
         aria-label="Fechar"
         onClick={onClose}
         className="absolute inset-0 bg-black/50 backdrop-blur-[8px] animate-in fade-in duration-200"
@@ -379,13 +380,13 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
         {/* Header */}
         <div className="relative flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
           <div className="flex items-center gap-3">
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => setHistoryOpen((v) => !v)}
               aria-label="Histórico"
               className="grid h-9 w-9 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground"
             >
               {historyOpen ? <ChevronLeft className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
-            </button>
+            </Button>
             <div className="relative grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-primary/20 to-transparent ring-1 ring-primary/30">
               <LaunchIcon className="h-5 w-5" />
             </div>
@@ -395,19 +396,19 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={startNewConversation}
               aria-label="Nova conversa"
               className="hidden sm:flex h-9 items-center gap-1.5 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-3 text-xs text-muted-foreground transition hover:text-foreground"
             >
               <Plus className="h-3.5 w-3.5" /> Nova
-            </button>
+            </Button>
             <span className="hidden md:flex items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.02] px-2 py-1 text-[10px] text-muted-foreground">
               <Keyboard className="h-3 w-3" /> ⌘K
             </span>
-            <button onClick={onClose} aria-label="Fechar" className="grid h-9 w-9 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground">
+            <Button variant="unstyled" size="unstyled" onClick={onClose} aria-label="Fechar" className="grid h-9 w-9 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] text-muted-foreground transition hover:text-foreground">
               <X className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -416,12 +417,12 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
           {historyOpen && (
             <aside className="w-60 shrink-0 border-r border-white/[0.06] bg-white/[0.01] overflow-y-auto">
               <div className="p-3">
-                <button
+                <Button variant="unstyled" size="unstyled"
                   onClick={startNewConversation}
                   className="flex w-full items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-sm transition hover:bg-white/[0.06]"
                 >
                   <Plus className="h-4 w-4" /> Nova conversa
-                </button>
+                </Button>
               </div>
               <ul className="px-2 pb-3 space-y-1">
                 {conversations.length === 0 && (
@@ -429,7 +430,7 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
                 )}
                 {conversations.map((c) => (
                   <li key={c.id} className="group flex items-center gap-1">
-                    <button
+                    <Button variant="unstyled" size="unstyled"
                       onClick={() => { setConversationId(c.id); setHistoryOpen(false); }}
                       className={[
                         "flex-1 truncate rounded-lg px-3 py-2 text-left text-[13px] transition",
@@ -438,8 +439,8 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
                       title={c.titulo}
                     >
                       {c.titulo}
-                    </button>
-                    <button
+                    </Button>
+                    <Button variant="unstyled" size="unstyled"
                       onClick={() => {
                         if (confirm("Remover esta conversa?")) {
                           deleteConv.mutate(c.id);
@@ -450,7 +451,7 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
                       className="opacity-0 group-hover:opacity-100 grid h-7 w-7 place-items-center rounded-lg text-muted-foreground hover:text-destructive transition"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -478,12 +479,12 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
                         : s.tone === "success" ? "border-success/30 bg-success/5 hover:bg-success/10"
                         : "border-primary/30 bg-primary/5 hover:bg-primary/10";
                       return (
-                        <button key={i} onClick={() => send(s.prompt)}
+                        <Button variant="unstyled" size="unstyled" key={i} onClick={() => send(s.prompt)}
                           className={["flex w-full items-center gap-3 rounded-2xl border px-4 py-2.5 text-left transition", toneCls].join(" ")}>
                           <s.icon className="h-4 w-4 shrink-0 text-foreground/70" />
                           <span className="flex-1 text-[13px] font-medium">{s.label}</span>
                           <span className="text-[10px] uppercase tracking-wider text-muted-foreground">analisar →</span>
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
@@ -499,13 +500,13 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
                     'Crie um projeto de implantação para a Acme com prazo de 30 dias',
                     'Gere um relatório de vendas do último trimestre',
                   ].map((s) => (
-                    <button
+                    <Button variant="unstyled" size="unstyled"
                       key={s}
                       onClick={() => send(s)}
                       className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5 text-left text-[13px] text-muted-foreground transition hover:border-white/[0.12] hover:bg-white/[0.04] hover:text-foreground"
                     >
                       {s}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -593,14 +594,14 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
               placeholder="Pergunte algo ao Launch…  (⌘K para abrir/fechar)"
               className="max-h-32 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm placeholder:text-muted-foreground focus:outline-none"
             />
-            <button
+            <Button variant="unstyled" size="unstyled"
               onClick={() => send()}
               disabled={!input.trim() || loading}
               aria-label="Enviar"
               className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-glow transition hover:brightness-110 disabled:opacity-40"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -620,13 +621,13 @@ export function LaunchPanel({ open, onClose }: { open: boolean; onClose: () => v
 
 function QuickActionChip({ icon: Icon, label, onClick }: { icon: any; label: string; onClick: () => void }) {
   return (
-    <button
+    <Button variant="unstyled" size="unstyled"
       onClick={onClick}
       className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[12px] text-foreground/90 transition hover:border-primary/40 hover:bg-primary/10 hover:text-foreground"
     >
       <Icon className="h-3.5 w-3.5 text-primary" />
       {label}
-    </button>
+    </Button>
   );
 }
 
@@ -640,7 +641,7 @@ function ActionConfirmDialog({
 }) {
   return (
     <div className="fixed inset-0 z-[60] grid place-items-center p-4" role="dialog" aria-modal="true">
-      <button aria-label="Cancelar" onClick={onCancel} className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      <Button variant="unstyled" size="unstyled" aria-label="Cancelar" onClick={onCancel} className="absolute inset-0 bg-black/60 backdrop-blur-md" />
       <div className="relative w-full max-w-md rounded-3xl border border-white/[0.10] bg-background/95 p-6 shadow-2xl backdrop-blur-2xl">
         <div className="mb-4 flex items-center gap-3">
           <div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
@@ -884,10 +885,10 @@ function ActionConfirmDialog({
         </div>
 
         <div className="mt-5 flex justify-end gap-2">
-          <button onClick={onCancel} className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2 text-sm text-muted-foreground hover:text-foreground">
+          <Button variant="unstyled" size="unstyled" onClick={onCancel} className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2 text-sm text-muted-foreground hover:text-foreground">
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button variant="unstyled" size="unstyled"
             onClick={onConfirm}
             disabled={
               (pending.kind === "criar_lead" && !pending.nome.trim()) ||
@@ -900,7 +901,7 @@ function ActionConfirmDialog({
             className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow hover:brightness-110 disabled:opacity-40"
           >
             Confirmar
-          </button>
+          </Button>
         </div>
       </div>
     </div>

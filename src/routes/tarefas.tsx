@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
@@ -5,7 +7,7 @@ import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import { useTasks, useToggleTask, useDeleteTask, useCreateTask, type TaskPriority, type TaskRow, type TaskStatus, TASK_STATUS_LABEL } from "@/hooks/use-tasks";
 import { useLeads } from "@/hooks/use-leads";
 import { useProjects } from "@/hooks/use-projects";
-import { Plus, Calendar, CheckCircle2, Circle, Loader2, Trash2, Inbox, X, Search, LayoutGrid, List, AlertCircle, TrendingUp, Clock, ListChecks } from "lucide-react";
+import { Plus, Calendar, CheckCircle2, Circle, Loader2, Trash2, Inbox, X, Search, LayoutGrid, List, AlertCircle, TrendingUp, Clock, ListChecks } from "@/components/ui/icons";
 import { TaskGroupsSkeleton } from "@/components/skeletons";
 import { TaskDetailDrawer } from "@/components/task-detail-drawer";
 
@@ -13,7 +15,7 @@ type PrazoFilter = "todos" | "hoje" | "atrasadas" | "semana" | "sem_prazo";
 type ViewMode = "lista" | "kanban";
 
 export const Route = createFileRoute("/tarefas")({
-  head: () => ({ meta: [{ title: "Tarefas — Align CRM" }] }),
+  head: () => pageHead("Tarefas"),
   component: TarefasPage,
 });
 
@@ -120,12 +122,12 @@ function TarefasPage() {
       action={
         <div className="flex items-center gap-2">
           <div className="hidden md:flex rounded-lg border border-border bg-surface-1 p-0.5">
-            <button onClick={() => setView("lista")} className={["inline-flex h-7 items-center gap-1.5 rounded px-2 text-[11px] font-medium", view === "lista" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"].join(" ")}>
+            <Button variant="unstyled" size="unstyled" onClick={() => setView("lista")} className={["inline-flex h-7 items-center gap-1.5 rounded px-2 text-[11px] font-medium", view === "lista" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"].join(" ")}>
               <List className="h-3 w-3" /> Lista
-            </button>
-            <button onClick={() => setView("kanban")} className={["inline-flex h-7 items-center gap-1.5 rounded px-2 text-[11px] font-medium", view === "kanban" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"].join(" ")}>
+            </Button>
+            <Button variant="unstyled" size="unstyled" onClick={() => setView("kanban")} className={["inline-flex h-7 items-center gap-1.5 rounded px-2 text-[11px] font-medium", view === "kanban" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"].join(" ")}>
               <LayoutGrid className="h-3 w-3" /> Kanban
-            </button>
+            </Button>
           </div>
           <PrimaryButton icon={Plus} onClick={() => setOpen(true)}>Nova tarefa</PrimaryButton>
         </div>
@@ -244,9 +246,9 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
       <Inbox className="mb-3 h-10 w-10 text-muted-foreground" />
       <h3 className="text-lg font-semibold">Nenhuma tarefa</h3>
       <p className="mt-1 max-w-sm text-sm text-muted-foreground">Crie tarefas, defina checklists, subtarefas e acompanhe o tempo gasto.</p>
-      <button onClick={onCreate} className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-glow">
+      <Button variant="unstyled" size="unstyled" onClick={onCreate} className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-glow">
         <Plus className="h-3.5 w-3.5" /> Criar primeira tarefa
-      </button>
+      </Button>
     </div>
   );
 }
@@ -293,9 +295,9 @@ function ListView({ ativas, concluidas, toggle, del, onPick, leads, projects }: 
               return (
                 <li key={t.id} onClick={() => onPick(t)}
                   className="flex items-center gap-3 px-5 py-3.5 cursor-pointer transition hover:bg-surface-1/50">
-                  <button onClick={(e) => { e.stopPropagation(); toggle.mutate({ id: t.id, done: !done }); }}>
+                  <Button variant="unstyled" size="unstyled" onClick={(e) => { e.stopPropagation(); toggle.mutate({ id: t.id, done: !done }); }}>
                     {done ? <CheckCircle2 className="h-5 w-5 text-success" /> : <Circle className="h-5 w-5 text-muted-foreground hover:text-primary" />}
-                  </button>
+                  </Button>
                   <div className="min-w-0 flex-1">
                     <div className={`text-sm font-medium ${done ? "line-through text-muted-foreground" : ""}`}>{t.titulo}</div>
                     <div className="text-[11px] text-muted-foreground flex flex-wrap items-center gap-2">
@@ -306,10 +308,10 @@ function ListView({ ativas, concluidas, toggle, del, onPick, leads, projects }: 
                     </div>
                   </div>
                   {!done && <StatusPill tone={tone(t.prioridade)}>{t.prioridade}</StatusPill>}
-                  <button onClick={(e) => { e.stopPropagation(); if (confirm("Excluir?")) del.mutate(t.id); }}
+                  <Button variant="unstyled" size="unstyled" onClick={(e) => { e.stopPropagation(); if (confirm("Excluir?")) del.mutate(t.id); }}
                     className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-destructive">
                     <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  </Button>
                 </li>
               );
             })}

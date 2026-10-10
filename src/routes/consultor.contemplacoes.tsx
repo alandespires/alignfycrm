@@ -1,10 +1,12 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useContemplations } from "@/hooks/use-consortium-quotas";
 import { useQuotas } from "@/hooks/use-consortium-quotas";
 import { ConsultorExportBar } from "@/components/consultor-export-bar";
-import { Award } from "lucide-react";
+import { Award } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/consultor/contemplacoes")({
+  head: () => pageHead("Consultor · Contemplacoes"),
   component: ContemplacoesPage,
 });
 

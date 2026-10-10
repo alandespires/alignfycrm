@@ -1,16 +1,18 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/align-panel";
 import {
   Target, Plus, Pencil, Trash2, Search, TrendingUp, CheckCircle2, AlertTriangle, Clock, Filter,
-} from "lucide-react";
+} from "@/components/ui/icons";
 import { useGoals, useSaveGoal, useDeleteGoal, type Goal } from "@/hooks/use-goals";
 import { useDepartments } from "@/hooks/use-team";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/metas")({
-  head: () => ({ meta: [{ title: "Metas — Align CRM" }] }),
+  head: () => pageHead("Metas"),
   component: MetasPage,
 });
 
@@ -148,12 +150,12 @@ function MetasPage() {
           <p className="mt-1 max-w-sm text-sm text-muted-foreground">
             Crie objetivos por departamento, defina prazo e acompanhe o progresso.
           </p>
-          <button
+          <Button variant="unstyled" size="unstyled"
             onClick={openNew}
             className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-glow"
           >
             <Plus className="h-3.5 w-3.5" /> Criar primeira meta
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -163,7 +165,7 @@ function MetasPage() {
               className="group relative overflow-hidden rounded-2xl border border-border bg-surface-2 p-4 shadow-card transition hover:-translate-y-px hover:border-primary/30"
             >
               <div className="flex items-start justify-between gap-3">
-                <button
+                <Button variant="unstyled" size="unstyled"
                   onClick={() => openEdit(g)}
                   className="min-w-0 flex-1 text-left"
                 >
@@ -171,18 +173,18 @@ function MetasPage() {
                   <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                     {g.descricao ?? "Sem descrição"}
                   </div>
-                </button>
+                </Button>
                 <div className="flex opacity-0 transition group-hover:opacity-100">
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => openEdit(g)}
                     className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-surface-3 hover:text-foreground"
                     aria-label="Editar"
-                  ><Pencil className="h-3.5 w-3.5" /></button>
-                  <button
+                  ><Pencil className="h-3.5 w-3.5" /></Button>
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => confirm("Remover meta?") && del.mutate(g.id)}
                     className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
                     aria-label="Remover"
-                  ><Trash2 className="h-3.5 w-3.5" /></button>
+                  ><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>
               </div>
 
@@ -359,7 +361,7 @@ function MetasPage() {
 
             {editing.id && (
               <div className="pt-2">
-                <button
+                <Button variant="unstyled" size="unstyled"
                   onClick={() => {
                     if (confirm("Remover esta meta permanentemente?")) {
                       del.mutate(editing.id!, { onSuccess: () => setOpen(false) });
@@ -368,7 +370,7 @@ function MetasPage() {
                   className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive transition hover:bg-destructive/20"
                 >
                   <Trash2 className="h-3.5 w-3.5" /> Excluir meta
-                </button>
+                </Button>
               </div>
             )}
           </div>

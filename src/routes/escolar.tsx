@@ -1,8 +1,10 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap } from "@/components/ui/icons";
 import { AppShell } from "@/components/app-shell";
 
 export const Route = createFileRoute("/escolar")({
+  head: () => pageHead("Align Escolar"),
   component: EscolarLayout,
 });
 

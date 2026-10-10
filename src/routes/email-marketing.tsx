@@ -1,9 +1,10 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { UnavailableModule } from "@/components/unavailable-module";
-import { Mail } from "lucide-react";
+import { Mail } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/email-marketing")({
-  head: () => ({ meta: [{ title: "E-mail Marketing — Align CRM" }] }),
+  head: () => pageHead("E-mail Marketing"),
   component: () => (
     <UnavailableModule
       title="E-mail Marketing"

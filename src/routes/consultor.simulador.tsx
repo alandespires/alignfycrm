@@ -1,11 +1,14 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useAdministrators, calcularParcela, SEGMENT_LABEL, type ConsortiumSegment } from "@/hooks/use-consortium";
 import { useCreateSimulation, useSimulations } from "@/hooks/use-consortium-simulations";
 import { useLeads } from "@/hooks/use-leads";
-import { Calculator, Send } from "lucide-react";
+import { Calculator, Send } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/consultor/simulador")({
+  head: () => pageHead("Consultor · Simulador"),
   component: SimuladorPage,
 });
 
@@ -87,10 +90,10 @@ function SimuladorPage() {
           </Field>
         </div>
 
-        <button onClick={salvar} disabled={createSim.isPending}
+        <Button variant="unstyled" size="unstyled" onClick={salvar} disabled={createSim.isPending}
           className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow disabled:opacity-60">
           <Send className="h-4 w-4" /> {createSim.isPending ? "Gerando..." : "Salvar simulação"}
-        </button>
+        </Button>
       </div>
 
       <div className="space-y-3">

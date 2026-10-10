@@ -1,9 +1,11 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useConsultorAudit, ENTITY_LABEL, ACTION_LABEL, type AuditEntityType, type AuditAction } from "@/hooks/use-consultor-audit";
-import { History, Plus, Pencil, Trash2 } from "lucide-react";
+import { History, Plus, Pencil, Trash2 } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/consultor/historico")({
+  head: () => pageHead("Consultor · Historico"),
   component: HistoricoPage,
 });
 

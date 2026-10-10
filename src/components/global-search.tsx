@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Briefcase, Sparkles, UserRound, Users, AlertCircle } from "lucide-react";
+import { Briefcase, Sparkles, UserRound, Users, AlertCircle } from "@/components/ui/icons";
 import {
   CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator,
 } from "@/components/ui/command";

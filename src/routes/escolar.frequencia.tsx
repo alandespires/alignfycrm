@@ -1,10 +1,12 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useClasses, useEnrollments, useStudentAttendance } from "@/hooks/use-school";
-import { CalendarCheck } from "lucide-react";
+import { CalendarCheck } from "@/components/ui/icons";
 import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/escolar/frequencia")({ component: Page });
+export const Route = createFileRoute("/escolar/frequencia")({
+  head: () => pageHead("Escolar · Frequencia"), component: Page });
 
 function Page() {
   const { data: classes = [] } = useClasses();

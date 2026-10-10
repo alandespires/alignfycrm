@@ -1,10 +1,13 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Loader2, UserCog } from "lucide-react";
+import { Plus, Loader2, UserCog } from "@/components/ui/icons";
 import { useProfessionals, useUpsertProfessional } from "@/hooks/use-clinic";
 import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 
 export const Route = createFileRoute("/clinicas/configuracoes")({
+  head: () => pageHead("Clinicas · Configuracoes"),
   component: ConfigClinicaPage,
 });
 
@@ -21,9 +24,9 @@ function ConfigClinicaPage() {
             <h3 className="text-base font-semibold">Profissionais da clínica</h3>
             <p className="text-xs text-muted-foreground">Cadastre dentistas e especialistas para usar na agenda.</p>
           </div>
-          <button onClick={() => setCreating(true)} className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground shadow-glow hover:brightness-110">
+          <Button variant="unstyled" size="unstyled" onClick={() => setCreating(true)} className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-semibold text-primary-foreground shadow-glow hover:brightness-110">
             <Plus className="h-4 w-4" /> Novo profissional
-          </button>
+          </Button>
         </div>
         {isLoading ? (
           <div className="grid place-items-center py-12"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>

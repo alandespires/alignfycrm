@@ -1,3 +1,5 @@
+import { pageHead } from "@/lib/page-head";
+import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type FormEvent } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
@@ -16,12 +18,12 @@ import { useRealtimeSync } from "@/hooks/use-realtime";
 import {
   Briefcase, Plus, X, Loader2, Trash2, DollarSign, Target, CheckCircle2,
   ListChecks, Wallet, Search, Filter, History, AlertCircle, Ban, Sparkles,
-} from "lucide-react";
+} from "@/components/ui/icons";
 import { ProjectTemplatesGallery } from "@/components/project-templates-gallery";
 import { AlignPanel, AlignPanelFooter, AlignPanelSection } from "@/components/align-panel";
 
 export const Route = createFileRoute("/projetos")({
-  head: () => ({ meta: [{ title: "Controle de Projetos — Align CRM" }] }),
+  head: () => pageHead("Controle de Projetos"),
   component: ProjetosPage,
 });
 
@@ -112,10 +114,10 @@ function ProjetosPage() {
       subtitle="Gestão integrada de projetos, tarefas e financeiro"
       action={
         <div className="flex items-center gap-2">
-          <button onClick={() => setTemplatesOpen(true)}
+          <Button variant="unstyled" size="unstyled" onClick={() => setTemplatesOpen(true)}
             className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-xs font-semibold transition hover:border-primary/50">
             <Sparkles className="h-3.5 w-3.5 text-primary" /> Templates
-          </button>
+          </Button>
           <PrimaryButton icon={Plus} onClick={() => setOpen(true)}>Novo projeto</PrimaryButton>
         </div>
       }
@@ -157,9 +159,9 @@ function ProjetosPage() {
             <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="h-8 bg-transparent text-xs focus:outline-none" />
           </div>
           {activeFilters > 0 && (
-            <button onClick={clearFilters} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-2.5 text-[11px] font-medium text-muted-foreground hover:text-foreground">
+            <Button variant="unstyled" size="unstyled" onClick={clearFilters} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-2.5 text-[11px] font-medium text-muted-foreground hover:text-foreground">
               <X className="h-3 w-3" /> Limpar ({activeFilters})
-            </button>
+            </Button>
           )}
           <span className="ml-auto text-[11px] text-muted-foreground">
             {filtered.length} de {projects.length}
@@ -172,16 +174,16 @@ function ProjetosPage() {
             <span className="text-xs font-semibold">{picked.size} selecionado(s)</span>
             <span className="ml-2 text-[11px] text-muted-foreground">Alterar status para:</span>
             {STATUS_LIST.map((s) => (
-              <button
+              <Button variant="unstyled" size="unstyled"
                 key={s} onClick={() => bulkApply(s)} disabled={bulk.isPending}
                 className="rounded-md border border-border bg-surface-1 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide transition hover:border-primary/60 hover:text-primary disabled:opacity-50"
               >
                 {PROJECT_STATUS_LABEL[s]}
-              </button>
+              </Button>
             ))}
-            <button onClick={() => setPicked(new Set())} className="ml-auto text-[11px] text-muted-foreground hover:text-foreground">
+            <Button variant="unstyled" size="unstyled" onClick={() => setPicked(new Set())} className="ml-auto text-[11px] text-muted-foreground hover:text-foreground">
               Limpar seleção
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -414,13 +416,13 @@ function ProjectDetailDrawer({ project, onClose, onDelete, onUpdate, tasks, entr
       status={{ label: PROJECT_STATUS_LABEL[project.status], tone: statusTone as any }}
       expandable
       headerActions={
-        <button
+        <Button variant="unstyled" size="unstyled"
           onClick={() => onDelete(project.id)}
           className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-surface-2 text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive"
           aria-label="Excluir"
         >
           <Trash2 className="h-4 w-4" />
-        </button>
+        </Button>
       }
       tabs={[
         { id: "overview", label: "Visão geral" },
@@ -455,7 +457,7 @@ function ProjectDetailDrawer({ project, onClose, onDelete, onUpdate, tasks, entr
               />
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {STATUS_LIST.map((s) => (
-                  <button key={s} onClick={() => handleStatusChange(s)} className={["rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide transition", project.status === s ? "bg-primary text-primary-foreground" : "border border-border bg-surface-1 text-muted-foreground hover:text-foreground"].join(" ")}>{PROJECT_STATUS_LABEL[s]}</button>
+                  <Button variant="unstyled" size="unstyled" key={s} onClick={() => handleStatusChange(s)} className={["rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide transition", project.status === s ? "bg-primary text-primary-foreground" : "border border-border bg-surface-1 text-muted-foreground hover:text-foreground"].join(" ")}>{PROJECT_STATUS_LABEL[s]}</Button>
                 ))}
               </div>
             </div>

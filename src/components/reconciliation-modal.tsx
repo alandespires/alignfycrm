@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useMemo, useState, type FormEvent } from "react";
-import { Loader2, Plus, Trash2, CheckCircle2, AlertTriangle, Ban } from "lucide-react";
+import { Loader2, Plus, Trash2, CheckCircle2, AlertTriangle, Ban } from "@/components/ui/icons";
 import { useEntryPayments, useCreatePayment, useDeletePayment } from "@/hooks/use-payments";
 import { brl, type EntryRow, type PaymentMethod } from "@/hooks/use-finance";
 import { toast } from "sonner";
@@ -115,9 +116,9 @@ export function ReconciliationModal({ entry, onClose }: { entry: EntryRow | null
                       placeholder={String(saldo.toFixed(2))}
                       className={`h-10 flex-1 rounded-lg border bg-surface-2 px-3 text-sm tabular-nums focus:outline-none ${error && /valor/i.test(error) ? "border-destructive/60" : "border-border focus:border-primary/60"}`}
                     />
-                    <button type="button" onClick={quitarTotal} className="h-10 whitespace-nowrap rounded-lg border border-border bg-surface-2 px-3 text-[11px] font-medium hover:border-primary/40 hover:text-primary">
+                    <Button variant="unstyled" size="unstyled" type="button" onClick={quitarTotal} className="h-10 whitespace-nowrap rounded-lg border border-border bg-surface-2 px-3 text-[11px] font-medium hover:border-primary/40 hover:text-primary">
                       Quitar tudo
-                    </button>
+                    </Button>
                   </div>
                   <div className="mt-1 text-[10px] text-muted-foreground">Máximo recomendado: {brl(saldo)}</div>
                 </div>
@@ -141,10 +142,10 @@ export function ReconciliationModal({ entry, onClose }: { entry: EntryRow | null
                   <input maxLength={500} value={obs} onChange={(e) => setObs(e.target.value)} placeholder="opcional..." className="h-10 w-full rounded-lg border border-border bg-surface-2 px-3 text-sm focus:border-primary/60 focus:outline-none" />
                 </div>
               </div>
-              <button type="submit" disabled={create.isPending || !valor} className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-primary px-4 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-50">
+              <Button variant="unstyled" size="unstyled" type="submit" disabled={create.isPending || !valor} className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-primary px-4 text-xs font-semibold text-primary-foreground shadow-glow disabled:opacity-50">
                 {create.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
                 Registrar pagamento
-              </button>
+              </Button>
             </form>
           </AlignPanelSection>
         )}
@@ -171,13 +172,13 @@ export function ReconciliationModal({ entry, onClose }: { entry: EntryRow | null
                       {p.observacoes && <> · {p.observacoes}</>}
                     </div>
                   </div>
-                  <button
+                  <Button variant="unstyled" size="unstyled"
                     onClick={() => { if (confirm("Remover este pagamento?")) del.mutate({ id: p.id, entry_id: p.entry_id }); }}
                     className="text-muted-foreground hover:text-destructive"
                     title="Remover pagamento"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>

@@ -1,14 +1,16 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useSchoolDashboard, useTodayClasses, useTeacherAlerts } from "@/hooks/use-school";
 import { supabase } from "@/integrations/supabase/client";
 import { getActiveTenantId } from "@/contexts/tenant-context";
-import { Users, GraduationCap, BookCheck, AlertTriangle, ArrowRight, Clock, FileWarning, CalendarDays, TrendingUp, Activity, Megaphone } from "lucide-react";
+import { Users, GraduationCap, BookCheck, AlertTriangle, ArrowRight, Clock, FileWarning, CalendarDays, TrendingUp, Activity, Megaphone } from "@/components/ui/icons";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
 } from "recharts";
 
-export const Route = createFileRoute("/escolar/")({ component: SchoolDashboard });
+export const Route = createFileRoute("/escolar/")({
+  head: () => pageHead("Escolar · Index"), component: SchoolDashboard });
 
 // Frequência semanal agregada (últimos 14 dias)
 function useWeeklyAttendance() {
