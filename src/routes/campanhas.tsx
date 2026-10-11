@@ -164,7 +164,7 @@ function CalendarTab({ statusFilter }: { statusFilter: string[] }) {
               <Badge variant="outline" className="text-[10px]">{i.prioridade}</Badge>
               {i.data_planejada && <Badge variant="outline" className="text-[10px]">{i.data_planejada}</Badge>}
             </div>
-          </section>
+          </Card>
         ))}
         {filtered.length === 0 && <div className="md:col-span-3 text-center text-sm text-muted-foreground py-8">Nenhum item.</div>}
       </div>
