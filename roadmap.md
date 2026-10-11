@@ -1,5 +1,11 @@
 # Roadmap
 
+## Alinhamento e marketing da empresa
+- [ ] Adicionar faixa compacta global de leads, clientes, oportunidades e pipeline.
+- [ ] Remover E-mail/Landing Pages da navegação e organizar Marketing em campanhas, conteúdo, ideias e desempenho.
+- [ ] Remover Consultor somente da conta solicitada e validar o bloqueio.
+- [ ] Verificar as alterações no navegador e testes.
+
 ## UX/UI — ícones e conexão entre telas
 - [ ] Aplicar ícones preenchidos e padronizar ações nos botões existentes.
 - [ ] Compactar cabeçalhos e facilitar acesso à busca e navegação relacionada.
