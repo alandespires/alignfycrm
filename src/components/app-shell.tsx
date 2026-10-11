@@ -23,6 +23,8 @@ import { LaunchIcon } from "@/components/launch-icon";
 import { DesktopSidebar, useSidebarCollapsed } from "@/components/desktop-sidebar";
 import { ProductTour } from "@/components/product-tour";
 import { LeadFormDialog } from "@/components/lead-form-dialog";
+import { CrmMetrics } from "@/components/crm-metrics";
+import { useConsultorAccess } from "@/hooks/use-module-access";
 
 
 /* ============================================================
@@ -46,6 +48,7 @@ const COMERCIAL_GROUPS: SubGroup[] = [
       { to: "/oportunidades", label: "Oportunidades", icon: Target },
       { to: "/propostas", label: "Propostas", icon: FileText },
       { to: "/follow-up", label: "Follow-up", icon: CalendarCheck },
+      { to: "/automacao", label: "Automação", icon: Zap },
     ],
   },
   {
@@ -74,10 +77,7 @@ const OPERACIONAL_GROUPS: SubGroup[] = [
   {
     id: "marketing", label: "Marketing", icon: Megaphone,
     items: [
-      { to: "/campanhas", label: "Campanhas", icon: Megaphone },
-      { to: "/email-marketing", label: "E-mail", icon: Mail, availability: "coming-soon" },
-      { to: "/landing-pages", label: "Landing Pages", icon: Globe, availability: "coming-soon" },
-      { to: "/automacao", label: "Automação", icon: Zap },
+      { to: "/campanhas", label: "Marketing da empresa", icon: Megaphone },
     ],
   },
   {
@@ -134,8 +134,8 @@ const MAIS_GROUPS: SubGroup[] = [
   },
 ];
 
-const COMERCIAL_PATHS = ["/leads", "/prospeccao", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas", "/follow-up"];
-const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/metas", "/equipe", "/campanhas", "/email-marketing", "/landing-pages", "/automacao", "/tickets", "/base-conhecimento", "/chat", "/consultor"];
+const COMERCIAL_PATHS = ["/leads", "/prospeccao", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas", "/follow-up", "/automacao"];
+const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/metas", "/equipe", "/campanhas", "/tickets", "/base-conhecimento", "/chat", "/consultor"];
 
 
 export function AppShell({ children, title, subtitle, action }: {
@@ -146,6 +146,7 @@ export function AppShell({ children, title, subtitle, action }: {
   const { loading: tenantLoading, memberships, isSuperAdmin, current } = useTenant();
   const { theme, toggleTheme } = useTheme();
   const { role: commercialRole } = useMyCommercialRole();
+  const { data: consultorAccess } = useConsultorAccess();
   const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
 
@@ -169,11 +170,11 @@ export function AppShell({ children, title, subtitle, action }: {
     [segmento],
   );
   const filteredOperacional = useMemo(
-    () => OPERACIONAL_GROUPS.map((g) => ({
+    () => OPERACIONAL_GROUPS.filter(g => g.id !== "consultor" || consultorAccess === true).map((g) => ({
       ...g,
       items: g.items.filter((i) => (!i.clinicOnly || segmento === "clinica") && (!i.schoolOnly || segmento === "escolar")),
     })).filter((g) => g.items.length),
-    [segmento],
+    [segmento, consultorAccess],
   );
   const filteredMais = useMemo(
     () => MAIS_GROUPS.map((g) => {
@@ -335,6 +336,7 @@ export function AppShell({ children, title, subtitle, action }: {
           </div>
         </div>
 
+        <div className="mx-auto max-w-[1600px] px-4 md:px-8"><CrmMetrics /></div>
       </header>
 
       {/* ===== Main ===== */}

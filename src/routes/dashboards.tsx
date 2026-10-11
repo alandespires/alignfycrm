@@ -6,6 +6,7 @@ import { useQuotas, useContemplations } from "@/hooks/use-consortium-quotas";
 import { useCommissions } from "@/hooks/use-consultor-commissions";
 import { useSimulations } from "@/hooks/use-consortium-simulations";
 import { useCreditSimulations } from "@/hooks/use-credit";
+import { useConsultorAccess } from "@/hooks/use-module-access";
 import { LineChart, Award, Wallet, Calculator, TrendingUp, AlertTriangle, Landmark, ArrowRight } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/dashboards")({
@@ -16,6 +17,12 @@ export const Route = createFileRoute("/dashboards")({
 const BRL = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 function DashboardsPage() {
+  const { data: consultorAccess } = useConsultorAccess();
+  if (consultorAccess !== true) return <AppShell title="Dashboards" subtitle="Visão comercial"><div className="flex flex-wrap gap-3"><Link to="/relatorios" className="rounded-lg border border-border px-4 py-3 text-sm hover:bg-muted">Relatórios <ArrowRight className="inline h-4 w-4" /></Link><Link to="/campanhas" className="rounded-lg border border-border px-4 py-3 text-sm hover:bg-muted">Marketing <ArrowRight className="inline h-4 w-4" /></Link></div></AppShell>;
+  return <ConsultorDashboards />;
+}
+
+function ConsultorDashboards() {
   const { data: quotas = [] } = useQuotas();
   const { data: contemplations = [] } = useContemplations();
   const { data: commissions = [] } = useCommissions();
