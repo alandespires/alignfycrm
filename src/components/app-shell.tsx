@@ -48,6 +48,7 @@ const COMERCIAL_GROUPS: SubGroup[] = [
       { to: "/oportunidades", label: "Oportunidades", icon: Target },
       { to: "/propostas", label: "Propostas", icon: FileText },
       { to: "/follow-up", label: "Follow-up", icon: CalendarCheck },
+      { to: "/automacao", label: "Automação", icon: Zap },
     ],
   },
   {
@@ -76,7 +77,7 @@ const OPERACIONAL_GROUPS: SubGroup[] = [
   {
     id: "marketing", label: "Marketing", icon: Megaphone,
     items: [
-      { to: "/campanhas", label: "Campanhas", icon: Megaphone },
+      { to: "/campanhas", label: "Marketing da empresa", icon: Megaphone },
     ],
   },
   {
@@ -133,8 +134,8 @@ const MAIS_GROUPS: SubGroup[] = [
   },
 ];
 
-const COMERCIAL_PATHS = ["/leads", "/prospeccao", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas", "/follow-up"];
-const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/metas", "/equipe", "/campanhas", "/email-marketing", "/landing-pages", "/automacao", "/tickets", "/base-conhecimento", "/chat", "/consultor"];
+const COMERCIAL_PATHS = ["/leads", "/prospeccao", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas", "/follow-up", "/automacao"];
+const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/metas", "/equipe", "/campanhas", "/tickets", "/base-conhecimento", "/chat", "/consultor"];
 
 
 export function AppShell({ children, title, subtitle, action }: {
@@ -335,6 +336,7 @@ export function AppShell({ children, title, subtitle, action }: {
           </div>
         </div>
 
+        <div className="mx-auto max-w-[1600px] px-4 md:px-8"><CrmMetrics /></div>
       </header>
 
       {/* ===== Main ===== */}
