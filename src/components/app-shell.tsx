@@ -277,7 +277,6 @@ export function AppShell({ children, title, subtitle, action }: {
         launchOpen={launchOpen}
         isSuperAdmin={isSuperAdmin}
         onSignOut={() => signOut()}
-        onSearch={() => setSearchOpen(true)}
       />
       {/* ===== Top bar (glass, minimal) ===== */}
       <header
