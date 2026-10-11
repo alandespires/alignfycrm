@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard, ShoppingBag, Briefcase, Wallet, MoreHorizontal,
-  Search, Sparkles, ChevronDown, PanelLeftClose, PanelLeftOpen, LogOut, Shield,
+  Sparkles, ChevronDown, PanelLeftClose, PanelLeftOpen, LogOut, Shield,
 } from "@/components/ui/icons";
 import { LaunchIcon } from "@/components/launch-icon";
 
@@ -27,13 +27,13 @@ export function useSidebarCollapsed() {
 
 export function DesktopSidebar({
   collapsed, onToggle, pathname, comercial, operacional, mais, active,
-  operacionalBadge, onLaunch, launchOpen, isSuperAdmin, onSignOut, onSearch,
+  operacionalBadge, onLaunch, launchOpen, isSuperAdmin, onSignOut,
 }: {
   collapsed: boolean; onToggle: (v: boolean) => void; pathname: string;
   comercial: Group[]; operacional: Group[]; mais: Group[];
   active: { home: boolean; comercial: boolean; operacional: boolean; financeiro: boolean };
   operacionalBadge?: number; onLaunch: () => void; launchOpen: boolean;
-  isSuperAdmin: boolean; onSignOut: () => void; onSearch: () => void;
+  isSuperAdmin: boolean; onSignOut: () => void;
 }) {
   const [open, setOpen] = useState<Record<string, boolean>>({});
   useEffect(() => {
@@ -78,7 +78,6 @@ export function DesktopSidebar({
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3 [scrollbar-width:thin]">
-        <Button variant="unstyled" size="unstyled" onClick={onSearch} aria-label="Buscar registros" className={rowClass(false, collapsed)}><Search className="h-[18px] w-[18px] shrink-0" />{!collapsed && <span>Buscar</span>}</Button>
         <NavLink to="/" label="Dashboard" icon={LayoutDashboard} active={active.home} collapsed={collapsed} />
         <Section id="comercial" label="Comercial" icon={ShoppingBag} groups={comercial} open={!!open.comercial} active={active.comercial} collapsed={collapsed} onToggle={toggle} isActive={isActive} />
         <Section id="operacional" label="Operacional" icon={Briefcase} groups={operacional} open={!!open.operacional} active={active.operacional} collapsed={collapsed} onToggle={toggle} isActive={isActive} badge={operacionalBadge} />
