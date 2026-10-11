@@ -9,7 +9,7 @@ export function useConsultorAccess() {
     enabled: !!user,
     placeholderData: undefined,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("has_module_access" as any, { _module: "consultor" } as any);
+      const { data, error } = await supabase.rpc("has_module_access", { _module: "consultor" });
       if (error) throw error;
       return data === true;
     },
