@@ -253,15 +253,7 @@ export function DashboardPage() {
         </div>
       }
     >
-      {/* KPI grid */}
-      {visible.kpis && (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <KpiCard label={`Leads ${periodo === "tudo" ? "totais" : `(${PERIODO_LABEL[periodo].toLowerCase()})`}`} value={String(leadsPeriodo.length)} icon={Users} loading={isLoading} />
-          <KpiCard label="Oportunidades abertas" value={String(oportunidadesAbertas)} icon={Target} accent loading={isLoading} />
-          <KpiCard label="Receita prevista" value={formatBRL(totalPipeline)} icon={DollarSign} accent loading={isLoading} />
-          <KpiCard label="Fechado no mês" value={formatBRL(wonMonth)} icon={CheckCircle2} loading={isLoading} />
-        </div>
-      )}
+      {visible.kpis && <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground"><span>{leadsPeriodo.length} leads · {PERIODO_LABEL[periodo]}</span><span>Recebido no mês <strong className="ml-1 text-success">{formatBRL(wonMonth)}</strong></span></div>}
 
       {/* Main grid */}
       {(visible.receita || visible.insights) && (

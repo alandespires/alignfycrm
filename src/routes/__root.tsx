@@ -8,6 +8,7 @@ import { Loader2, ShieldX } from "@/components/ui/icons";
 import { useAuth } from "@/contexts/auth-context";
 import { useTenant } from "@/contexts/tenant-context";
 import { canAccessPath } from "@/lib/access-control";
+import { useConsultorAccess } from "@/hooks/use-module-access";
 import alignIcon from "@/assets/align-icon.png";
 
 import appCss from "../styles.css?url";
@@ -93,6 +94,7 @@ function AccessBoundary() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const { user, loading: authLoading } = useAuth();
   const { current, loading: tenantLoading, isSuperAdmin } = useTenant();
+  const consultor = useConsultorAccess();
 
   const isPublic = pathname === "/auth" || pathname === "/onboarding" || pathname.startsWith("/t/");
   if (isPublic) return <Outlet />;
@@ -110,6 +112,10 @@ function AccessBoundary() {
   }
 
   const segment = current?.tenant.segmento ?? "geral";
+  if (pathname.startsWith("/consultor")) {
+    if (consultor.isPending) return <div className="grid min-h-screen place-items-center bg-background"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+    if (consultor.data !== true) return <AccessMessage title="Módulo indisponível" description="O Consultor não está habilitado para sua conta." />;
+  }
   if (pathname.startsWith("/clinicas") && !canAccessPath(pathname, segment, isSuperAdmin)) {
     return <AccessMessage title="Módulo não contratado" description="O módulo Align Clínicas não está habilitado para este workspace. Fale com o administrador do workspace para solicitar acesso." />;
   }
