@@ -4902,6 +4902,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_module_restrictions: {
+        Row: {
+          created_at: string
+          module: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          module: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          module?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -5040,6 +5058,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_module_access: { Args: { _module: string }; Returns: boolean }
       has_prospecting_permission: {
         Args: { _permission: string; _tenant_id: string; _user_id: string }
         Returns: boolean
