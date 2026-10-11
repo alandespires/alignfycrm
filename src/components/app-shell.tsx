@@ -23,6 +23,8 @@ import { LaunchIcon } from "@/components/launch-icon";
 import { DesktopSidebar, useSidebarCollapsed } from "@/components/desktop-sidebar";
 import { ProductTour } from "@/components/product-tour";
 import { LeadFormDialog } from "@/components/lead-form-dialog";
+import { CrmMetrics } from "@/components/crm-metrics";
+import { useConsultorAccess } from "@/hooks/use-module-access";
 
 
 /* ============================================================
@@ -75,9 +77,6 @@ const OPERACIONAL_GROUPS: SubGroup[] = [
     id: "marketing", label: "Marketing", icon: Megaphone,
     items: [
       { to: "/campanhas", label: "Campanhas", icon: Megaphone },
-      { to: "/email-marketing", label: "E-mail", icon: Mail, availability: "coming-soon" },
-      { to: "/landing-pages", label: "Landing Pages", icon: Globe, availability: "coming-soon" },
-      { to: "/automacao", label: "Automação", icon: Zap },
     ],
   },
   {
@@ -146,6 +145,7 @@ export function AppShell({ children, title, subtitle, action }: {
   const { loading: tenantLoading, memberships, isSuperAdmin, current } = useTenant();
   const { theme, toggleTheme } = useTheme();
   const { role: commercialRole } = useMyCommercialRole();
+  const { data: consultorAccess } = useConsultorAccess();
   const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
 
@@ -169,11 +169,11 @@ export function AppShell({ children, title, subtitle, action }: {
     [segmento],
   );
   const filteredOperacional = useMemo(
-    () => OPERACIONAL_GROUPS.map((g) => ({
+    () => OPERACIONAL_GROUPS.filter(g => g.id !== "consultor" || consultorAccess === true).map((g) => ({
       ...g,
       items: g.items.filter((i) => (!i.clinicOnly || segmento === "clinica") && (!i.schoolOnly || segmento === "escolar")),
     })).filter((g) => g.items.length),
-    [segmento],
+    [segmento, consultorAccess],
   );
   const filteredMais = useMemo(
     () => MAIS_GROUPS.map((g) => {
