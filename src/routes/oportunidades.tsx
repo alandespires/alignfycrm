@@ -1,81 +1,71 @@
 import { pageHead } from "@/lib/page-head";
 import { Button } from "@/components/ui/button";
-import { dealsQueryOptions } from "@/hooks/use-deals";
-import { leadsQueryOptions } from "@/hooks/use-leads";
+import { leadsQueryOptions, useLeads, useUpdateLeadStatus, useDeleteLead, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
 import { getActiveTenantId } from "@/contexts/tenant-context";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
-import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
+import { AppShell } from "@/components/app-shell";
 import { FunnelViewSwitch } from "@/components/funnel-view-switch";
-import { useDeals, useUpsertDeal, useDeleteDeal, type DealRow, type DealStage } from "@/hooks/use-deals";
+import { LeadFormDialog } from "@/components/lead-form-dialog";
+import { LeadDetailDrawer } from "@/components/lead-detail-drawer";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import { formatBRL } from "@/lib/mock-data";
-import { Target, Plus, Pencil, Trash2, Search, X, TrendingUp } from "@/components/ui/icons";
-import { toast } from "sonner";
+import { Target, Trash2, Search, TrendingUp } from "@/components/ui/icons";
 
 export const Route = createFileRoute("/oportunidades")({
-  head: () => pageHead("Oportunidades"),
+  head: () => pageHead("Funil de vendas · Lista"),
   loader: ({ context }) => {
     const tenantId = typeof window === "undefined" ? null : getActiveTenantId();
     if (!tenantId) return;
-    void context.queryClient.prefetchQuery(dealsQueryOptions(tenantId));
     void context.queryClient.prefetchQuery(leadsQueryOptions(tenantId));
   },
   component: OportunidadesPage,
 });
 
-const STAGE_LABEL: Record<DealStage, string> = {
-  novo: "Novo", contato_inicial: "Em contato", qualificacao: "Qualificada",
-  proposta: "Proposta", negociacao: "Negociação", fechado: "Ganha", perdido: "Perdida",
+// Mesmos estágios do Kanban: Lista e Kanban leem a mesma fonte (leads).
+const STAGE_LABEL: Record<LeadStatus, string> = {
+  novo: "Novo Lead", contato_inicial: "Contato Inicial", qualificacao: "Qualificação",
+  proposta: "Proposta", negociacao: "Negociação", fechado: "Fechado", perdido: "Perdido",
 };
 
-const STAGE_TONE = (s: DealStage) =>
-  s === "fechado" ? "success" : s === "perdido" ? "danger"
-  : s === "negociacao" || s === "proposta" ? "warn" : s === "qualificacao" ? "info" : "neutral";
-
 function OportunidadesPage() {
-  useRealtimeSync([{ table: "deals", queryKeys: [["deals"]] }]);
-  const { data: deals = [], isLoading } = useDeals();
-  const upsert = useUpsertDeal();
-  const del = useDeleteDeal();
+  useRealtimeSync([{ table: "leads", queryKeys: [["leads"]] }]);
+  const { data: leads = [], isLoading } = useLeads();
+  const updateStatus = useUpdateLeadStatus();
+  const del = useDeleteLead();
   const { canEdit, canDelete } = useMyCommercialRole();
   const [query, setQuery] = useState("");
-  const [stageFilter, setStageFilter] = useState<DealStage | "todos">("todos");
-  const [editing, setEditing] = useState<Partial<DealRow> | null>(null);
+  const [stageFilter, setStageFilter] = useState<LeadStatus | "todos">("todos");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = leads.find((l) => l.id === selectedId) ?? null;
 
   const filtered = useMemo(() => {
-    return deals.filter((d) => {
-      if (stageFilter !== "todos" && d.stage !== stageFilter) return false;
-      if (query && !d.titulo.toLowerCase().includes(query.toLowerCase())) return false;
+    const q = query.trim().toLowerCase();
+    return leads.filter((l) => {
+      if (stageFilter !== "todos" && l.status !== stageFilter) return false;
+      if (q && !`${l.nome} ${l.empresa ?? ""}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [deals, query, stageFilter]);
+  }, [leads, query, stageFilter]);
 
-  const openDeals = deals.filter((d) => d.stage !== "fechado" && d.stage !== "perdido");
-  const pipelineOpen = openDeals.reduce((a, d) => a + Number(d.valor || 0), 0);
-  const wonThisMonth = deals.filter((d) => {
-    if (d.stage !== "fechado" || !d.fechado_em) return false;
-    const dt = new Date(d.fechado_em);
-    const now = new Date();
-    return dt.getMonth() === now.getMonth() && dt.getFullYear() === now.getFullYear();
-  });
-  const wonValue = wonThisMonth.reduce((a, d) => a + Number(d.valor || 0), 0);
-  const ticketMedio = wonThisMonth.length > 0 ? wonValue / wonThisMonth.length : 0;
-  const conversao = deals.length > 0
-    ? Math.round((deals.filter((d) => d.stage === "fechado").length / deals.length) * 100)
-    : 0;
+  const valor = (l: LeadRow) => Number(l.valor_estimado || 0);
+  const open = leads.filter((l) => l.status !== "fechado" && l.status !== "perdido");
+  const pipelineOpen = open.reduce((a, l) => a + valor(l), 0);
+  const won = leads.filter((l) => l.status === "fechado");
+  const wonValue = won.reduce((a, l) => a + valor(l), 0);
+  const ticketMedio = won.length ? wonValue / won.length : 0;
+  const conversao = leads.length ? Math.round((won.length / leads.length) * 100) : 0;
 
   return (
     <AppShell
       title="Funil de vendas"
-      subtitle={`${openDeals.length} em aberto · ${formatBRL(pipelineOpen)} em pipeline`}
-      action={<div className="flex items-center gap-2"><FunnelViewSwitch current="lista" />{canEdit && <PrimaryButton icon={Plus} onClick={() => setEditing({ titulo: "", valor: 0, stage: "qualificacao" })}>Nova oportunidade</PrimaryButton>}</div>}
+      subtitle={`${open.length} em aberto · ${formatBRL(pipelineOpen)} em pipeline`}
+      action={<div className="flex items-center gap-2"><FunnelViewSwitch current="lista" />{canEdit && <LeadFormDialog />}</div>}
     >
       <div className="mb-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <Kpi label="Pipeline aberto" value={formatBRL(pipelineOpen)} icon={TrendingUp} />
-        <Kpi label="Ganhas no mês" value={String(wonThisMonth.length)} delta={formatBRL(wonValue)} />
+        <Kpi label="Ganhas" value={String(won.length)} delta={formatBRL(wonValue)} />
         <Kpi label="Ticket médio" value={formatBRL(ticketMedio)} />
         <Kpi label="Taxa de conversão" value={`${conversao}%`} />
       </div>
@@ -84,78 +74,74 @@ function OportunidadesPage() {
         <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar oportunidade…"
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar negócio…"
               className="h-9 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/25" />
           </div>
-          <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value as any)}
+          <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value as LeadStatus | "todos")}
             className="h-9 rounded-lg border border-border bg-background px-3 text-sm">
             <option value="todos">Todos os estágios</option>
             {Object.entries(STAGE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
-          <span className="text-xs text-muted-foreground">{filtered.length}/{deals.length}</span>
+          <span className="text-xs text-muted-foreground">{filtered.length}/{leads.length}</span>
         </div>
 
         {isLoading ? (
           <div className="px-6 py-12 text-center text-sm text-muted-foreground">Carregando…</div>
         ) : filtered.length === 0 ? (
-          <EmptyState
-            icon={Target}
-            label={deals.length === 0 ? "Nenhuma oportunidade ainda" : "Nada encontrado com esses filtros"}
-            cta={canEdit ? { label: "Nova oportunidade", onClick: () => setEditing({ titulo: "", valor: 0, stage: "qualificacao" }) } : undefined}
-          />
+          <div className="flex flex-col items-center justify-center gap-2 px-6 py-16 text-center">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-muted text-muted-foreground"><Target className="h-6 w-6" /></div>
+            <p className="text-sm font-medium">{leads.length === 0 ? "Nenhum negócio no funil" : "Nada encontrado com esses filtros"}</p>
+          </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="border-b border-border bg-surface-2/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="px-5 py-3 font-medium">Título</th>
-                <th className="px-5 py-3 font-medium">Estágio</th>
-                <th className="px-5 py-3 font-medium">Probabilidade</th>
-                <th className="px-5 py-3 font-medium text-right">Valor</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filtered.map((d) => (
-                <tr key={d.id} className="transition hover:bg-surface-2/40">
-                  <td className="px-5 py-3 font-medium">{d.titulo}</td>
-                  <td className="px-5 py-3"><StatusPill tone={STAGE_TONE(d.stage) as any}>{STAGE_LABEL[d.stage]}</StatusPill></td>
-                  <td className="px-5 py-3 text-muted-foreground tabular-nums">{d.probabilidade ?? 0}%</td>
-                  <td className="px-5 py-3 text-right font-semibold tabular-nums">{formatBRL(Number(d.valor))}</td>
-                  <td className="px-5 py-3">
-                    <div className="flex justify-end gap-1">
-                      {canEdit && (
-                        <Button variant="unstyled" size="unstyled" onClick={() => setEditing(d)} aria-label="Editar oportunidade" className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-surface-3 hover:text-foreground">
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                      )}
-                      {canDelete && (
-                        <Button variant="unstyled" size="unstyled" onClick={() => { if (confirm(`Excluir "${d.titulo}"?`)) del.mutate(d.id); }}
-                          aria-label="Excluir oportunidade" className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      )}
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-border bg-surface-2/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-5 py-3 font-medium">Negócio</th>
+                  <th className="px-5 py-3 font-medium">Estágio</th>
+                  <th className="px-5 py-3 font-medium">Score</th>
+                  <th className="px-5 py-3 font-medium text-right">Valor</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {filtered.map((l) => (
+                  <tr key={l.id} onClick={() => setSelectedId(l.id)} className="cursor-pointer transition hover:bg-surface-2/40">
+                    <td className="px-5 py-3">
+                      <div className="font-medium">{l.empresa || l.nome}</div>
+                      {l.empresa && <div className="text-xs text-muted-foreground">{l.nome}</div>}
+                    </td>
+                    <td className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
+                      <select
+                        value={l.status}
+                        disabled={!canEdit}
+                        onChange={(e) => updateStatus.mutate({ id: l.id, status: e.target.value as LeadStatus } as any)}
+                        className="h-8 rounded-lg border border-border bg-background px-2 text-xs"
+                      >
+                        {Object.entries(STAGE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                      </select>
+                    </td>
+                    <td className="px-5 py-3 text-muted-foreground tabular-nums">{l.ai_score ?? 0}</td>
+                    <td className="px-5 py-3 text-right font-semibold tabular-nums">{valor(l) > 0 ? formatBRL(valor(l)) : "—"}</td>
+                    <td className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
+                      {canDelete && (
+                        <div className="flex justify-end">
+                          <Button variant="unstyled" size="unstyled" onClick={() => { if (confirm(`Excluir "${l.empresa || l.nome}"?`)) del.mutate(l.id as any); }}
+                            aria-label="Excluir negócio" className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/15 hover:text-destructive">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
-      {editing && (
-        <DealDialog
-          draft={editing}
-          onClose={() => setEditing(null)}
-          onSave={(d) => {
-            if (!d.titulo?.trim()) { toast.error("Informe um título"); return; }
-            upsert.mutate({
-              id: d.id, titulo: d.titulo, valor: Number(d.valor ?? 0),
-              stage: (d.stage as DealStage) ?? "qualificacao", probabilidade: Number(d.probabilidade ?? 0),
-            }, { onSuccess: () => setEditing(null) });
-          }}
-        />
-      )}
+      <LeadDetailDrawer lead={selected} onClose={() => setSelectedId(null)} />
     </AppShell>
   );
 }
@@ -173,58 +159,4 @@ function Kpi({ label, value, delta, icon: Icon }: { label: string; value: string
       </div>
     </div>
   );
-}
-
-function EmptyState({ icon: Icon, label, cta }: { icon: any; label: string; cta?: { label: string; onClick: () => void } }) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-2 px-6 py-16 text-center">
-      <div className="grid h-12 w-12 place-items-center rounded-2xl bg-muted text-muted-foreground"><Icon className="h-6 w-6" /></div>
-      <p className="text-sm font-medium">{label}</p>
-      {cta && (
-        <Button variant="unstyled" size="unstyled" onClick={cta.onClick} className="mt-2 inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground hover:opacity-90">
-          <Plus className="h-3.5 w-3.5" /> {cta.label}
-        </Button>
-      )}
-    </div>
-  );
-}
-
-function DealDialog({ draft, onClose, onSave }: { draft: Partial<DealRow>; onClose: () => void; onSave: (d: Partial<DealRow>) => void }) {
-  const [d, setD] = useState(draft);
-  return (
-    <AlignPanel
-      open
-      onClose={onClose}
-      eyebrow="Oportunidade"
-      title={d.id ? "Editar oportunidade" : "Nova oportunidade"}
-      widthClass="md:max-w-[520px]"
-      footer={
-        <AlignPanelFooter
-          secondary={{ label: "Cancelar", onClick: onClose }}
-          primary={{ label: "Salvar", onClick: () => onSave(d) }}
-        />
-      }
-    >
-      <div className="space-y-3">
-        <L label="Título"><Inp value={d.titulo ?? ""} onChange={(v) => setD({ ...d, titulo: v })} autoFocus /></L>
-        <div className="grid grid-cols-2 gap-3">
-          <L label="Valor (R$)"><Inp type="number" value={String(d.valor ?? 0)} onChange={(v) => setD({ ...d, valor: Number(v) })} /></L>
-          <L label="Probabilidade %"><Inp type="number" value={String(d.probabilidade ?? 0)} onChange={(v) => setD({ ...d, probabilidade: Number(v) })} /></L>
-        </div>
-        <L label="Estágio">
-          <select value={d.stage ?? "qualificacao"} onChange={(e) => setD({ ...d, stage: e.target.value as DealStage })}
-            className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm">
-            {Object.entries(STAGE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-          </select>
-        </L>
-      </div>
-    </AlignPanel>
-  );
-}
-
-function L({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label className="block"><span className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>{children}</label>;
-}
-function Inp({ onChange, ...rest }: Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> & { onChange: (v: string) => void }) {
-  return <input {...rest} onChange={(e) => onChange(e.target.value)} className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/25" />;
 }
