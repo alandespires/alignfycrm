@@ -57,7 +57,7 @@ export function DesktopSidebar({
     });
   };
 
-  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
+  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/") || (to === "/pipeline" && pathname.startsWith("/oportunidades")));
 
   return (
     <aside

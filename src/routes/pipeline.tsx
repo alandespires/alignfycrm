@@ -10,6 +10,7 @@ import {
   type DragEndEvent, type DragStartEvent, useDraggable, useDroppable,
 } from "@dnd-kit/core";
 import { AppShell } from "@/components/app-shell";
+import { FunnelViewSwitch } from "@/components/funnel-view-switch";
 import { LeadFormDialog } from "@/components/lead-form-dialog";
 import { RealtimeBadge } from "@/components/realtime-badge";
 import { formatBRL } from "@/lib/mock-data";
@@ -200,10 +201,11 @@ function PipelinePage() {
 
   return (
     <AppShell
-      title="Pipeline"
+      title="Funil de vendas"
       subtitle={`${displayedLeads.length}${displayedLeads.length !== leads.length ? ` de ${leads.length}` : ""} leads no funil · ${formatBRL(totalValue)} em pipeline`}
       action={
         <div className="flex items-center gap-2">
+          <FunnelViewSwitch current="kanban" />
           <RealtimeBadge status={realtimeStatus} />
           <Button variant="unstyled" size="unstyled" type="button" aria-pressed={compact} onClick={() => setCompact((value) => !value)} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-border bg-surface-1 px-3 text-sm text-muted-foreground hover:text-foreground">
             <Rows3 className="h-3.5 w-3.5" /> {compact ? "Compacto" : "Detalhado"}

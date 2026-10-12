@@ -44,8 +44,7 @@ const COMERCIAL_GROUPS: SubGroup[] = [
     items: [
       { to: "/leads", label: "Leads", icon: Users },
       { to: "/prospeccao", label: "Prospecção B2B", icon: Target },
-      { to: "/pipeline", label: "Pipeline", icon: Kanban },
-      { to: "/oportunidades", label: "Oportunidades", icon: Target },
+      { to: "/pipeline", label: "Funil", icon: Kanban },
       { to: "/propostas", label: "Propostas", icon: FileText },
       { to: "/follow-up", label: "Follow-up", icon: CalendarCheck },
       { to: "/automacao", label: "Automação", icon: Zap },
@@ -254,7 +253,7 @@ export function AppShell({ children, title, subtitle, action }: {
     .split(" ").map((s: string) => s[0]).join("").slice(0, 2).toUpperCase();
   const displayName = user.user_metadata?.full_name || user.email?.split("@")[0];
 
-  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
+  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/") || (to === "/pipeline" && pathname.startsWith("/oportunidades")));
   const isComercialActive = COMERCIAL_PATHS.some((p) => pathname.startsWith(p));
   const isOperacionalActive = OPERACIONAL_PATHS.some((p) => pathname.startsWith(p));
   const showGlobalLeadAction = !["/", "/leads", "/pipeline"].includes(pathname);
@@ -550,7 +549,7 @@ function DockSheet({
 }: {
   title: string; onClose: () => void; groups: SubGroup[]; pathname: string; footer?: ReactNode;
 }) {
-  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/"));
+  const isActive = (to: string) => to === "/" ? pathname === "/" : (pathname === to || pathname.startsWith(to + "/") || (to === "/pipeline" && pathname.startsWith("/oportunidades")));
   const panelRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const onCloseRef = useRef(onClose);

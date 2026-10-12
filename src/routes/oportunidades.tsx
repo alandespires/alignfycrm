@@ -7,6 +7,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
+import { FunnelViewSwitch } from "@/components/funnel-view-switch";
 import { useDeals, useUpsertDeal, useDeleteDeal, type DealRow, type DealStage } from "@/hooks/use-deals";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { useRealtimeSync } from "@/hooks/use-realtime";
@@ -68,9 +69,9 @@ function OportunidadesPage() {
 
   return (
     <AppShell
-      title="Oportunidades"
+      title="Funil de vendas"
       subtitle={`${openDeals.length} em aberto · ${formatBRL(pipelineOpen)} em pipeline`}
-      action={canEdit ? <PrimaryButton icon={Plus} onClick={() => setEditing({ titulo: "", valor: 0, stage: "qualificacao" })}>Nova oportunidade</PrimaryButton> : null}
+      action={<div className="flex items-center gap-2"><FunnelViewSwitch current="lista" />{canEdit && <PrimaryButton icon={Plus} onClick={() => setEditing({ titulo: "", valor: 0, stage: "qualificacao" })}>Nova oportunidade</PrimaryButton>}</div>}
     >
       <div className="mb-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <Kpi label="Pipeline aberto" value={formatBRL(pipelineOpen)} icon={TrendingUp} />
