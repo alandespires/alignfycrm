@@ -96,7 +96,6 @@ const OPERACIONAL_GROUPS: SubGroup[] = [
     items: [
       { to: "/tickets", label: "Tickets", icon: LifeBuoy },
       { to: "/base-conhecimento", label: "Base", icon: BookOpen },
-      { to: "/chat", label: "Chat", icon: MessageCircle, availability: "coming-soon" },
     ],
   },
 ];
@@ -108,7 +107,6 @@ const MAIS_GROUPS: SubGroup[] = [
     items: [
       { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
       { to: "/insights", label: "Launch", icon: LaunchIcon },
-      { to: "/dashboards", label: "Dashboards", icon: LineChart },
     ],
   },
   {
@@ -135,7 +133,7 @@ const MAIS_GROUPS: SubGroup[] = [
 ];
 
 const COMERCIAL_PATHS = ["/leads", "/prospeccao", "/pipeline", "/oportunidades", "/propostas", "/clientes", "/contatos", "/empresas", "/interacoes", "/clinicas", "/follow-up", "/automacao"];
-const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/metas", "/equipe", "/campanhas", "/tickets", "/base-conhecimento", "/chat", "/consultor"];
+const OPERACIONAL_PATHS = ["/projetos", "/tarefas", "/metas", "/equipe", "/campanhas", "/tickets", "/base-conhecimento", "/consultor"];
 
 
 export function AppShell({ children, title, subtitle, action }: {
