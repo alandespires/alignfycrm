@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useState, type FormEvent } from "react";
-import { Sparkles, Loader2, Mail, Phone, MessageSquare, Calendar, Plus, Building2, RefreshCw, Trash2, UserCheck, X } from "@/components/ui/icons";
+import { Link } from "@tanstack/react-router";
+import { Sparkles, Loader2, Mail, Phone, MessageSquare, Calendar, Plus, Building2, RefreshCw, Trash2, UserCheck, X, FileText, Kanban } from "@/components/ui/icons";
 import { useScoreLead } from "@/hooks/use-score-lead";
 import { useDeleteLead, useSetWhatsAppConsent, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
 import { useLeadActivities, useCreateActivity, type ActivityType } from "@/hooks/use-activities";
@@ -137,6 +138,15 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
                 <MessageSquare className="h-3 w-3" /> WhatsApp
               </WhatsAppContactLink>
             )}
+            <Link to="/propostas" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 text-xs hover:border-primary/40 hover:text-primary">
+              <FileText className="h-3 w-3" /> Proposta
+            </Link>
+            <Link to="/pipeline" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 text-xs hover:border-primary/40 hover:text-primary">
+              <Kanban className="h-3 w-3" /> Funil
+            </Link>
+            <Link to="/clientes" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 text-xs hover:border-primary/40 hover:text-primary">
+              <Building2 className="h-3 w-3" /> Clientes
+            </Link>
           </div>
 
           {lead.whatsapp && (
