@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { FolderKanban, CheckSquare, Loader2 } from "@/components/ui/icons";
+import { Kanban as FolderKanban, CheckSquare, Loader2 } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { useCreateProject } from "@/hooks/use-projects";
 import { useCreateTask } from "@/hooks/use-tasks";
