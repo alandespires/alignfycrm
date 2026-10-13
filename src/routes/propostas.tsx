@@ -1,7 +1,7 @@
 import { pageHead } from "@/lib/page-head";
 import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell, PrimaryButton, StatusPill } from "@/components/app-shell";
 import { AlignPanel, AlignPanelFooter } from "@/components/align-panel";
 import { useProposals, useUpsertProposal, useDeleteProposal, type ProposalRow, type ProposalStatus } from "@/hooks/use-proposals";
@@ -10,9 +10,12 @@ import { useRealtimeSync } from "@/hooks/use-realtime";
 import { formatBRL } from "@/lib/mock-data";
 import { FileText, Plus, Pencil, Trash2, Search, X, Send, CheckCircle2 } from "@/components/ui/icons";
 import { toast } from "sonner";
+import { useLeads, type LeadRow } from "@/hooks/use-leads";
+import { LeadDetailDrawer } from "@/components/lead-detail-drawer";
 
 export const Route = createFileRoute("/propostas")({
   head: () => pageHead("Propostas"),
+  validateSearch: (s: Record<string, unknown>): { lead?: string } => ({ lead: typeof s.lead === "string" ? s.lead : undefined }),
   component: PropostasPage,
 });
 
@@ -33,6 +36,18 @@ function PropostasPage() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [editing, setEditing] = useState<Partial<ProposalRow> | null>(null);
+  const { data: leads = [] } = useLeads();
+  const leadById = useMemo(() => new Map(leads.map((l) => [l.id, l])), [leads]);
+  const [convertLead, setConvertLead] = useState<LeadRow | null>(null);
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
+  useEffect(() => {
+    if (!search.lead || !canEdit) return;
+    const l = leadById.get(search.lead);
+    if (!l) return;
+    setEditing({ titulo: `Proposta — ${l.empresa || l.nome}`, valor: Number(l.valor_estimado ?? 0), status: "rascunho", lead_id: l.id });
+    void navigate({ search: {}, replace: true });
+  }, [search.lead, leadById, canEdit, navigate]);
 
   const filtered = useMemo(() => proposals.filter((p) => {
     if (statusFilter !== "todos" && p.status !== statusFilter) return false;
@@ -88,6 +103,7 @@ function PropostasPage() {
             <thead className="border-b border-border bg-surface-2/50 text-left text-[11px] uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-5 py-3 font-medium">Título</th>
+                <th className="px-5 py-3 font-medium">Lead</th>
                 <th className="px-5 py-3 font-medium">Status</th>
                 <th className="px-5 py-3 font-medium">Validade</th>
                 <th className="px-5 py-3 font-medium text-right">Valor</th>
@@ -98,6 +114,7 @@ function PropostasPage() {
               {filtered.map((p) => (
                 <tr key={p.id} className="transition hover:bg-surface-2/40">
                   <td className="px-5 py-3 font-medium">{p.titulo}</td>
+                  <td className="px-5 py-3 text-muted-foreground">{p.lead_id ? (leadById.get(p.lead_id)?.empresa || leadById.get(p.lead_id)?.nome || "—") : "—"}</td>
                   <td className="px-5 py-3"><StatusPill tone={STATUS_TONE(p.status)}>{STATUS_LABEL[p.status] ?? p.status}</StatusPill></td>
                   <td className="px-5 py-3 text-muted-foreground">{p.validade ? new Date(p.validade).toLocaleDateString("pt-BR") : "—"}</td>
                   <td className="px-5 py-3 text-right font-semibold tabular-nums">{formatBRL(Number(p.valor || 0))}</td>
@@ -115,16 +132,22 @@ function PropostasPage() {
       </div>
 
       {editing && (
-        <ProposalDialog draft={editing} onClose={() => setEditing(null)}
+        <ProposalDialog draft={editing} leads={leads} onClose={() => setEditing(null)}
           onSave={(d) => {
             if (!d.titulo?.trim()) { toast.error("Informe um título"); return; }
             upsert.mutate({
               id: d.id, titulo: d.titulo!, valor: Number(d.valor ?? 0),
               status: (d.status as ProposalStatus) ?? "rascunho",
               validade: d.validade || null,
-            }, { onSuccess: () => setEditing(null) });
+              lead_id: d.lead_id || null,
+            }, { onSuccess: () => {
+              setEditing(null);
+              const l = d.lead_id ? leadById.get(d.lead_id) : undefined;
+              if (d.status === "aceita" && l && l.status !== "fechado") setConvertLead({ ...l, valor_estimado: Number(d.valor ?? l.valor_estimado ?? 0) });
+            } });
           }} />
       )}
+      <LeadDetailDrawer lead={convertLead} startConverting onClose={() => setConvertLead(null)} />
     </AppShell>
   );
 }
@@ -154,7 +177,7 @@ function EmptyState({ icon: Icon, label, cta }: { icon: any; label: string; cta?
   );
 }
 
-function ProposalDialog({ draft, onClose, onSave }: { draft: Partial<ProposalRow>; onClose: () => void; onSave: (d: Partial<ProposalRow>) => void }) {
+function ProposalDialog({ draft, leads, onClose, onSave }: { draft: Partial<ProposalRow>; leads: LeadRow[]; onClose: () => void; onSave: (d: Partial<ProposalRow>) => void }) {
   const [d, setD] = useState(draft);
   return (
     <AlignPanel
@@ -171,6 +194,18 @@ function ProposalDialog({ draft, onClose, onSave }: { draft: Partial<ProposalRow
       }
     >
       <div className="space-y-3">
+        <L label="Lead">
+          <select value={d.lead_id ?? ""} onChange={(e) => {
+            const l = leads.find((x) => x.id === e.target.value);
+            setD({ ...d, lead_id: e.target.value || null,
+              titulo: d.titulo?.trim() ? d.titulo : l ? `Proposta — ${l.empresa || l.nome}` : d.titulo,
+              valor: !d.valor && l ? Number(l.valor_estimado ?? 0) : d.valor });
+          }} className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm">
+            <option value="">Sem lead</option>
+            {leads.map((l) => <option key={l.id} value={l.id}>{l.empresa ? `${l.empresa} · ${l.nome}` : l.nome}</option>)}
+          </select>
+        </L>
+        {d.status === "aceita" && d.lead_id && <p className="text-[11px] text-success">Ao salvar como aceita, abriremos a conversão do lead em cliente.</p>}
         <L label="Título"><Inp value={d.titulo ?? ""} onChange={(v) => setD({ ...d, titulo: v })} autoFocus /></L>
         <div className="grid grid-cols-2 gap-3">
           <L label="Valor (R$)"><Inp type="number" value={String(d.valor ?? 0)} onChange={(v) => setD({ ...d, valor: Number(v) })} /></L>

@@ -139,7 +139,7 @@ export function LeadDetailDrawer({ lead, onClose, startConverting = false }: { l
                 <MessageSquare className="h-3 w-3" /> WhatsApp
               </WhatsAppContactLink>
             )}
-            <Link to="/propostas" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 text-xs hover:border-primary/40 hover:text-primary">
+            <Link to="/propostas" search={{ lead: lead.id }} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 text-xs hover:border-primary/40 hover:text-primary">
               <FileText className="h-3 w-3" /> Proposta
             </Link>
             <Link to="/pipeline" className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-2 px-2.5 text-xs hover:border-primary/40 hover:text-primary">
