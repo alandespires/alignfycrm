@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { Sparkles, Loader2, Mail, Phone, MessageSquare, Calendar, Plus, Building2, RefreshCw, Trash2, UserCheck, X, FileText, Kanban } from "@/components/ui/icons";
 import { useScoreLead } from "@/hooks/use-score-lead";
@@ -30,7 +30,7 @@ function fmtDateTime(s: string) {
   return new Date(s).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
-export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onClose: () => void }) {
+export function LeadDetailDrawer({ lead, onClose, startConverting = false }: { lead: LeadRow | null; onClose: () => void; startConverting?: boolean }) {
   const consentMutation = useSetWhatsAppConsent();
   const open = !!lead;
   const score = useScoreLead();
@@ -47,6 +47,7 @@ export function LeadDetailDrawer({ lead, onClose }: { lead: LeadRow | null; onCl
   const [taskTitle, setTaskTitle] = useState("");
 
   const [convertOpen, setConvertOpen] = useState(false);
+  useEffect(() => { setConvertOpen(Boolean(lead && startConverting)); }, [lead?.id, startConverting]);
   const [genFin, setGenFin] = useState(true);
   const [finCat, setFinCat] = useState<"venda" | "assinatura" | "servico" | "consultoria" | "outros">("venda");
   const [finVenc, setFinVenc] = useState<string>(() => {

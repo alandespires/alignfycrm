@@ -175,6 +175,8 @@ function PipelinePage() {
   const [query, setQuery] = useState("");
   const [minimumScore, setMinimumScore] = useState(0);
   const [compact, setCompact] = useState(true);
+  const [openLead, setOpenLead] = useState<{ id: string; convert: boolean } | null>(null);
+  const selectedLead = openLead ? leads.find((l) => l.id === openLead.id) ?? null : null;
   const hasActiveFilters = Boolean(query.trim()) || minimumScore > 0;
   const displayedLeads = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
@@ -193,6 +195,10 @@ function PipelinePage() {
     const id = String(e.active.id);
     const lead = leads.find((l) => l.id === id);
     if (!lead || lead.status === overId) return;
+    if (overId === "fechado") {
+      setOpenLead({ id, convert: true });
+      return;
+    }
     updateStatus.mutate({ id, status: overId });
   }
 
@@ -247,6 +253,7 @@ function PipelinePage() {
           <DragOverlay>{activeLead ? <div className="w-72"><LeadCard lead={activeLead} /></div> : null}</DragOverlay>
         </DndContext>
       )}
+      <LeadDetailDrawer lead={selectedLead} startConverting={openLead?.convert ?? false} onClose={() => setOpenLead(null)} />
     </AppShell>
   );
 }
