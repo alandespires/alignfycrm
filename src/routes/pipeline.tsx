@@ -12,6 +12,9 @@ import {
 import { AppShell } from "@/components/app-shell";
 import { FunnelViewSwitch } from "@/components/funnel-view-switch";
 import { LeadFormDialog } from "@/components/lead-form-dialog";
+import { LeadDetailDrawer } from "@/components/lead-detail-drawer";
+import { createContext, useContext } from "react";
+const OpenLeadContext = createContext<(id: string) => void>(() => {});
 import { RealtimeBadge } from "@/components/realtime-badge";
 import { formatBRL } from "@/lib/mock-data";
 import { useLeads, useUpdateLeadStatus, type LeadRow, type LeadStatus } from "@/hooks/use-leads";
@@ -110,8 +113,9 @@ function LeadCard({ lead, dragging, compact = false }: { lead: LeadRow; dragging
 
 function DraggableLead({ lead, compact }: { lead: LeadRow; compact: boolean }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: lead.id });
+  const openLead = useContext(OpenLeadContext);
   return (
-    <div ref={setNodeRef} {...listeners} {...attributes}>
+    <div ref={setNodeRef} {...listeners} {...attributes} onClick={() => openLead(lead.id)}>
       <LeadCard lead={lead} dragging={isDragging} compact={compact} />
     </div>
   );
@@ -175,6 +179,8 @@ function PipelinePage() {
   const [query, setQuery] = useState("");
   const [minimumScore, setMinimumScore] = useState(0);
   const [compact, setCompact] = useState(true);
+  const [openLead, setOpenLead] = useState<{ id: string; convert: boolean } | null>(null);
+  const selectedLead = openLead ? leads.find((l) => l.id === openLead.id) ?? null : null;
   const hasActiveFilters = Boolean(query.trim()) || minimumScore > 0;
   const displayedLeads = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
@@ -193,6 +199,10 @@ function PipelinePage() {
     const id = String(e.active.id);
     const lead = leads.find((l) => l.id === id);
     if (!lead || lead.status === overId) return;
+    if (overId === "fechado") {
+      setOpenLead({ id, convert: true });
+      return;
+    }
     updateStatus.mutate({ id, status: overId });
   }
 
@@ -236,7 +246,7 @@ function PipelinePage() {
       {isLoading ? (
         <KanbanSkeleton columns={6} />
       ) : (
-        <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <OpenLeadContext.Provider value={(id) => setOpenLead({ id, convert: false })}><DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
           <div className="-mx-5 overflow-x-auto px-5 pb-4 md:-mx-8 md:px-8" aria-label="Etapas do pipeline; deslize horizontalmente para ver todas">
             <div className="flex gap-4">
               {STAGES.map((s) => (
@@ -245,8 +255,9 @@ function PipelinePage() {
             </div>
           </div>
           <DragOverlay>{activeLead ? <div className="w-72"><LeadCard lead={activeLead} /></div> : null}</DragOverlay>
-        </DndContext>
+        </DndContext></OpenLeadContext.Provider>
       )}
+      <LeadDetailDrawer lead={selectedLead} startConverting={openLead?.convert ?? false} onClose={() => setOpenLead(null)} />
     </AppShell>
   );
 }
