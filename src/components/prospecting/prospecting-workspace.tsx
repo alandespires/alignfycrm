@@ -13,6 +13,7 @@ import {
 } from "@/hooks/use-prospecting";
 import { History, Layers, Play, Save, Trash2 } from "@/components/ui/icons";
 import { ProspectingSettings } from "./prospecting-settings";
+import { ProspectedLeadsPanel } from "./prospected-leads-panel";
 
 export function ProspectingWorkspace({
   filters,
@@ -42,15 +43,20 @@ export function ProspectingWorkspace({
 
   return (
     <Tabs
-      defaultValue="historico"
+      defaultValue="prospectados"
       className="rounded-2xl border border-border bg-surface-2 p-4 shadow-card"
     >
       <TabsList>
+        <TabsTrigger value="prospectados">Prospectados</TabsTrigger>
         <TabsTrigger value="historico">Histórico</TabsTrigger>
         <TabsTrigger value="perfis">Perfis</TabsTrigger>
         <TabsTrigger value="listas">Listas</TabsTrigger>
         {canManage && <TabsTrigger value="configuracoes">Configurações</TabsTrigger>}
       </TabsList>
+
+      <TabsContent value="prospectados" className="mt-4">
+        <ProspectedLeadsPanel />
+      </TabsContent>
 
       <TabsContent value="historico" className="mt-4 space-y-2">
         {!searches.length && <Empty text="Nenhuma pesquisa registrada." />}

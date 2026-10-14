@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/icons";
 import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, staggerItem } from "@/lib/motion";
+import { useCampaigns } from "@/hooks/use-marketing";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { canImportProspectingResult } from "@/lib/prospecting/demo";
 import { exportProspectingCsv, exportProspectingXlsx } from "@/lib/prospecting/export";
@@ -42,6 +43,10 @@ export const Route = createFileRoute("/prospeccao")({
         content: "Busque, qualifique e importe leads B2B com score inteligente.",
       },
     ],
+  }),
+  validateSearch: (search: Record<string, unknown>): { campanha?: string; nicho?: string } => ({
+    campanha: typeof search.campanha === "string" ? search.campanha : undefined,
+    nicho: typeof search.nicho === "string" ? search.nicho : undefined,
   }),
   component: ProspeccaoPage,
 });
@@ -63,7 +68,14 @@ const ACTIVE_STATUSES = [
 ];
 
 function ProspeccaoPage() {
-  const [filters, setFilters] = useState<ProspectingFilters>(DEFAULT_FILTERS);
+  const routeSearch = Route.useSearch();
+  const { data: campaigns = [] } = useCampaigns();
+  const [filters, setFilters] = useState<ProspectingFilters>(() => ({
+    ...DEFAULT_FILTERS,
+    ...(routeSearch.campanha ? { campaign_id: routeSearch.campanha } : {}),
+    ...(routeSearch.nicho ? { nicho: routeSearch.nicho } : {}),
+  }));
+  const linkedCampaign = campaigns.find((c) => c.id === filters.campaign_id);
   const [activeSearchId, setActiveSearchId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [opened, setOpened] = useState<ProspectingResultRow | null>(null);
@@ -237,6 +249,18 @@ function ProspeccaoPage() {
             variant={staggerItem}
           />
         </motion.div>
+
+        {filters.campaign_id && (
+          <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-sm">
+            <Target className="h-4 w-4 text-primary" />
+            <span className="flex-1">
+              Prospectando para a campanha <strong>{linkedCampaign?.nome ?? "selecionada"}</strong> — os leads importados ficam ligados a ela.
+            </span>
+            <Button variant="ghost" size="sm" onClick={() => setFilters(({ campaign_id: _c, ...rest }) => rest)}>
+              Desvincular
+            </Button>
+          </div>
+        )}
 
         <ProspectingFiltersBar
           value={filters}

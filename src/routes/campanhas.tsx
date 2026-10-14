@@ -78,7 +78,7 @@ function CampaignsTab() {
       <Table className="min-w-[860px]">
         <TableHeader><TableRow>
           <TableHead>Nome</TableHead><TableHead>Status</TableHead><TableHead>Plataforma</TableHead>
-          <TableHead>Período</TableHead><TableHead>Orçamento</TableHead><TableHead>ROI</TableHead><TableHead className="w-24"></TableHead>
+          <TableHead>Período</TableHead><TableHead>Orçamento</TableHead><TableHead>ROI</TableHead><TableHead className="w-32"></TableHead>
         </TableRow></TableHeader>
         <TableBody>
           {camps.map(c => (
@@ -90,6 +90,7 @@ function CampaignsTab() {
               <TableCell>{c.orcamento ? brl(c.orcamento) : "—"}</TableCell>
               <TableCell>{c.roi ? `${c.roi.toFixed(1)}x` : "—"}</TableCell>
               <TableCell>
+                <Button asChild aria-label={`Prospectar para ${c.nome}`} title="Prospectar empresas" variant="ghost" size="icon"><Link to="/prospeccao" search={{ campanha: c.id }}><Target className="size-4" /></Link></Button>
                 <Button aria-label={`Editar campanha ${c.nome}`} variant="ghost" size="icon" onClick={() => { setF(c); setOpen(true); }}><Pencil className="size-4" /></Button>
                 <Button aria-label={`Remover campanha ${c.nome}`} variant="ghost" size="icon" onClick={() => confirm("Remover?") && del.mutate(c.id)}><Trash2 className="size-4" /></Button>
               </TableCell>
