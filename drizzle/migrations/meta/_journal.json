@@ -8,6 +8,13 @@
       "when": 1791741034945,
       "tag": "0000_account_module_access",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791980233394,
+      "tag": "0001_prospecting_funnel_bridge",
+      "breakpoints": true
     }
   ]
 }

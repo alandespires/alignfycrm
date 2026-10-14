@@ -2257,6 +2257,8 @@ export type Database = {
           ai_resumo: string | null
           ai_score: number | null
           ai_sugestao: string | null
+          campaign_id: string | null
+          cidade: string | null
           created_at: string
           created_by: string
           email: string | null
@@ -2290,6 +2292,8 @@ export type Database = {
           ai_resumo?: string | null
           ai_score?: number | null
           ai_sugestao?: string | null
+          campaign_id?: string | null
+          cidade?: string | null
           created_at?: string
           created_by: string
           email?: string | null
@@ -2323,6 +2327,8 @@ export type Database = {
           ai_resumo?: string | null
           ai_score?: number | null
           ai_sugestao?: string | null
+          campaign_id?: string | null
+          cidade?: string | null
           created_at?: string
           created_by?: string
           email?: string | null
@@ -2353,6 +2359,13 @@ export type Database = {
           whatsapp_opt_out_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "leads_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_campaigns"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "leads_prospecting_result_fkey"
             columns: ["prospecting_result_id"]
