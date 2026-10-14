@@ -31,6 +31,7 @@ export type ProspectingFilters = {
   sem_whatsapp?: boolean;
   baixa_presenca_digital?: boolean;
   recem_abertas?: boolean;
+  campaign_id?: string;
 };
 
 export type RawLead = {

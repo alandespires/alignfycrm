@@ -18,6 +18,7 @@ export type ProspectingFilters = {
   possui_email?: boolean;
   baixa_presenca_digital?: boolean;
   recem_abertas?: boolean;
+  campaign_id?: string;
 };
 
 export type RawLead = {

@@ -72,6 +72,10 @@ function sanitizeFilters(value: unknown, maxQuantity: number): ProspectingFilter
     possui_email: input.possui_email === true,
     baixa_presenca_digital: input.baixa_presenca_digital === true,
     recem_abertas: input.recem_abertas === true,
+    campaign_id:
+      typeof input.campaign_id === "string" && /^[0-9a-f-]{36}$/i.test(input.campaign_id)
+        ? input.campaign_id
+        : undefined,
   };
 }
 
