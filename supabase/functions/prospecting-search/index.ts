@@ -123,7 +123,11 @@ Deno.serve(async (req) => {
       .eq("tenant_id", tenantId)
       .eq("provider", "google_places")
       .maybeSingle();
-    const googleKey = Deno.env.get("GOOGLE_PLACES_API_KEY");
+    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+    const mapsConnKey = Deno.env.get("GOOGLE_MAPS_API_KEY");
+    const gateway =
+      lovableKey && mapsConnKey ? { lovableKey, connectionKey: mapsConnKey } : undefined;
+    const googleKey = gateway ? "gateway" : Deno.env.get("GOOGLE_PLACES_API_KEY");
     const environment = (Deno.env.get("ENVIRONMENT") ?? "production").toLowerCase();
     const googleEnabled = Boolean(source?.ativo && source?.configurado);
     if (
@@ -144,7 +148,7 @@ Deno.serve(async (req) => {
     }
     const provider =
       googleEnabled && googleKey
-        ? new GooglePlacesProvider(googleKey)
+        ? new GooglePlacesProvider(googleKey, gateway)
         : new MockProspectingProvider();
     const requestedSearchId =
       typeof body.search_id === "string" && /^[0-9a-f-]{36}$/i.test(body.search_id)
