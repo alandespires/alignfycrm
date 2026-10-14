@@ -20,17 +20,29 @@ export class GooglePlacesProvider implements ProspectingProvider {
   readonly name = "google_places";
   readonly isDemo = false;
 
-  constructor(private readonly apiKey: string) {}
+  constructor(
+    private readonly apiKey: string,
+    private readonly gateway?: { lovableKey: string; connectionKey: string },
+  ) {}
 
   private async request(body: Record<string, unknown>) {
     let lastStatus = 0;
     for (let attempt = 0; attempt < 3; attempt += 1) {
       try {
-        const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
+        const url = this.gateway
+          ? "https://connector-gateway.lovable.dev/google_maps/places/v1/places:searchText"
+          : "https://places.googleapis.com/v1/places:searchText";
+        const auth: Record<string, string> = this.gateway
+          ? {
+              Authorization: `Bearer ${this.gateway.lovableKey}`,
+              "X-Connection-Api-Key": this.gateway.connectionKey,
+            }
+          : { "X-Goog-Api-Key": this.apiKey };
+        const response = await fetch(url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Goog-Api-Key": this.apiKey,
+            ...auth,
             "X-Goog-FieldMask": [
               "places.id",
               "places.displayName",
