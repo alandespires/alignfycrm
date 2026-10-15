@@ -105,8 +105,8 @@ export function useCreateLead() {
 export function useUpdateLeadStatus() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: LeadStatus }) => {
-      const { error } = await supabase.from("leads").update({ status }).eq("id", id);
+    mutationFn: async ({ id, status, motivo_perda }: { id: string; status: LeadStatus; motivo_perda?: string }) => {
+      const { error } = await supabase.from("leads").update(motivo_perda ? { status, motivo_perda } : { status }).eq("id", id);
       if (error) throw error;
     },
     onMutate: async ({ id, status }) => {

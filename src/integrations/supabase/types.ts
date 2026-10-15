@@ -2263,13 +2263,16 @@ export type Database = {
           created_by: string
           email: string | null
           empresa: string | null
+          etapa_alterada_em: string
           id: string
           interesse: string | null
+          motivo_perda: string | null
           nicho: string | null
           nome: string
           observacoes: string | null
           origem: string | null
           owner_id: string | null
+          previsao_fechamento: string | null
           prospecting_reasons: Json
           prospecting_result_id: string | null
           prospecting_score: number | null
@@ -2298,13 +2301,16 @@ export type Database = {
           created_by: string
           email?: string | null
           empresa?: string | null
+          etapa_alterada_em?: string
           id?: string
           interesse?: string | null
+          motivo_perda?: string | null
           nicho?: string | null
           nome: string
           observacoes?: string | null
           origem?: string | null
           owner_id?: string | null
+          previsao_fechamento?: string | null
           prospecting_reasons?: Json
           prospecting_result_id?: string | null
           prospecting_score?: number | null
@@ -2333,13 +2339,16 @@ export type Database = {
           created_by?: string
           email?: string | null
           empresa?: string | null
+          etapa_alterada_em?: string
           id?: string
           interesse?: string | null
+          motivo_perda?: string | null
           nicho?: string | null
           nome?: string
           observacoes?: string | null
           origem?: string | null
           owner_id?: string | null
+          previsao_fechamento?: string | null
           prospecting_reasons?: Json
           prospecting_result_id?: string | null
           prospecting_score?: number | null

@@ -15,6 +15,13 @@
       "when": 1791980233394,
       "tag": "0001_prospecting_funnel_bridge",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792066468105,
+      "tag": "0002_funnel_rules",
+      "breakpoints": true
     }
   ]
 }

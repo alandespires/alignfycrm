@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { ForecastField } from "@/components/lead-forecast-field";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { Sparkles, Loader2, Mail, Phone, MessageSquare, Calendar, Plus, Building2, RefreshCw, Trash2, UserCheck, X, FileText, Kanban } from "@/components/ui/icons";
@@ -149,6 +150,9 @@ export function LeadDetailDrawer({ lead, onClose, startConverting = false }: { l
               <Building2 className="h-3 w-3" /> Clientes
             </Link>
           </div>
+
+          <ForecastField lead={lead} />
+
 
           {lead.whatsapp && (
             <AlignPanelSection title="Consentimento de WhatsApp" icon={MessageSquare}>
