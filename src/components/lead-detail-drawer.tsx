@@ -150,6 +150,9 @@ export function LeadDetailDrawer({ lead, onClose, startConverting = false }: { l
             </Link>
           </div>
 
+          <ForecastField lead={lead} />
+
+
           {lead.whatsapp && (
             <AlignPanelSection title="Consentimento de WhatsApp" icon={MessageSquare}>
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface-2 p-3">
