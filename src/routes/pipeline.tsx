@@ -13,6 +13,7 @@ import { AppShell } from "@/components/app-shell";
 import { FunnelViewSwitch } from "@/components/funnel-view-switch";
 import { LeadFormDialog } from "@/components/lead-form-dialog";
 import { LeadDetailDrawer } from "@/components/lead-detail-drawer";
+import { LostReasonPanel } from "@/components/lost-reason-panel";
 import { createContext, useContext } from "react";
 const OpenLeadContext = createContext<(id: string) => void>(() => {});
 import { RealtimeBadge } from "@/components/realtime-badge";
@@ -57,6 +58,22 @@ function initialsOf(name: string) {
   return name.split(" ").map((s) => s[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() || "?";
 }
 
+function StageSignals({ lead }: { lead: LeadRow }) {
+  const l = lead as LeadRow & { etapa_alterada_em?: string; previsao_fechamento?: string | null; motivo_perda?: string | null };
+  const open = l.status !== "fechado" && l.status !== "perdido";
+  const days = l.etapa_alterada_em ? Math.floor((Date.now() - new Date(l.etapa_alterada_em).getTime()) / 86400000) : 0;
+  const overdue = open && l.previsao_fechamento && new Date(l.previsao_fechamento) < new Date(new Date().toDateString());
+  if (!(open && days >= 7) && !l.previsao_fechamento && !l.motivo_perda) return null;
+  return (
+    <div className="mt-2 flex flex-wrap gap-1 text-[10px] font-semibold">
+      {open && days >= 7 && <span className="rounded-md bg-warning/15 px-1.5 py-0.5 text-warning" title="Sem mudança de etapa">Parado há {days}d</span>}
+      {open && l.previsao_fechamento && <span className={`rounded-md px-1.5 py-0.5 ${overdue ? "bg-destructive/15 text-destructive" : "bg-surface-3 text-muted-foreground"}`}>Prev. {new Date(l.previsao_fechamento + "T00:00").toLocaleDateString("pt-BR")}</span>}
+      {l.status === "perdido" && l.motivo_perda && <span className="rounded-md bg-destructive/15 px-1.5 py-0.5 text-destructive">{l.motivo_perda}</span>}
+    </div>
+  );
+}
+
+
 function LeadCard({ lead, dragging, compact = false }: { lead: LeadRow; dragging?: boolean; compact?: boolean }) {
   const score = useScoreLead();
   const isScoring = score.isPending && score.variables === lead.id;
@@ -80,6 +97,7 @@ function LeadCard({ lead, dragging, compact = false }: { lead: LeadRow; dragging
         </div>
       )}
 
+      <StageSignals lead={lead} />
       <div className="mt-3 flex items-center justify-between">
         <span className="text-sm font-semibold text-foreground tabular-nums">
           {lead.valor_estimado && lead.valor_estimado > 0 ? formatBRL(Number(lead.valor_estimado)) : "—"}
@@ -180,6 +198,7 @@ function PipelinePage() {
   const [minimumScore, setMinimumScore] = useState(0);
   const [compact, setCompact] = useState(true);
   const [openLead, setOpenLead] = useState<{ id: string; convert: boolean } | null>(null);
+  const [lostId, setLostId] = useState<string | null>(null);
   const selectedLead = openLead ? leads.find((l) => l.id === openLead.id) ?? null : null;
   const hasActiveFilters = Boolean(query.trim()) || minimumScore > 0;
   const displayedLeads = useMemo(() => {
@@ -203,6 +222,7 @@ function PipelinePage() {
       setOpenLead({ id, convert: true });
       return;
     }
+    if (overId === "perdido") { setLostId(id); return; }
     updateStatus.mutate({ id, status: overId });
   }
 
@@ -258,6 +278,9 @@ function PipelinePage() {
         </DndContext></OpenLeadContext.Provider>
       )}
       <LeadDetailDrawer lead={selectedLead} startConverting={openLead?.convert ?? false} onClose={() => setOpenLead(null)} />
+      <LostReasonPanel open={!!lostId} leadName={leads.find((l) => l.id === lostId)?.nome}
+        onClose={() => setLostId(null)}
+        onConfirm={(motivo) => { if (lostId) updateStatus.mutate({ id: lostId, status: "perdido", motivo_perda: motivo }); setLostId(null); }} />
     </AppShell>
   );
 }
