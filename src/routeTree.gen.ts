@@ -9,225 +9,70 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TicketsRouteImport } from './routes/tickets'
-import { Route as TarefasRouteImport } from './routes/tarefas'
-import { Route as SuperAdminRouteImport } from './routes/super-admin'
-import { Route as RelatoriosRouteImport } from './routes/relatorios'
-import { Route as ProspeccaoRouteImport } from './routes/prospeccao'
-import { Route as PropostasRouteImport } from './routes/propostas'
-import { Route as ProjetosRouteImport } from './routes/projetos'
-import { Route as PortalAlunoRouteImport } from './routes/portal-aluno'
-import { Route as PipelineRouteImport } from './routes/pipeline'
-import { Route as OportunidadesRouteImport } from './routes/oportunidades'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as MetasRouteImport } from './routes/metas'
-import { Route as LeadsRouteImport } from './routes/leads'
-import { Route as LandingPagesRouteImport } from './routes/landing-pages'
-import { Route as InteracoesRouteImport } from './routes/interacoes'
-import { Route as InsightsRouteImport } from './routes/insights'
-import { Route as FollowUpRouteImport } from './routes/follow-up'
-import { Route as FinanceiroRouteImport } from './routes/financeiro'
-import { Route as EscolarRouteImport } from './routes/escolar'
-import { Route as EquipeRouteImport } from './routes/equipe'
-import { Route as EmpresasRouteImport } from './routes/empresas'
-import { Route as EmailMarketingRouteImport } from './routes/email-marketing'
-import { Route as DashboardsRouteImport } from './routes/dashboards'
-import { Route as ContatosRouteImport } from './routes/contatos'
-import { Route as ConsultorRouteImport } from './routes/consultor'
-import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
-import { Route as ClinicasRouteImport } from './routes/clinicas'
-import { Route as ClientesRouteImport } from './routes/clientes'
-import { Route as ChatRouteImport } from './routes/chat'
-import { Route as CampanhasRouteImport } from './routes/campanhas'
-import { Route as BaseConhecimentoRouteImport } from './routes/base-conhecimento'
-import { Route as AutomacaoRouteImport } from './routes/automacao'
-import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as EscolarIndexRouteImport } from './routes/escolar.index'
-import { Route as ConsultorIndexRouteImport } from './routes/consultor.index'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AutomacaoRouteImport } from './routes/automacao'
+import { Route as BaseConhecimentoRouteImport } from './routes/base-conhecimento'
+import { Route as CampanhasRouteImport } from './routes/campanhas'
+import { Route as ChatRouteImport } from './routes/chat'
+import { Route as ClientesRouteImport } from './routes/clientes'
+import { Route as ClinicasRouteImport } from './routes/clinicas'
+import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
+import { Route as ConsultorRouteImport } from './routes/consultor'
+import { Route as ContatosRouteImport } from './routes/contatos'
+import { Route as DashboardsRouteImport } from './routes/dashboards'
+import { Route as EmailMarketingRouteImport } from './routes/email-marketing'
+import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as EquipeRouteImport } from './routes/equipe'
+import { Route as EscolarRouteImport } from './routes/escolar'
+import { Route as FinanceiroRouteImport } from './routes/financeiro'
+import { Route as FollowUpRouteImport } from './routes/follow-up'
+import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as InteracoesRouteImport } from './routes/interacoes'
+import { Route as LandingPagesRouteImport } from './routes/landing-pages'
+import { Route as LeadsRouteImport } from './routes/leads'
+import { Route as MetasRouteImport } from './routes/metas'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as OportunidadesRouteImport } from './routes/oportunidades'
+import { Route as PipelineRouteImport } from './routes/pipeline'
+import { Route as PortalAlunoRouteImport } from './routes/portal-aluno'
+import { Route as ProjetosRouteImport } from './routes/projetos'
+import { Route as PropostasRouteImport } from './routes/propostas'
+import { Route as ProspeccaoRouteImport } from './routes/prospeccao'
+import { Route as RelatoriosRouteImport } from './routes/relatorios'
+import { Route as SuperAdminRouteImport } from './routes/super-admin'
+import { Route as TarefasRouteImport } from './routes/tarefas'
+import { Route as TicketsRouteImport } from './routes/tickets'
 import { Route as ClinicasIndexRouteImport } from './routes/clinicas.index'
-import { Route as TTenantSlugRouteImport } from './routes/t.$tenantSlug'
-import { Route as EscolarTurmasRouteImport } from './routes/escolar.turmas'
-import { Route as EscolarProfessoresRouteImport } from './routes/escolar.professores'
-import { Route as EscolarMapaRouteImport } from './routes/escolar.mapa'
-import { Route as EscolarFrequenciaRouteImport } from './routes/escolar.frequencia'
-import { Route as EscolarDiarioRouteImport } from './routes/escolar.diario'
-import { Route as EscolarCursosRouteImport } from './routes/escolar.cursos'
-import { Route as EscolarConfiguracoesRouteImport } from './routes/escolar.configuracoes'
-import { Route as EscolarComunicacaoRouteImport } from './routes/escolar.comunicacao'
-import { Route as EscolarAvaliacoesRouteImport } from './routes/escolar.avaliacoes'
-import { Route as EscolarAlunosRouteImport } from './routes/escolar.alunos'
-import { Route as ConsultorSimuladorRouteImport } from './routes/consultor.simulador'
-import { Route as ConsultorHistoricoRouteImport } from './routes/consultor.historico'
-import { Route as ConsultorCreditoRouteImport } from './routes/consultor.credito'
-import { Route as ConsultorCotasRouteImport } from './routes/consultor.cotas'
-import { Route as ConsultorContemplacoesRouteImport } from './routes/consultor.contemplacoes'
-import { Route as ConsultorComissoesRouteImport } from './routes/consultor.comissoes'
-import { Route as ClinicasProntuariosRouteImport } from './routes/clinicas.prontuarios'
-import { Route as ClinicasPacientesRouteImport } from './routes/clinicas.pacientes'
-import { Route as ClinicasConfiguracoesRouteImport } from './routes/clinicas.configuracoes'
 import { Route as ClinicasAgendaRouteImport } from './routes/clinicas.agenda'
-import { Route as TTenantSlugIndexRouteImport } from './routes/t.$tenantSlug.index'
+import { Route as ClinicasConfiguracoesRouteImport } from './routes/clinicas.configuracoes'
+import { Route as ClinicasPacientesRouteImport } from './routes/clinicas.pacientes'
+import { Route as ClinicasProntuariosRouteImport } from './routes/clinicas.prontuarios'
+import { Route as ConsultorIndexRouteImport } from './routes/consultor.index'
+import { Route as ConsultorComissoesRouteImport } from './routes/consultor.comissoes'
+import { Route as ConsultorContemplacoesRouteImport } from './routes/consultor.contemplacoes'
+import { Route as ConsultorCotasRouteImport } from './routes/consultor.cotas'
+import { Route as ConsultorCreditoRouteImport } from './routes/consultor.credito'
+import { Route as ConsultorHistoricoRouteImport } from './routes/consultor.historico'
+import { Route as ConsultorSimuladorRouteImport } from './routes/consultor.simulador'
+import { Route as EscolarIndexRouteImport } from './routes/escolar.index'
+import { Route as EscolarAlunosRouteImport } from './routes/escolar.alunos'
+import { Route as EscolarAvaliacoesRouteImport } from './routes/escolar.avaliacoes'
+import { Route as EscolarComunicacaoRouteImport } from './routes/escolar.comunicacao'
+import { Route as EscolarConfiguracoesRouteImport } from './routes/escolar.configuracoes'
+import { Route as EscolarCursosRouteImport } from './routes/escolar.cursos'
+import { Route as EscolarDiarioRouteImport } from './routes/escolar.diario'
+import { Route as EscolarFrequenciaRouteImport } from './routes/escolar.frequencia'
+import { Route as EscolarMapaRouteImport } from './routes/escolar.mapa'
+import { Route as EscolarProfessoresRouteImport } from './routes/escolar.professores'
+import { Route as EscolarTurmasRouteImport } from './routes/escolar.turmas'
+import { Route as TTenantSlugRouteImport } from './routes/t.$tenantSlug'
 import { Route as EscolarTurmaClassIdRouteImport } from './routes/escolar.turma.$classId'
+import { Route as TTenantSlugIndexRouteImport } from './routes/t.$tenantSlug.index'
 
-const TicketsRoute = TicketsRouteImport.update({
-  id: '/tickets',
-  path: '/tickets',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TarefasRoute = TarefasRouteImport.update({
-  id: '/tarefas',
-  path: '/tarefas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SuperAdminRoute = SuperAdminRouteImport.update({
-  id: '/super-admin',
-  path: '/super-admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RelatoriosRoute = RelatoriosRouteImport.update({
-  id: '/relatorios',
-  path: '/relatorios',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProspeccaoRoute = ProspeccaoRouteImport.update({
-  id: '/prospeccao',
-  path: '/prospeccao',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PropostasRoute = PropostasRouteImport.update({
-  id: '/propostas',
-  path: '/propostas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjetosRoute = ProjetosRouteImport.update({
-  id: '/projetos',
-  path: '/projetos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortalAlunoRoute = PortalAlunoRouteImport.update({
-  id: '/portal-aluno',
-  path: '/portal-aluno',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PipelineRoute = PipelineRouteImport.update({
-  id: '/pipeline',
-  path: '/pipeline',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OportunidadesRoute = OportunidadesRouteImport.update({
-  id: '/oportunidades',
-  path: '/oportunidades',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MetasRoute = MetasRouteImport.update({
-  id: '/metas',
-  path: '/metas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LeadsRoute = LeadsRouteImport.update({
-  id: '/leads',
-  path: '/leads',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LandingPagesRoute = LandingPagesRouteImport.update({
-  id: '/landing-pages',
-  path: '/landing-pages',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InteracoesRoute = InteracoesRouteImport.update({
-  id: '/interacoes',
-  path: '/interacoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InsightsRoute = InsightsRouteImport.update({
-  id: '/insights',
-  path: '/insights',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FollowUpRoute = FollowUpRouteImport.update({
-  id: '/follow-up',
-  path: '/follow-up',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FinanceiroRoute = FinanceiroRouteImport.update({
-  id: '/financeiro',
-  path: '/financeiro',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EscolarRoute = EscolarRouteImport.update({
-  id: '/escolar',
-  path: '/escolar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EquipeRoute = EquipeRouteImport.update({
-  id: '/equipe',
-  path: '/equipe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmpresasRoute = EmpresasRouteImport.update({
-  id: '/empresas',
-  path: '/empresas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmailMarketingRoute = EmailMarketingRouteImport.update({
-  id: '/email-marketing',
-  path: '/email-marketing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardsRoute = DashboardsRouteImport.update({
-  id: '/dashboards',
-  path: '/dashboards',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContatosRoute = ContatosRouteImport.update({
-  id: '/contatos',
-  path: '/contatos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConsultorRoute = ConsultorRouteImport.update({
-  id: '/consultor',
-  path: '/consultor',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClinicasRoute = ClinicasRouteImport.update({
-  id: '/clinicas',
-  path: '/clinicas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClientesRoute = ClientesRouteImport.update({
-  id: '/clientes',
-  path: '/clientes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChatRoute = ChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CampanhasRoute = CampanhasRouteImport.update({
-  id: '/campanhas',
-  path: '/campanhas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BaseConhecimentoRoute = BaseConhecimentoRouteImport.update({
-  id: '/base-conhecimento',
-  path: '/base-conhecimento',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AutomacaoRoute = AutomacaoRouteImport.update({
-  id: '/automacao',
-  path: '/automacao',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -235,124 +80,169 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AutomacaoRoute = AutomacaoRouteImport.update({
+  id: '/automacao',
+  path: '/automacao',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EscolarIndexRoute = EscolarIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => EscolarRoute,
+const BaseConhecimentoRoute = BaseConhecimentoRouteImport.update({
+  id: '/base-conhecimento',
+  path: '/base-conhecimento',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const ConsultorIndexRoute = ConsultorIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ConsultorRoute,
+const CampanhasRoute = CampanhasRouteImport.update({
+  id: '/campanhas',
+  path: '/campanhas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientesRoute = ClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClinicasRoute = ClinicasRouteImport.update({
+  id: '/clinicas',
+  path: '/clinicas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsultorRoute = ConsultorRouteImport.update({
+  id: '/consultor',
+  path: '/consultor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContatosRoute = ContatosRouteImport.update({
+  id: '/contatos',
+  path: '/contatos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardsRoute = DashboardsRouteImport.update({
+  id: '/dashboards',
+  path: '/dashboards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailMarketingRoute = EmailMarketingRouteImport.update({
+  id: '/email-marketing',
+  path: '/email-marketing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipeRoute = EquipeRouteImport.update({
+  id: '/equipe',
+  path: '/equipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EscolarRoute = EscolarRouteImport.update({
+  id: '/escolar',
+  path: '/escolar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinanceiroRoute = FinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FollowUpRoute = FollowUpRouteImport.update({
+  id: '/follow-up',
+  path: '/follow-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InsightsRoute = InsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InteracoesRoute = InteracoesRouteImport.update({
+  id: '/interacoes',
+  path: '/interacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandingPagesRoute = LandingPagesRouteImport.update({
+  id: '/landing-pages',
+  path: '/landing-pages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeadsRoute = LeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MetasRoute = MetasRouteImport.update({
+  id: '/metas',
+  path: '/metas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OportunidadesRoute = OportunidadesRouteImport.update({
+  id: '/oportunidades',
+  path: '/oportunidades',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PipelineRoute = PipelineRouteImport.update({
+  id: '/pipeline',
+  path: '/pipeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalAlunoRoute = PortalAlunoRouteImport.update({
+  id: '/portal-aluno',
+  path: '/portal-aluno',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjetosRoute = ProjetosRouteImport.update({
+  id: '/projetos',
+  path: '/projetos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropostasRoute = PropostasRouteImport.update({
+  id: '/propostas',
+  path: '/propostas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProspeccaoRoute = ProspeccaoRouteImport.update({
+  id: '/prospeccao',
+  path: '/prospeccao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RelatoriosRoute = RelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuperAdminRoute = SuperAdminRouteImport.update({
+  id: '/super-admin',
+  path: '/super-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TarefasRoute = TarefasRouteImport.update({
+  id: '/tarefas',
+  path: '/tarefas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TicketsRoute = TicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ClinicasIndexRoute = ClinicasIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => ClinicasRoute,
-} as any)
-const TTenantSlugRoute = TTenantSlugRouteImport.update({
-  id: '/t/$tenantSlug',
-  path: '/t/$tenantSlug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EscolarTurmasRoute = EscolarTurmasRouteImport.update({
-  id: '/turmas',
-  path: '/turmas',
-  getParentRoute: () => EscolarRoute,
-} as any)
-const EscolarProfessoresRoute = EscolarProfessoresRouteImport.update({
-  id: '/professores',
-  path: '/professores',
-  getParentRoute: () => EscolarRoute,
-} as any)
-const EscolarMapaRoute = EscolarMapaRouteImport.update({
-  id: '/mapa',
-  path: '/mapa',
-  getParentRoute: () => EscolarRoute,
-} as any)
-const EscolarFrequenciaRoute = EscolarFrequenciaRouteImport.update({
-  id: '/frequencia',
-  path: '/frequencia',
-  getParentRoute: () => EscolarRoute,
-} as any)
-const EscolarDiarioRoute = EscolarDiarioRouteImport.update({
-  id: '/diario',
-  path: '/diario',
-  getParentRoute: () => EscolarRoute,
-} as any)
-const EscolarCursosRoute = EscolarCursosRouteImport.update({
-  id: '/cursos',
-  path: '/cursos',
-  getParentRoute: () => EscolarRoute,
-} as any)
-const EscolarConfiguracoesRoute = EscolarConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
-  getParentRoute: () => EscolarRoute,
-} as any)
-const EscolarComunicacaoRoute = EscolarComunicacaoRouteImport.update({
-  id: '/comunicacao',
-  path: '/comunicacao',
-  getParentRoute: () => EscolarRoute,
-} as any)
-const EscolarAvaliacoesRoute = EscolarAvaliacoesRouteImport.update({
-  id: '/avaliacoes',
-  path: '/avaliacoes',
-  getParentRoute: () => EscolarRoute,
-} as any)
-const EscolarAlunosRoute = EscolarAlunosRouteImport.update({
-  id: '/alunos',
-  path: '/alunos',
-  getParentRoute: () => EscolarRoute,
-} as any)
-const ConsultorSimuladorRoute = ConsultorSimuladorRouteImport.update({
-  id: '/simulador',
-  path: '/simulador',
-  getParentRoute: () => ConsultorRoute,
-} as any)
-const ConsultorHistoricoRoute = ConsultorHistoricoRouteImport.update({
-  id: '/historico',
-  path: '/historico',
-  getParentRoute: () => ConsultorRoute,
-} as any)
-const ConsultorCreditoRoute = ConsultorCreditoRouteImport.update({
-  id: '/credito',
-  path: '/credito',
-  getParentRoute: () => ConsultorRoute,
-} as any)
-const ConsultorCotasRoute = ConsultorCotasRouteImport.update({
-  id: '/cotas',
-  path: '/cotas',
-  getParentRoute: () => ConsultorRoute,
-} as any)
-const ConsultorContemplacoesRoute = ConsultorContemplacoesRouteImport.update({
-  id: '/contemplacoes',
-  path: '/contemplacoes',
-  getParentRoute: () => ConsultorRoute,
-} as any)
-const ConsultorComissoesRoute = ConsultorComissoesRouteImport.update({
-  id: '/comissoes',
-  path: '/comissoes',
-  getParentRoute: () => ConsultorRoute,
-} as any)
-const ClinicasProntuariosRoute = ClinicasProntuariosRouteImport.update({
-  id: '/prontuarios',
-  path: '/prontuarios',
-  getParentRoute: () => ClinicasRoute,
-} as any)
-const ClinicasPacientesRoute = ClinicasPacientesRouteImport.update({
-  id: '/pacientes',
-  path: '/pacientes',
-  getParentRoute: () => ClinicasRoute,
-} as any)
-const ClinicasConfiguracoesRoute = ClinicasConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
   getParentRoute: () => ClinicasRoute,
 } as any)
 const ClinicasAgendaRoute = ClinicasAgendaRouteImport.update({
@@ -360,15 +250,125 @@ const ClinicasAgendaRoute = ClinicasAgendaRouteImport.update({
   path: '/agenda',
   getParentRoute: () => ClinicasRoute,
 } as any)
-const TTenantSlugIndexRoute = TTenantSlugIndexRouteImport.update({
+const ClinicasConfiguracoesRoute = ClinicasConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => ClinicasRoute,
+} as any)
+const ClinicasPacientesRoute = ClinicasPacientesRouteImport.update({
+  id: '/pacientes',
+  path: '/pacientes',
+  getParentRoute: () => ClinicasRoute,
+} as any)
+const ClinicasProntuariosRoute = ClinicasProntuariosRouteImport.update({
+  id: '/prontuarios',
+  path: '/prontuarios',
+  getParentRoute: () => ClinicasRoute,
+} as any)
+const ConsultorIndexRoute = ConsultorIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => TTenantSlugRoute,
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorComissoesRoute = ConsultorComissoesRouteImport.update({
+  id: '/comissoes',
+  path: '/comissoes',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorContemplacoesRoute = ConsultorContemplacoesRouteImport.update({
+  id: '/contemplacoes',
+  path: '/contemplacoes',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorCotasRoute = ConsultorCotasRouteImport.update({
+  id: '/cotas',
+  path: '/cotas',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorCreditoRoute = ConsultorCreditoRouteImport.update({
+  id: '/credito',
+  path: '/credito',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorHistoricoRoute = ConsultorHistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const ConsultorSimuladorRoute = ConsultorSimuladorRouteImport.update({
+  id: '/simulador',
+  path: '/simulador',
+  getParentRoute: () => ConsultorRoute,
+} as any)
+const EscolarIndexRoute = EscolarIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const EscolarAlunosRoute = EscolarAlunosRouteImport.update({
+  id: '/alunos',
+  path: '/alunos',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const EscolarAvaliacoesRoute = EscolarAvaliacoesRouteImport.update({
+  id: '/avaliacoes',
+  path: '/avaliacoes',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const EscolarComunicacaoRoute = EscolarComunicacaoRouteImport.update({
+  id: '/comunicacao',
+  path: '/comunicacao',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const EscolarConfiguracoesRoute = EscolarConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const EscolarCursosRoute = EscolarCursosRouteImport.update({
+  id: '/cursos',
+  path: '/cursos',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const EscolarDiarioRoute = EscolarDiarioRouteImport.update({
+  id: '/diario',
+  path: '/diario',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const EscolarFrequenciaRoute = EscolarFrequenciaRouteImport.update({
+  id: '/frequencia',
+  path: '/frequencia',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const EscolarMapaRoute = EscolarMapaRouteImport.update({
+  id: '/mapa',
+  path: '/mapa',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const EscolarProfessoresRoute = EscolarProfessoresRouteImport.update({
+  id: '/professores',
+  path: '/professores',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const EscolarTurmasRoute = EscolarTurmasRouteImport.update({
+  id: '/turmas',
+  path: '/turmas',
+  getParentRoute: () => EscolarRoute,
+} as any)
+const TTenantSlugRoute = TTenantSlugRouteImport.update({
+  id: '/t/$tenantSlug',
+  path: '/t/$tenantSlug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EscolarTurmaClassIdRoute = EscolarTurmaClassIdRouteImport.update({
   id: '/turma/$classId',
   path: '/turma/$classId',
   getParentRoute: () => EscolarRoute,
+} as any)
+const TTenantSlugIndexRoute = TTenantSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TTenantSlugRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -779,228 +779,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tickets': {
-      id: '/tickets'
-      path: '/tickets'
-      fullPath: '/tickets'
-      preLoaderRoute: typeof TicketsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tarefas': {
-      id: '/tarefas'
-      path: '/tarefas'
-      fullPath: '/tarefas'
-      preLoaderRoute: typeof TarefasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/super-admin': {
-      id: '/super-admin'
-      path: '/super-admin'
-      fullPath: '/super-admin'
-      preLoaderRoute: typeof SuperAdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/relatorios': {
-      id: '/relatorios'
-      path: '/relatorios'
-      fullPath: '/relatorios'
-      preLoaderRoute: typeof RelatoriosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/prospeccao': {
-      id: '/prospeccao'
-      path: '/prospeccao'
-      fullPath: '/prospeccao'
-      preLoaderRoute: typeof ProspeccaoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/propostas': {
-      id: '/propostas'
-      path: '/propostas'
-      fullPath: '/propostas'
-      preLoaderRoute: typeof PropostasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/projetos': {
-      id: '/projetos'
-      path: '/projetos'
-      fullPath: '/projetos'
-      preLoaderRoute: typeof ProjetosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portal-aluno': {
-      id: '/portal-aluno'
-      path: '/portal-aluno'
-      fullPath: '/portal-aluno'
-      preLoaderRoute: typeof PortalAlunoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pipeline': {
-      id: '/pipeline'
-      path: '/pipeline'
-      fullPath: '/pipeline'
-      preLoaderRoute: typeof PipelineRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/oportunidades': {
-      id: '/oportunidades'
-      path: '/oportunidades'
-      fullPath: '/oportunidades'
-      preLoaderRoute: typeof OportunidadesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/metas': {
-      id: '/metas'
-      path: '/metas'
-      fullPath: '/metas'
-      preLoaderRoute: typeof MetasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leads': {
-      id: '/leads'
-      path: '/leads'
-      fullPath: '/leads'
-      preLoaderRoute: typeof LeadsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/landing-pages': {
-      id: '/landing-pages'
-      path: '/landing-pages'
-      fullPath: '/landing-pages'
-      preLoaderRoute: typeof LandingPagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/interacoes': {
-      id: '/interacoes'
-      path: '/interacoes'
-      fullPath: '/interacoes'
-      preLoaderRoute: typeof InteracoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/insights': {
-      id: '/insights'
-      path: '/insights'
-      fullPath: '/insights'
-      preLoaderRoute: typeof InsightsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/follow-up': {
-      id: '/follow-up'
-      path: '/follow-up'
-      fullPath: '/follow-up'
-      preLoaderRoute: typeof FollowUpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/financeiro': {
-      id: '/financeiro'
-      path: '/financeiro'
-      fullPath: '/financeiro'
-      preLoaderRoute: typeof FinanceiroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/escolar': {
-      id: '/escolar'
-      path: '/escolar'
-      fullPath: '/escolar'
-      preLoaderRoute: typeof EscolarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/equipe': {
-      id: '/equipe'
-      path: '/equipe'
-      fullPath: '/equipe'
-      preLoaderRoute: typeof EquipeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/empresas': {
-      id: '/empresas'
-      path: '/empresas'
-      fullPath: '/empresas'
-      preLoaderRoute: typeof EmpresasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/email-marketing': {
-      id: '/email-marketing'
-      path: '/email-marketing'
-      fullPath: '/email-marketing'
-      preLoaderRoute: typeof EmailMarketingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboards': {
-      id: '/dashboards'
-      path: '/dashboards'
-      fullPath: '/dashboards'
-      preLoaderRoute: typeof DashboardsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contatos': {
-      id: '/contatos'
-      path: '/contatos'
-      fullPath: '/contatos'
-      preLoaderRoute: typeof ContatosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/consultor': {
-      id: '/consultor'
-      path: '/consultor'
-      fullPath: '/consultor'
-      preLoaderRoute: typeof ConsultorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/configuracoes': {
-      id: '/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/configuracoes'
-      preLoaderRoute: typeof ConfiguracoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/clinicas': {
-      id: '/clinicas'
-      path: '/clinicas'
-      fullPath: '/clinicas'
-      preLoaderRoute: typeof ClinicasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/clientes': {
-      id: '/clientes'
-      path: '/clientes'
-      fullPath: '/clientes'
-      preLoaderRoute: typeof ClientesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chat': {
-      id: '/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof ChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/campanhas': {
-      id: '/campanhas'
-      path: '/campanhas'
-      fullPath: '/campanhas'
-      preLoaderRoute: typeof CampanhasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/base-conhecimento': {
-      id: '/base-conhecimento'
-      path: '/base-conhecimento'
-      fullPath: '/base-conhecimento'
-      preLoaderRoute: typeof BaseConhecimentoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/automacao': {
-      id: '/automacao'
-      path: '/automacao'
-      fullPath: '/automacao'
-      preLoaderRoute: typeof AutomacaoRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1010,172 +793,235 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/automacao': {
+      id: '/automacao'
+      path: '/automacao'
+      fullPath: '/automacao'
+      preLoaderRoute: typeof AutomacaoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/escolar/': {
-      id: '/escolar/'
-      path: '/'
-      fullPath: '/escolar/'
-      preLoaderRoute: typeof EscolarIndexRouteImport
-      parentRoute: typeof EscolarRoute
+    '/base-conhecimento': {
+      id: '/base-conhecimento'
+      path: '/base-conhecimento'
+      fullPath: '/base-conhecimento'
+      preLoaderRoute: typeof BaseConhecimentoRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/consultor/': {
-      id: '/consultor/'
-      path: '/'
-      fullPath: '/consultor/'
-      preLoaderRoute: typeof ConsultorIndexRouteImport
-      parentRoute: typeof ConsultorRoute
+    '/campanhas': {
+      id: '/campanhas'
+      path: '/campanhas'
+      fullPath: '/campanhas'
+      preLoaderRoute: typeof CampanhasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clientes': {
+      id: '/clientes'
+      path: '/clientes'
+      fullPath: '/clientes'
+      preLoaderRoute: typeof ClientesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clinicas': {
+      id: '/clinicas'
+      path: '/clinicas'
+      fullPath: '/clinicas'
+      preLoaderRoute: typeof ClinicasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/configuracoes': {
+      id: '/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof ConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consultor': {
+      id: '/consultor'
+      path: '/consultor'
+      fullPath: '/consultor'
+      preLoaderRoute: typeof ConsultorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contatos': {
+      id: '/contatos'
+      path: '/contatos'
+      fullPath: '/contatos'
+      preLoaderRoute: typeof ContatosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboards': {
+      id: '/dashboards'
+      path: '/dashboards'
+      fullPath: '/dashboards'
+      preLoaderRoute: typeof DashboardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email-marketing': {
+      id: '/email-marketing'
+      path: '/email-marketing'
+      fullPath: '/email-marketing'
+      preLoaderRoute: typeof EmailMarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/equipe': {
+      id: '/equipe'
+      path: '/equipe'
+      fullPath: '/equipe'
+      preLoaderRoute: typeof EquipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/escolar': {
+      id: '/escolar'
+      path: '/escolar'
+      fullPath: '/escolar'
+      preLoaderRoute: typeof EscolarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/financeiro': {
+      id: '/financeiro'
+      path: '/financeiro'
+      fullPath: '/financeiro'
+      preLoaderRoute: typeof FinanceiroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/follow-up': {
+      id: '/follow-up'
+      path: '/follow-up'
+      fullPath: '/follow-up'
+      preLoaderRoute: typeof FollowUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insights': {
+      id: '/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interacoes': {
+      id: '/interacoes'
+      path: '/interacoes'
+      fullPath: '/interacoes'
+      preLoaderRoute: typeof InteracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/landing-pages': {
+      id: '/landing-pages'
+      path: '/landing-pages'
+      fullPath: '/landing-pages'
+      preLoaderRoute: typeof LandingPagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leads': {
+      id: '/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof LeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metas': {
+      id: '/metas'
+      path: '/metas'
+      fullPath: '/metas'
+      preLoaderRoute: typeof MetasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oportunidades': {
+      id: '/oportunidades'
+      path: '/oportunidades'
+      fullPath: '/oportunidades'
+      preLoaderRoute: typeof OportunidadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pipeline': {
+      id: '/pipeline'
+      path: '/pipeline'
+      fullPath: '/pipeline'
+      preLoaderRoute: typeof PipelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal-aluno': {
+      id: '/portal-aluno'
+      path: '/portal-aluno'
+      fullPath: '/portal-aluno'
+      preLoaderRoute: typeof PortalAlunoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projetos': {
+      id: '/projetos'
+      path: '/projetos'
+      fullPath: '/projetos'
+      preLoaderRoute: typeof ProjetosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/propostas': {
+      id: '/propostas'
+      path: '/propostas'
+      fullPath: '/propostas'
+      preLoaderRoute: typeof PropostasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prospeccao': {
+      id: '/prospeccao'
+      path: '/prospeccao'
+      fullPath: '/prospeccao'
+      preLoaderRoute: typeof ProspeccaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/relatorios': {
+      id: '/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof RelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/super-admin': {
+      id: '/super-admin'
+      path: '/super-admin'
+      fullPath: '/super-admin'
+      preLoaderRoute: typeof SuperAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tarefas': {
+      id: '/tarefas'
+      path: '/tarefas'
+      fullPath: '/tarefas'
+      preLoaderRoute: typeof TarefasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tickets': {
+      id: '/tickets'
+      path: '/tickets'
+      fullPath: '/tickets'
+      preLoaderRoute: typeof TicketsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/clinicas/': {
       id: '/clinicas/'
       path: '/'
       fullPath: '/clinicas/'
       preLoaderRoute: typeof ClinicasIndexRouteImport
-      parentRoute: typeof ClinicasRoute
-    }
-    '/t/$tenantSlug': {
-      id: '/t/$tenantSlug'
-      path: '/t/$tenantSlug'
-      fullPath: '/t/$tenantSlug'
-      preLoaderRoute: typeof TTenantSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/escolar/turmas': {
-      id: '/escolar/turmas'
-      path: '/turmas'
-      fullPath: '/escolar/turmas'
-      preLoaderRoute: typeof EscolarTurmasRouteImport
-      parentRoute: typeof EscolarRoute
-    }
-    '/escolar/professores': {
-      id: '/escolar/professores'
-      path: '/professores'
-      fullPath: '/escolar/professores'
-      preLoaderRoute: typeof EscolarProfessoresRouteImport
-      parentRoute: typeof EscolarRoute
-    }
-    '/escolar/mapa': {
-      id: '/escolar/mapa'
-      path: '/mapa'
-      fullPath: '/escolar/mapa'
-      preLoaderRoute: typeof EscolarMapaRouteImport
-      parentRoute: typeof EscolarRoute
-    }
-    '/escolar/frequencia': {
-      id: '/escolar/frequencia'
-      path: '/frequencia'
-      fullPath: '/escolar/frequencia'
-      preLoaderRoute: typeof EscolarFrequenciaRouteImport
-      parentRoute: typeof EscolarRoute
-    }
-    '/escolar/diario': {
-      id: '/escolar/diario'
-      path: '/diario'
-      fullPath: '/escolar/diario'
-      preLoaderRoute: typeof EscolarDiarioRouteImport
-      parentRoute: typeof EscolarRoute
-    }
-    '/escolar/cursos': {
-      id: '/escolar/cursos'
-      path: '/cursos'
-      fullPath: '/escolar/cursos'
-      preLoaderRoute: typeof EscolarCursosRouteImport
-      parentRoute: typeof EscolarRoute
-    }
-    '/escolar/configuracoes': {
-      id: '/escolar/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/escolar/configuracoes'
-      preLoaderRoute: typeof EscolarConfiguracoesRouteImport
-      parentRoute: typeof EscolarRoute
-    }
-    '/escolar/comunicacao': {
-      id: '/escolar/comunicacao'
-      path: '/comunicacao'
-      fullPath: '/escolar/comunicacao'
-      preLoaderRoute: typeof EscolarComunicacaoRouteImport
-      parentRoute: typeof EscolarRoute
-    }
-    '/escolar/avaliacoes': {
-      id: '/escolar/avaliacoes'
-      path: '/avaliacoes'
-      fullPath: '/escolar/avaliacoes'
-      preLoaderRoute: typeof EscolarAvaliacoesRouteImport
-      parentRoute: typeof EscolarRoute
-    }
-    '/escolar/alunos': {
-      id: '/escolar/alunos'
-      path: '/alunos'
-      fullPath: '/escolar/alunos'
-      preLoaderRoute: typeof EscolarAlunosRouteImport
-      parentRoute: typeof EscolarRoute
-    }
-    '/consultor/simulador': {
-      id: '/consultor/simulador'
-      path: '/simulador'
-      fullPath: '/consultor/simulador'
-      preLoaderRoute: typeof ConsultorSimuladorRouteImport
-      parentRoute: typeof ConsultorRoute
-    }
-    '/consultor/historico': {
-      id: '/consultor/historico'
-      path: '/historico'
-      fullPath: '/consultor/historico'
-      preLoaderRoute: typeof ConsultorHistoricoRouteImport
-      parentRoute: typeof ConsultorRoute
-    }
-    '/consultor/credito': {
-      id: '/consultor/credito'
-      path: '/credito'
-      fullPath: '/consultor/credito'
-      preLoaderRoute: typeof ConsultorCreditoRouteImport
-      parentRoute: typeof ConsultorRoute
-    }
-    '/consultor/cotas': {
-      id: '/consultor/cotas'
-      path: '/cotas'
-      fullPath: '/consultor/cotas'
-      preLoaderRoute: typeof ConsultorCotasRouteImport
-      parentRoute: typeof ConsultorRoute
-    }
-    '/consultor/contemplacoes': {
-      id: '/consultor/contemplacoes'
-      path: '/contemplacoes'
-      fullPath: '/consultor/contemplacoes'
-      preLoaderRoute: typeof ConsultorContemplacoesRouteImport
-      parentRoute: typeof ConsultorRoute
-    }
-    '/consultor/comissoes': {
-      id: '/consultor/comissoes'
-      path: '/comissoes'
-      fullPath: '/consultor/comissoes'
-      preLoaderRoute: typeof ConsultorComissoesRouteImport
-      parentRoute: typeof ConsultorRoute
-    }
-    '/clinicas/prontuarios': {
-      id: '/clinicas/prontuarios'
-      path: '/prontuarios'
-      fullPath: '/clinicas/prontuarios'
-      preLoaderRoute: typeof ClinicasProntuariosRouteImport
-      parentRoute: typeof ClinicasRoute
-    }
-    '/clinicas/pacientes': {
-      id: '/clinicas/pacientes'
-      path: '/pacientes'
-      fullPath: '/clinicas/pacientes'
-      preLoaderRoute: typeof ClinicasPacientesRouteImport
-      parentRoute: typeof ClinicasRoute
-    }
-    '/clinicas/configuracoes': {
-      id: '/clinicas/configuracoes'
-      path: '/configuracoes'
-      fullPath: '/clinicas/configuracoes'
-      preLoaderRoute: typeof ClinicasConfiguracoesRouteImport
       parentRoute: typeof ClinicasRoute
     }
     '/clinicas/agenda': {
@@ -1185,12 +1031,159 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClinicasAgendaRouteImport
       parentRoute: typeof ClinicasRoute
     }
-    '/t/$tenantSlug/': {
-      id: '/t/$tenantSlug/'
+    '/clinicas/configuracoes': {
+      id: '/clinicas/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/clinicas/configuracoes'
+      preLoaderRoute: typeof ClinicasConfiguracoesRouteImport
+      parentRoute: typeof ClinicasRoute
+    }
+    '/clinicas/pacientes': {
+      id: '/clinicas/pacientes'
+      path: '/pacientes'
+      fullPath: '/clinicas/pacientes'
+      preLoaderRoute: typeof ClinicasPacientesRouteImport
+      parentRoute: typeof ClinicasRoute
+    }
+    '/clinicas/prontuarios': {
+      id: '/clinicas/prontuarios'
+      path: '/prontuarios'
+      fullPath: '/clinicas/prontuarios'
+      preLoaderRoute: typeof ClinicasProntuariosRouteImport
+      parentRoute: typeof ClinicasRoute
+    }
+    '/consultor/': {
+      id: '/consultor/'
       path: '/'
-      fullPath: '/t/$tenantSlug/'
-      preLoaderRoute: typeof TTenantSlugIndexRouteImport
-      parentRoute: typeof TTenantSlugRoute
+      fullPath: '/consultor/'
+      preLoaderRoute: typeof ConsultorIndexRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/comissoes': {
+      id: '/consultor/comissoes'
+      path: '/comissoes'
+      fullPath: '/consultor/comissoes'
+      preLoaderRoute: typeof ConsultorComissoesRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/contemplacoes': {
+      id: '/consultor/contemplacoes'
+      path: '/contemplacoes'
+      fullPath: '/consultor/contemplacoes'
+      preLoaderRoute: typeof ConsultorContemplacoesRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/cotas': {
+      id: '/consultor/cotas'
+      path: '/cotas'
+      fullPath: '/consultor/cotas'
+      preLoaderRoute: typeof ConsultorCotasRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/credito': {
+      id: '/consultor/credito'
+      path: '/credito'
+      fullPath: '/consultor/credito'
+      preLoaderRoute: typeof ConsultorCreditoRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/historico': {
+      id: '/consultor/historico'
+      path: '/historico'
+      fullPath: '/consultor/historico'
+      preLoaderRoute: typeof ConsultorHistoricoRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/consultor/simulador': {
+      id: '/consultor/simulador'
+      path: '/simulador'
+      fullPath: '/consultor/simulador'
+      preLoaderRoute: typeof ConsultorSimuladorRouteImport
+      parentRoute: typeof ConsultorRoute
+    }
+    '/escolar/': {
+      id: '/escolar/'
+      path: '/'
+      fullPath: '/escolar/'
+      preLoaderRoute: typeof EscolarIndexRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/escolar/alunos': {
+      id: '/escolar/alunos'
+      path: '/alunos'
+      fullPath: '/escolar/alunos'
+      preLoaderRoute: typeof EscolarAlunosRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/escolar/avaliacoes': {
+      id: '/escolar/avaliacoes'
+      path: '/avaliacoes'
+      fullPath: '/escolar/avaliacoes'
+      preLoaderRoute: typeof EscolarAvaliacoesRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/escolar/comunicacao': {
+      id: '/escolar/comunicacao'
+      path: '/comunicacao'
+      fullPath: '/escolar/comunicacao'
+      preLoaderRoute: typeof EscolarComunicacaoRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/escolar/configuracoes': {
+      id: '/escolar/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/escolar/configuracoes'
+      preLoaderRoute: typeof EscolarConfiguracoesRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/escolar/cursos': {
+      id: '/escolar/cursos'
+      path: '/cursos'
+      fullPath: '/escolar/cursos'
+      preLoaderRoute: typeof EscolarCursosRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/escolar/diario': {
+      id: '/escolar/diario'
+      path: '/diario'
+      fullPath: '/escolar/diario'
+      preLoaderRoute: typeof EscolarDiarioRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/escolar/frequencia': {
+      id: '/escolar/frequencia'
+      path: '/frequencia'
+      fullPath: '/escolar/frequencia'
+      preLoaderRoute: typeof EscolarFrequenciaRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/escolar/mapa': {
+      id: '/escolar/mapa'
+      path: '/mapa'
+      fullPath: '/escolar/mapa'
+      preLoaderRoute: typeof EscolarMapaRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/escolar/professores': {
+      id: '/escolar/professores'
+      path: '/professores'
+      fullPath: '/escolar/professores'
+      preLoaderRoute: typeof EscolarProfessoresRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/escolar/turmas': {
+      id: '/escolar/turmas'
+      path: '/turmas'
+      fullPath: '/escolar/turmas'
+      preLoaderRoute: typeof EscolarTurmasRouteImport
+      parentRoute: typeof EscolarRoute
+    }
+    '/t/$tenantSlug': {
+      id: '/t/$tenantSlug'
+      path: '/t/$tenantSlug'
+      fullPath: '/t/$tenantSlug'
+      preLoaderRoute: typeof TTenantSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/escolar/turma/$classId': {
       id: '/escolar/turma/$classId'
@@ -1198,6 +1191,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/escolar/turma/$classId'
       preLoaderRoute: typeof EscolarTurmaClassIdRouteImport
       parentRoute: typeof EscolarRoute
+    }
+    '/t/$tenantSlug/': {
+      id: '/t/$tenantSlug/'
+      path: '/'
+      fullPath: '/t/$tenantSlug/'
+      preLoaderRoute: typeof TTenantSlugIndexRouteImport
+      parentRoute: typeof TTenantSlugRoute
     }
   }
 }

@@ -9,7 +9,7 @@ import {
   useExpenses, useCreateExpense, useUpdateExpense, useDeleteExpense,
   useFinSubscriptions, useCreateFinSub, useUpdateFinSub, useDeleteFinSub,
   useCommissions, useCreateCommission, useUpdateCommission, useDeleteCommission,
-  brl, startOfMonth, endOfMonth,
+  brl as brlRaw, startOfMonth, endOfMonth,
   computeEntryReceived, computeEntryBalance, effectiveEntryStatus,
   type EntryRow, type ExpenseRow, type SubRow, type CommissionRow,
   type FinStatus, type EntryCategory, type ExpenseCategory, type PaymentMethod,
@@ -24,6 +24,12 @@ import {
   Plus, Trash2, X, Loader2, Sparkles, ArrowUpRight, ArrowDownRight, Clock,
   CheckCircle2, XCircle, CalendarClock, DollarSign, Activity, Receipt, Layers,
 } from "@/components/ui/icons";
+import { usePrivacyMode } from "@/hooks/use-privacy";
+import { PrivacyToggle } from "@/components/privacy-toggle";
+
+// Modo privacidade: quando ativo, os valores monetários ficam ocultos
+let privacyHidden = false;
+const brl = (n: number) => (privacyHidden ? "•••••" : brlRaw(n));
 
 export const Route = createFileRoute("/financeiro")({
   head: () => pageHead("Financeiro"),
@@ -51,10 +57,13 @@ function FinanceiroPage() {
   const search = Route.useSearch();
   const [tab, setTab] = useState<Tab>(search.tab ?? "dashboard");
   useEffect(() => { if (search.tab && search.tab !== tab) setTab(search.tab); }, [search.tab]);
+  const { hidden, toggle: togglePrivacy } = usePrivacyMode();
+  privacyHidden = hidden;
 
   return (
     <AppShell title="Financeiro" subtitle="Receitas, despesas e cobranças">
-      <div role="tablist" aria-label="Visões financeiras" className="mb-6 flex gap-1 overflow-x-auto border-b border-border pb-2">
+      <div className="mb-6 flex items-center gap-3">
+      <div role="tablist" aria-label="Visões financeiras" className="flex flex-1 gap-1 overflow-x-auto border-b border-border pb-2">
         {TABS.map(({ id, label, icon: Icon }) => {
           const active = tab === id;
           return (
@@ -72,6 +81,8 @@ function FinanceiroPage() {
             </Button>
           );
         })}
+      </div>
+      <PrivacyToggle hidden={hidden} onToggle={togglePrivacy} />
       </div>
 
       {tab === "dashboard" && <DashboardTab />}
