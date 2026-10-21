@@ -23,16 +23,14 @@ export function usePrivacyMode() {
   }, []);
 
   const toggle = useCallback(() => {
-    setHidden((prev) => {
-      const next = !prev;
-      try {
-        window.localStorage.setItem(KEY, next ? "on" : "off");
-        window.dispatchEvent(new Event(EVENT));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
+    const next = !readPrivacyHidden();
+    try {
+      window.localStorage.setItem(KEY, next ? "on" : "off");
+    } catch {
+      /* ignore */
+    }
+    window.dispatchEvent(new Event(EVENT));
+    setHidden(next);
   }, []);
 
   return { hidden, toggle };
