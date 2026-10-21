@@ -565,3 +565,12 @@
   color: var(--primary);
   border: 1px solid oklch(from var(--primary) l c h / 0.35);
 }
+
+/* Modo privacidade: oculta números/valores com desfoque */
+.privacy-hidden {
+  filter: blur(10px);
+  user-select: none;
+  pointer-events: none;
+  transition: filter 0.2s ease;
+}
+
