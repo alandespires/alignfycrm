@@ -1,4 +1,4 @@
-import { createRouter, useRouter } from "@tanstack/react-router";
+import { createRouter, useRouter, type ErrorRouteComponent } from "@tanstack/react-router";
 import { QueryClient } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
 
@@ -82,7 +82,7 @@ export const getRouter = () => {
     defaultPreloadStaleTime: 0,
     defaultPendingMs: 80,
     defaultPendingMinMs: 120,
-    defaultErrorComponent: DefaultErrorComponent,
+    defaultErrorComponent: DefaultErrorComponent as unknown as ErrorRouteComponent,
   });
 
   return router;
