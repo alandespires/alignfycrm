@@ -12,12 +12,14 @@ import { useDashboardWidgets, WIDGET_LABELS, type WidgetId } from "@/hooks/use-d
 import {
   AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid,
 } from "recharts";
-import { formatBRL } from "@/lib/mock-data";
+import { formatBRL as formatBRLRaw } from "@/lib/mock-data";
 import { useLeads, type LeadStatus } from "@/hooks/use-leads";
 import { useActivities, useDeals, useRevenueSeries } from "@/hooks/use-dashboard";
 import { useEntries, computeEntryReceived, startOfMonth, endOfMonth } from "@/hooks/use-finance";
 import { useAllPayments } from "@/hooks/use-payments";
 import { useInsights } from "@/hooks/use-insights";
+import { usePrivacyMode } from "@/hooks/use-privacy";
+import { PrivacyToggle } from "@/components/privacy-toggle";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ListSkeleton } from "@/components/skeletons";
@@ -116,6 +118,8 @@ export function DashboardPage() {
   const [periodoOpen, setPeriodoOpen] = useState(false);
   const [widgetsOpen, setWidgetsOpen] = useState(false);
   const { visible, toggle, reset } = useDashboardWidgets();
+  const { hidden, toggle: togglePrivacy } = usePrivacyMode();
+  const formatBRL = (n: number) => (hidden ? "•••••" : formatBRLRaw(n));
 
   const leads = useLeads();
   const deals = useDeals();
@@ -182,6 +186,7 @@ export function DashboardPage() {
       subtitle="Aqui está o panorama da sua operação comercial hoje."
       action={
         <div className="flex flex-wrap gap-2">
+          <PrivacyToggle hidden={hidden} onToggle={togglePrivacy} />
           <div className="relative">
             <Button variant="unstyled" size="unstyled"
               onClick={() => setWidgetsOpen((v) => !v)}
@@ -253,7 +258,7 @@ export function DashboardPage() {
         </div>
       }
     >
-      {visible.kpis && <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground"><span>{leadsPeriodo.length} leads · {PERIODO_LABEL[periodo]}</span><span>Recebido no mês <strong className="ml-1 text-success">{formatBRL(wonMonth)}</strong></span></div>}
+      {visible.kpis && <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground"><span className={hidden ? "privacy-hidden" : undefined}>{leadsPeriodo.length} leads · {PERIODO_LABEL[periodo]}</span><span className={hidden ? "privacy-hidden" : undefined}>Recebido no mês <strong className="ml-1 text-success">{formatBRL(wonMonth)}</strong></span></div>}
 
       {/* Main grid */}
       {(visible.receita || visible.insights) && (
@@ -271,7 +276,7 @@ export function DashboardPage() {
               <span className="inline-flex items-center gap-1.5 text-muted-foreground"><span className="h-2 w-2 rounded-full bg-success" />Fechado</span>
             </div>
           </div>
-          <div className="h-72 px-2 py-4">
+          <div className={"h-72 px-2 py-4" + (hidden ? " privacy-hidden" : "")}>
             {revenue.isLoading ? (
               <Skeleton className="h-full w-full rounded-lg" />
             ) : revenueHasData ? (
@@ -394,7 +399,7 @@ export function DashboardPage() {
                       opacity: 0.85,
                     }}
                   />
-                  <span className="absolute inset-y-0 left-3 flex items-center text-xs font-semibold">
+                  <span className={"absolute inset-y-0 left-3 flex items-center text-xs font-semibold" + (hidden ? " privacy-hidden" : "")}>
                     {s.count} {s.count === 1 ? "lead" : "leads"}
                   </span>
                 </div>
