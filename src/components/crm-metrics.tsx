@@ -3,13 +3,16 @@ import { Users, Building2, Target, Kanban } from "@/components/ui/icons";
 import { useLeads } from "@/hooks/use-leads";
 import { useClients } from "@/hooks/use-clients";
 import { useDeals } from "@/hooks/use-deals";
+import { usePrivacyMode } from "@/hooks/use-privacy";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatBRL } from "@/lib/mock-data";
+import { formatBRL as formatBRLRaw } from "@/lib/mock-data";
 
 export function CrmMetrics() {
   const leads = useLeads();
   const clients = useClients();
   const deals = useDeals();
+  const { hidden } = usePrivacyMode();
+  const formatBRL = (n: number) => (hidden ? "•••••" : formatBRLRaw(n));
   const pipeline = (leads.data ?? []).filter(l => l.status !== "fechado" && l.status !== "perdido").reduce((sum, l) => sum + Number(l.valor_estimado ?? 0), 0);
   const metrics = [
     { label: "Leads", to: "/leads", icon: Users, value: String(leads.data?.length ?? 0), pending: leads.isPending },
