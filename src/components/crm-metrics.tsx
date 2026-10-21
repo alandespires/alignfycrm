@@ -27,7 +27,7 @@ export function CrmMetrics() {
           <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden />
           <div className="min-w-0">
             <div className="truncate text-[11px] text-muted-foreground">{label}</div>
-            {pending ? <Skeleton className="mt-1 h-5 w-16" /> : <div className="break-words text-sm font-semibold tabular-nums">{value}</div>}
+            {pending ? <Skeleton className="mt-1 h-5 w-16" /> : <div className={"break-words text-sm font-semibold tabular-nums" + (hidden ? " privacy-hidden" : "")}>{value}</div>}
           </div>
         </Link>
       ))}
