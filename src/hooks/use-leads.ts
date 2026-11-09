@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { requireTenantId, getActiveTenantId } from "@/contexts/tenant-context";
 import { toast } from "sonner";
 import type { LeadImportValue } from "@/lib/leads/csv-import";
+import { runStageAutomation, STAGE_NEXT_TASK } from "@/lib/stage-automation";
 
 export type LeadStatus =
   | "novo"
@@ -123,6 +124,13 @@ export function useUpdateLeadStatus() {
     onError: (e: any, _v, ctx) => {
       if (ctx?.prev) qc.setQueryData(["leads"], ctx.prev);
       toast.error(e.message ?? "Erro ao mover lead");
+    },
+    onSuccess: async (_d, { id, status, motivo_perda }) => {
+      await runStageAutomation(id, status, motivo_perda);
+      qc.invalidateQueries({ queryKey: ["activities"] });
+      qc.invalidateQueries({ queryKey: ["tasks"] });
+      const next = STAGE_NEXT_TASK[status];
+      if (next) toast.success(`Próximo passo agendado: ${next.titulo}`);
     },
     onSettled: () => qc.invalidateQueries({ queryKey: ["leads"] }),
   });
