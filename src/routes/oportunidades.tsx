@@ -8,6 +8,7 @@ import { AppShell } from "@/components/app-shell";
 import { FunnelViewSwitch } from "@/components/funnel-view-switch";
 import { LeadFormDialog } from "@/components/lead-form-dialog";
 import { LeadDetailDrawer } from "@/components/lead-detail-drawer";
+import { LostReasonPanel } from "@/components/lost-reason-panel";
 import { useMyCommercialRole } from "@/hooks/use-commercial-role";
 import { useRealtimeSync } from "@/hooks/use-realtime";
 import { formatBRL } from "@/lib/mock-data";
@@ -39,6 +40,13 @@ function OportunidadesPage() {
   const [stageFilter, setStageFilter] = useState<LeadStatus | "todos">("todos");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = leads.find((l) => l.id === selectedId) ?? null;
+  const [converting, setConverting] = useState(false);
+  const [lostId, setLostId] = useState<string | null>(null);
+  const changeStage = (id: string, status: LeadStatus) => {
+    if (status === "fechado") { setConverting(true); setSelectedId(id); return; }
+    if (status === "perdido") { setLostId(id); return; }
+    updateStatus.mutate({ id, status });
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -115,7 +123,7 @@ function OportunidadesPage() {
                       <select
                         value={l.status}
                         disabled={!canEdit}
-                        onChange={(e) => updateStatus.mutate({ id: l.id, status: e.target.value as LeadStatus } as any)}
+                        onChange={(e) => changeStage(l.id, e.target.value as LeadStatus)}
                         className="h-8 rounded-lg border border-border bg-background px-2 text-xs"
                       >
                         {Object.entries(STAGE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -141,7 +149,10 @@ function OportunidadesPage() {
         )}
       </div>
 
-      <LeadDetailDrawer lead={selected} onClose={() => setSelectedId(null)} />
+      <LeadDetailDrawer lead={selected} startConverting={converting} onClose={() => { setSelectedId(null); setConverting(false); }} />
+      <LostReasonPanel open={!!lostId} leadName={leads.find((l) => l.id === lostId)?.nome}
+        onClose={() => setLostId(null)}
+        onConfirm={(motivo) => { if (lostId) updateStatus.mutate({ id: lostId, status: "perdido", motivo_perda: motivo }); setLostId(null); }} />
     </AppShell>
   );
 }
