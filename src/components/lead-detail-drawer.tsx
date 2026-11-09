@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ForecastField } from "@/components/lead-forecast-field";
+import { EntityProposals } from "@/components/entity-proposals";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { Sparkles, Loader2, Mail, Phone, MessageSquare, Calendar, Plus, Building2, RefreshCw, Trash2, UserCheck, X, FileText, Kanban } from "@/components/ui/icons";
@@ -203,6 +204,8 @@ export function LeadDetailDrawer({ lead, onClose, startConverting = false }: { l
               </div>
             )}
           </AlignPanelSection>
+
+          <EntityProposals leadId={lead.id} />
 
           <AlignPanelSection title={`Tarefas · ${tasks.length}`}>
             <form onSubmit={submitTask} className="mb-3 flex gap-2">
