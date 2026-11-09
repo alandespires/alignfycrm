@@ -6,6 +6,7 @@ import { formatBRL } from "@/lib/mock-data";
 import { AlignPanel, AlignPanelSection } from "@/components/align-panel";
 import { WhatsAppContactLink } from "@/components/whatsapp-contact-link";
 import { ClientQuickActions } from "@/components/client-quick-actions";
+import { EntityProposals } from "@/components/entity-proposals";
 
 const TIPO_ICON: Record<string, any> = {
   ligacao: Phone, email: Mail, whatsapp: MessageSquare, reuniao: Calendar,
@@ -103,6 +104,8 @@ export function ClientDetailDrawer({ client, onClose }: { client: ClientRow | nu
         <AlignPanelSection title="Operacional">
           <ClientQuickActions client={client} />
         </AlignPanelSection>
+
+        <EntityProposals leadId={client.lead_id} clientId={client.id} />
 
         <AlignPanelSection title="Histórico de conversão" icon={ArrowRightLeft}>
           {leadQ.isLoading ? (
